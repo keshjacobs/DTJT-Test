@@ -1,20 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using System.Web.Http;
 using StickManWebAPI.Models;
-using System.Net.Security;
-using System.Net.Sockets;
-using System.Security.Cryptography.X509Certificates;
-using System.Web;
-using System.Security.Authentication;
 using PushSharp.Apple;
 using PushSharp;
 using PushSharp.Core;
-using Newtonsoft.Json.Linq;
 
 namespace StickManWebAPI.Controllers
 {
@@ -54,9 +49,9 @@ namespace StickManWebAPI.Controllers
 		[HttpPost]
 		public UserWrapper signUp(string username, string fullName, string password, string mobileNo, string emailID, string dob, string sex, string imagePath, string deviceId)
 		{
-			UserWrapper userWrapper = new UserWrapper();
-			Reply reply = new Reply();
-			User user = new User();
+			var userWrapper = new UserWrapper();
+			var reply = new Reply();
+			var user = new User();
 
 			try
 			{
@@ -67,27 +62,31 @@ namespace StickManWebAPI.Controllers
 					{
 						if (!string.IsNullOrWhiteSpace(password))
 						{
-							SqlConnection con = new SqlConnection();
-							con.ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString;
+							var con = new SqlConnection
+							{
+								ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+							};
 
-							SqlCommand cmd = new SqlCommand();
-							cmd.CommandType = System.Data.CommandType.StoredProcedure;
-							cmd.Connection = con;
+							var cmd = new SqlCommand
+							{
+								CommandType = CommandType.StoredProcedure,
+								Connection = con,
 
-							cmd.CommandText = "StickMan_usp_CreateUpdate_User";
-							cmd.Parameters.Add("@UserID", System.Data.SqlDbType.Int).Value = 0;
-							cmd.Parameters.Add("@UserName", System.Data.SqlDbType.VarChar, 500).Value = username;
-							cmd.Parameters.Add("@FullName", System.Data.SqlDbType.VarChar, 500).Value = fullName;
-							cmd.Parameters.Add("@Password", System.Data.SqlDbType.VarChar, 500).Value = password;
-							cmd.Parameters.Add("@MobileNo", System.Data.SqlDbType.VarChar, 500).Value = mobileNo;
-							cmd.Parameters.Add("@EmailID", System.Data.SqlDbType.VarChar, 500).Value = emailID;
-							cmd.Parameters.Add("@DOB", System.Data.SqlDbType.VarChar,100).Value = dob;
-							cmd.Parameters.Add("@Sex", System.Data.SqlDbType.VarChar, 500).Value = sex;
-							cmd.Parameters.Add("@ImagePath", System.Data.SqlDbType.VarChar, 1024).Value = imagePath;
-							cmd.Parameters.Add("@DeviceId", System.Data.SqlDbType.VarChar, 1024).Value = deviceId;
+								CommandText = "StickMan_usp_CreateUpdate_User"
+							};
+							cmd.Parameters.Add("@UserID", SqlDbType.Int).Value = 0;
+							cmd.Parameters.Add("@UserName", SqlDbType.VarChar, 500).Value = username;
+							cmd.Parameters.Add("@FullName", SqlDbType.VarChar, 500).Value = fullName;
+							cmd.Parameters.Add("@Password", SqlDbType.VarChar, 500).Value = password;
+							cmd.Parameters.Add("@MobileNo", SqlDbType.VarChar, 500).Value = mobileNo;
+							cmd.Parameters.Add("@EmailID", SqlDbType.VarChar, 500).Value = emailID;
+							cmd.Parameters.Add("@DOB", SqlDbType.VarChar, 100).Value = dob;
+							cmd.Parameters.Add("@Sex", SqlDbType.VarChar, 500).Value = sex;
+							cmd.Parameters.Add("@ImagePath", SqlDbType.VarChar, 1024).Value = imagePath;
+							cmd.Parameters.Add("@DeviceId", SqlDbType.VarChar, 1024).Value = deviceId;
 
-							SqlDataAdapter adp = new SqlDataAdapter(cmd);
-							DataSet ds = new DataSet();
+							var adp = new SqlDataAdapter(cmd);
+							var ds = new DataSet();
 							adp.Fill(ds);
 
 							user.userID = Convert.ToInt32(ds.Tables[0].Rows[0]["UserID"]);
@@ -111,7 +110,7 @@ namespace StickManWebAPI.Controllers
 
 							if (reply.replyCode == 200)
 							{
-								string mainDIR = @"~\Content\Audio\" + user.userID;
+								var mainDIR = @"~\Content\Audio\" + user.userID;
 
 								if (!Directory.Exists(mainDIR))
 								{
@@ -152,23 +151,27 @@ namespace StickManWebAPI.Controllers
 		[HttpPost]
 		public UserWrapper Login(string username, string password, string deviceId)
 		{
-			UserWrapper userWrapper = new UserWrapper();
-			Reply reply = new Reply();
-			User user = new User();
+			var userWrapper = new UserWrapper();
+			var reply = new Reply();
+			var user = new User();
 			try
 			{
-				SqlConnection con = new SqlConnection();
-				con.ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString;
+				var con = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
 
-				SqlCommand cmd = new SqlCommand();
-				cmd.CommandType = System.Data.CommandType.StoredProcedure;
-				cmd.Connection = con;
-				cmd.CommandText = "StickMan_usp_Login_User";
-				cmd.Parameters.Add("@UserName", System.Data.SqlDbType.VarChar, 32).Value = username;
-				cmd.Parameters.Add("@Password", System.Data.SqlDbType.VarChar, 1024).Value = password;
-				cmd.Parameters.Add("@DeviceId", System.Data.SqlDbType.VarChar, 1024).Value = deviceId;
-				SqlDataAdapter adp = new SqlDataAdapter(cmd);
-				DataSet ds = new DataSet();
+				var cmd = new SqlCommand
+				{
+					CommandType = CommandType.StoredProcedure,
+					Connection = con,
+					CommandText = "StickMan_usp_Login_User"
+				};
+				cmd.Parameters.Add("@UserName", SqlDbType.VarChar, 32).Value = username;
+				cmd.Parameters.Add("@Password", SqlDbType.VarChar, 1024).Value = password;
+				cmd.Parameters.Add("@DeviceId", SqlDbType.VarChar, 1024).Value = deviceId;
+				var adp = new SqlDataAdapter(cmd);
+				var ds = new DataSet();
 				adp.Fill(ds);
 
 				user.userID = Convert.ToInt32(ds.Tables[0].Rows[0]["UserId"]);
@@ -205,30 +208,34 @@ namespace StickManWebAPI.Controllers
 		[HttpPost]
 		public AudioWrapper SaveAudioPath(AudioContent audioContent)
 		{
-			AudioWrapper audioWrapper = new AudioWrapper();
+			var audioWrapper = new AudioWrapper();
 			//List<AudioWrapper> audioWrapperList = new List<AudioWrapper>();
-			Reply reply = new Reply();
-			PushInfo pushInfo = new PushInfo();
+			var reply = new Reply();
+			var pushInfo = new PushInfo();
 
 
 			try
 			{
-				SqlConnection con = new SqlConnection();
-				con.ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString;
-				SqlCommand cmd = new SqlCommand();
-				cmd.CommandType = System.Data.CommandType.StoredProcedure;
-				cmd.Connection = con;
-				cmd.CommandText = "StickMan_usp_SaveAudioPath";
-				foreach (string currentrecieverId in audioContent.recieverId)
+				var con = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
+				var cmd = new SqlCommand
+				{
+					CommandType = CommandType.StoredProcedure,
+					Connection = con,
+					CommandText = "StickMan_usp_SaveAudioPath"
+				};
+				foreach (var currentrecieverId in audioContent.recieverId)
 				{
 
-					cmd.Parameters.Add("@UserID", System.Data.SqlDbType.Int, 32).Value = audioContent.userId;
-					cmd.Parameters.Add("@RecieverID", System.Data.SqlDbType.Int, 32).Value = currentrecieverId;
-					cmd.Parameters.Add("@FilePath", System.Data.SqlDbType.VarChar, 2048).Value = audioContent.filePath;
-					cmd.Parameters.Add("@Filter", System.Data.SqlDbType.VarChar, 2048).Value = audioContent.filter;
-					cmd.Parameters.Add("@SessionToken", System.Data.SqlDbType.VarChar, 512).Value = audioContent.sessionToken;
-					SqlDataAdapter adp = new SqlDataAdapter(cmd);
-					DataSet ds = new DataSet();
+					cmd.Parameters.Add("@UserID", SqlDbType.Int, 32).Value = audioContent.userId;
+					cmd.Parameters.Add("@RecieverID", SqlDbType.Int, 32).Value = currentrecieverId;
+					cmd.Parameters.Add("@FilePath", SqlDbType.VarChar, 2048).Value = audioContent.filePath;
+					cmd.Parameters.Add("@Filter", SqlDbType.VarChar, 2048).Value = audioContent.filter;
+					cmd.Parameters.Add("@SessionToken", SqlDbType.VarChar, 512).Value = audioContent.sessionToken;
+					var adp = new SqlDataAdapter(cmd);
+					var ds = new DataSet();
 					adp.Fill(ds);
 					cmd.Parameters.Clear();
 					reply.replyCode = Convert.ToInt32(ds.Tables[0].Rows[0]["ResponseCode"]);
@@ -237,7 +244,7 @@ namespace StickManWebAPI.Controllers
 					//push message to reciever
 					if (reply.replyCode == 200)
 					{
-						string deviceID = ds.Tables[0].Rows[0]["DeviceID"].ToString();
+						var deviceID = ds.Tables[0].Rows[0]["DeviceID"].ToString();
 
 						if (!string.IsNullOrEmpty(deviceID))
 						{
@@ -267,34 +274,49 @@ namespace StickManWebAPI.Controllers
 			return audioWrapper;
 		}
 
-
-        //[HttpGet]
-        //public SendFriendRequest SendFriendRequest(int UserId, int RecieverUserId, string SessionToken)
-       [HttpPost]
-        public SendFriendRequest SendFriendRequest(Friend friend)
-             
+		[HttpPost]
+		public SendFriendRequest SendFriendRequest(Friend friend)
 		{
-			SendFriendRequest response = new SendFriendRequest();
-			Reply reply = new Reply();
-			FriendRequest requestDetails = new FriendRequest();
-			User users = new User();
-			string deviceID = string.Empty;
-			User user = new User();
+			var response = new SendFriendRequest();
+			var reply = new Reply();
+			var requestDetails = new FriendRequest();
+			var deviceID = string.Empty;
+			var user = new User();
+
+			var friendRequest = GetAlreadySentFriendRequests(friend);
+			if (friendRequest != null)
+			{
+				response.FriendRequestDetail = new FriendRequest
+				{
+					FriendRequestId = friendRequest.FriendRequestID,
+					FriendRequestState = friendRequest.FriendRequestStatus
+				};
+				response.user = friendRequest;
+				response.reply = new Reply
+				{
+					replyCode = 400,
+					replyMessage = "Such request already sent"
+				};
+			}
 
 			try
 			{
-				SqlConnection con = new SqlConnection();
-				con.ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString;
+				var con = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
 
-				SqlCommand cmd = new SqlCommand();
-				cmd.CommandType = System.Data.CommandType.StoredProcedure;
-				cmd.Connection = con;
-				cmd.CommandText = "StickMan_usp_SendFriendRequest";
-                cmd.Parameters.Add("@SenderID", System.Data.SqlDbType.Int, 32).Value = friend.UserId;
-                cmd.Parameters.Add("@RecieverID", System.Data.SqlDbType.Int, 32).Value = friend.RecieverUserId;
-                cmd.Parameters.Add("@SessionToken", System.Data.SqlDbType.VarChar).Value = friend.SessionToken;
-				SqlDataAdapter adp = new SqlDataAdapter(cmd);
-				DataSet ds = new DataSet();
+				var cmd = new SqlCommand
+				{
+					CommandType = CommandType.StoredProcedure,
+					Connection = con,
+					CommandText = "StickMan_usp_SendFriendRequest"
+				};
+				cmd.Parameters.Add("@SenderID", SqlDbType.Int, 32).Value = friend.UserId;
+				cmd.Parameters.Add("@RecieverID", SqlDbType.Int, 32).Value = friend.RecieverUserId;
+				cmd.Parameters.Add("@SessionToken", SqlDbType.VarChar).Value = friend.SessionToken;
+				var adp = new SqlDataAdapter(cmd);
+				var ds = new DataSet();
 				adp.Fill(ds);
 
 				reply.replyCode = Convert.ToInt32(ds.Tables[0].Rows[0]["ResponseCode"]);
@@ -306,16 +328,11 @@ namespace StickManWebAPI.Controllers
 
 				response.FriendRequestDetail = requestDetails;
 
-
-
 				//creating user object
 				if (reply.replyCode == 200 && ds.Tables[1].Rows.Count > 0)
 				{
-
-
 					foreach (DataRow record in ds.Tables[1].Rows)
 					{
-
 						user.userID = Convert.ToInt32(record["UserID"]);
 						user.username = string.IsNullOrEmpty(record["UserName"].ToString()) ? string.Empty : record["UserName"].ToString();
 						user.fullName = string.IsNullOrEmpty(record["FullName"].ToString()) ? string.Empty : record["FullName"].ToString();
@@ -326,14 +343,12 @@ namespace StickManWebAPI.Controllers
 						user.emailID = string.IsNullOrEmpty(record["EmailID"].ToString()) ? string.Empty : record["EmailID"].ToString();
 						user.dob = string.IsNullOrEmpty(record["DOB"].ToString()) ? string.Empty : record["DOB"].ToString();
 						user.deviceId = string.Empty;
-
-						//usersList.Add(user);
 					}
 
 					//send push notification
 					if (Convert.ToInt32(ds.Tables[0].Rows[0]["ResponseCode"]) == 200)
 					{
-						string message = user.username + " sent you a friend request.";
+						var message = user.username + " sent you a friend request.";
 
 						if (!string.IsNullOrEmpty(deviceID))
 							PushSharpNotification(deviceID, message);
@@ -346,9 +361,6 @@ namespace StickManWebAPI.Controllers
 					reply.replyCode = Convert.ToInt32(EnumReply.noDataFound);
 					reply.replyMessage = "No Data Found";
 				}
-
-
-
 			}
 			catch (Exception ex)
 			{
@@ -363,25 +375,29 @@ namespace StickManWebAPI.Controllers
 		[HttpPost]
 		public SearchResult SearchUsers(SearchUser searchUser)
 		{
-			SearchResult searchResult = new SearchResult();
-			Reply reply = new Reply();
-			List<UserExtension> usersList = new List<UserExtension>();
+			var searchResult = new SearchResult();
+			var reply = new Reply();
+			var usersList = new List<UserExtension>();
 
 
 			try
 			{
-				SqlConnection con = new SqlConnection();
-				con.ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString;
+				var con = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
 
-				SqlCommand cmd = new SqlCommand();
-				cmd.CommandType = System.Data.CommandType.StoredProcedure;
-				cmd.Connection = con;
-				cmd.CommandText = "StickMan_usp_GetUsersList";
-				cmd.Parameters.Add("@SessionToken", System.Data.SqlDbType.VarChar).Value = searchUser.sessionToken;
-				cmd.Parameters.Add("@UserId", System.Data.SqlDbType.Int, 32).Value = searchUser.userId;
-				cmd.Parameters.Add("@SearchKeyword", System.Data.SqlDbType.VarChar).Value = searchUser.searchKeyword;
-				SqlDataAdapter adp = new SqlDataAdapter(cmd);
-				DataSet ds = new DataSet();
+				var cmd = new SqlCommand
+				{
+					CommandType = CommandType.StoredProcedure,
+					Connection = con,
+					CommandText = "StickMan_usp_GetUsersList"
+				};
+				cmd.Parameters.Add("@SessionToken", SqlDbType.VarChar).Value = searchUser.sessionToken;
+				cmd.Parameters.Add("@UserId", SqlDbType.Int, 32).Value = searchUser.userId;
+				cmd.Parameters.Add("@SearchKeyword", SqlDbType.VarChar).Value = searchUser.searchKeyword;
+				var adp = new SqlDataAdapter(cmd);
+				var ds = new DataSet();
 				adp.Fill(ds);
 
 				reply.replyCode = Convert.ToInt32(ds.Tables[0].Rows[0]["ResponseCode"]);
@@ -397,10 +413,13 @@ namespace StickManWebAPI.Controllers
 				{
 					foreach (DataRow record in ds.Tables[1].Rows)
 					{
-						UserExtension user = new UserExtension();
-						user.userID = Convert.ToInt32(record["UserID"]);
-						user.username = string.IsNullOrEmpty(record["UserName"].ToString()) ? string.Empty : record["UserName"].ToString();
-						user.fullName = string.IsNullOrEmpty(record["FullName"].ToString()) ? string.Empty : record["FullName"].ToString(); ;
+						var user = new UserExtension
+						{
+							userID = Convert.ToInt32(record["UserID"]),
+							username = string.IsNullOrEmpty(record["UserName"].ToString()) ? string.Empty : record["UserName"].ToString(),
+							fullName = string.IsNullOrEmpty(record["FullName"].ToString()) ? string.Empty : record["FullName"].ToString()
+						};
+						;
 						user.sex = string.IsNullOrEmpty(record["Sex"].ToString()) ? string.Empty : record["Sex"].ToString(); ; ;
 						user.imagePath = string.IsNullOrEmpty(record["ImagePath"].ToString()) ? string.Empty : record["ImagePath"].ToString(); ; ; ;
 						//user.FriendRequestID = Convert.ToInt32(record["FriendRequestID"]);
@@ -436,29 +455,32 @@ namespace StickManWebAPI.Controllers
 		[HttpPost]
 		public Reply RespondFriendRequest(Friend friend)
 		{
-			Reply reply = new Reply();
+			var reply = new Reply();
 
 			try
 			{
-				SqlConnection con = new SqlConnection();
-				con.ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString;
+				var con = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
 
-				SqlCommand cmd = new SqlCommand();
-				cmd.CommandType = System.Data.CommandType.StoredProcedure;
-				cmd.Connection = con;
-				cmd.CommandText = "StickMan_usp_ResponseFriendRequest";
-				cmd.Parameters.Add("@UserID", System.Data.SqlDbType.Int, 32).Value = friend.UserId;
-				cmd.Parameters.Add("@RespondingToUserID", System.Data.SqlDbType.Int, 32).Value = friend.RespondingToUserID;
-				cmd.Parameters.Add("@FriendRequestID", System.Data.SqlDbType.Int, 32).Value = friend.FriendRequestId;
-				cmd.Parameters.Add("@FriendRequestReply", System.Data.SqlDbType.Int, 32).Value = friend.FriendRequestReply;
-				cmd.Parameters.Add("@SessionToken", System.Data.SqlDbType.VarChar).Value = friend.SessionToken;
-				SqlDataAdapter adp = new SqlDataAdapter(cmd);
-				DataSet ds = new DataSet();
+				var cmd = new SqlCommand
+				{
+					CommandType = CommandType.StoredProcedure,
+					Connection = con,
+					CommandText = "StickMan_usp_ResponseFriendRequest"
+				};
+				cmd.Parameters.Add("@UserID", SqlDbType.Int, 32).Value = friend.UserId;
+				cmd.Parameters.Add("@RespondingToUserID", SqlDbType.Int, 32).Value = friend.RespondingToUserID;
+				cmd.Parameters.Add("@FriendRequestID", SqlDbType.Int, 32).Value = friend.FriendRequestId;
+				cmd.Parameters.Add("@FriendRequestReply", SqlDbType.Int, 32).Value = friend.FriendRequestReply;
+				cmd.Parameters.Add("@SessionToken", SqlDbType.VarChar).Value = friend.SessionToken;
+				var adp = new SqlDataAdapter(cmd);
+				var ds = new DataSet();
 				adp.Fill(ds);
 
 				reply.replyCode = Convert.ToInt32(ds.Tables[0].Rows[0]["ResponseCode"]);
 				reply.replyMessage = ds.Tables[0].Rows[0]["ResponseMesssage"].ToString();
-
 			}
 			catch (Exception ex)
 			{
@@ -472,23 +494,27 @@ namespace StickManWebAPI.Controllers
 		[HttpPost]
 		public SearchResult GetFriends(Friend friend)
 		{
-			SearchResult searchResult = new SearchResult();
-			Reply reply = new Reply();
-			List<UserExtension> usersList = new List<UserExtension>();
+			var searchResult = new SearchResult();
+			var reply = new Reply();
+			var usersList = new List<UserExtension>();
 
 			try
 			{
-				SqlConnection con = new SqlConnection();
-				con.ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString;
+				var con = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
 
-				SqlCommand cmd = new SqlCommand();
-				cmd.CommandType = System.Data.CommandType.StoredProcedure;
-				cmd.Connection = con;
-				cmd.CommandText = "StickMan_usp_GetFriends";
-				cmd.Parameters.Add("@UserID", System.Data.SqlDbType.Int, 32).Value = friend.UserId;
-				cmd.Parameters.Add("@SessionToken", System.Data.SqlDbType.VarChar).Value = friend.SessionToken;
-				SqlDataAdapter adp = new SqlDataAdapter(cmd);
-				DataSet ds = new DataSet();
+				var cmd = new SqlCommand
+				{
+					CommandType = CommandType.StoredProcedure,
+					Connection = con,
+					CommandText = "StickMan_usp_GetFriends"
+				};
+				cmd.Parameters.Add("@UserID", SqlDbType.Int, 32).Value = friend.UserId;
+				cmd.Parameters.Add("@SessionToken", SqlDbType.VarChar).Value = friend.SessionToken;
+				var adp = new SqlDataAdapter(cmd);
+				var ds = new DataSet();
 				adp.Fill(ds);
 
 				reply.replyCode = Convert.ToInt32(ds.Tables[0].Rows[0]["ResponseCode"]);
@@ -498,15 +524,17 @@ namespace StickManWebAPI.Controllers
 				{
 					foreach (DataRow record in ds.Tables[1].Rows)
 					{
-						UserExtension user = new UserExtension();
-						user.userID = Convert.ToInt32(record["UserID"]);
-						user.username = record["UserName"].ToString();
-						user.fullName = record["FullName"].ToString();
-						user.imagePath = record["ImagePath"].ToString();
-						user.sex = record["Sex"].ToString();
-						user.mobileNo = record["MobileNo"].ToString();
-						user.emailID = record["EmailID"].ToString();
-						user.dob = record["DOB"].ToString();
+						var user = new UserExtension
+						{
+							userID = Convert.ToInt32(record["UserID"]),
+							username = record["UserName"].ToString(),
+							fullName = record["FullName"].ToString(),
+							imagePath = record["ImagePath"].ToString(),
+							sex = record["Sex"].ToString(),
+							mobileNo = record["MobileNo"].ToString(),
+							emailID = record["EmailID"].ToString(),
+							dob = record["DOB"].ToString()
+						};
 						usersList.Add(user);
 					}
 
@@ -532,24 +560,28 @@ namespace StickManWebAPI.Controllers
 		[HttpPost]
 		public SearchResult GetPendingFriendRequests(Friend friend)
 		{
-			SearchResult searchResult = new SearchResult();
-			Reply reply = new Reply();
-			List<UserExtension> usersList = new List<UserExtension>();
+			var searchResult = new SearchResult();
+			var reply = new Reply();
+			var usersList = new List<UserExtension>();
 
 			try
 			{
-				SqlConnection con = new SqlConnection();
-				con.ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString;
+				var con = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
 
-				SqlCommand cmd = new SqlCommand();
-				cmd.CommandType = System.Data.CommandType.StoredProcedure;
-				cmd.Connection = con;
-				cmd.CommandText = "StickMan_usp_GetPendingFriendRequests";
-				cmd.Parameters.Add("@SessionToken", System.Data.SqlDbType.VarChar).Value = friend.SessionToken;
-				cmd.Parameters.Add("@UserId", System.Data.SqlDbType.Int, 32).Value = friend.UserId;
+				var cmd = new SqlCommand
+				{
+					CommandType = CommandType.StoredProcedure,
+					Connection = con,
+					CommandText = "StickMan_usp_GetPendingFriendRequests"
+				};
+				cmd.Parameters.Add("@SessionToken", SqlDbType.VarChar).Value = friend.SessionToken;
+				cmd.Parameters.Add("@UserId", SqlDbType.Int, 32).Value = friend.UserId;
 
-				SqlDataAdapter adp = new SqlDataAdapter(cmd);
-				DataSet ds = new DataSet();
+				var adp = new SqlDataAdapter(cmd);
+				var ds = new DataSet();
 				adp.Fill(ds);
 
 				reply.replyCode = Convert.ToInt32(ds.Tables[0].Rows[0]["ResponseCode"]);
@@ -559,19 +591,23 @@ namespace StickManWebAPI.Controllers
 				{
 					foreach (DataRow record in ds.Tables[1].Rows)
 					{
-						UserExtension user = new UserExtension();
-						user.userID = Convert.ToInt32(record["UserID"]);
-						user.username = string.IsNullOrEmpty(record["UserName"].ToString()) ? string.Empty : record["UserName"].ToString();
-						user.fullName = string.IsNullOrEmpty(record["FullName"].ToString()) ? string.Empty : record["FullName"].ToString(); ;
-						user.sex = string.IsNullOrEmpty(record["Sex"].ToString()) ? string.Empty : record["Sex"].ToString(); ; ;
-						user.imagePath = string.IsNullOrEmpty(record["ImagePath"].ToString()) ? string.Empty : record["ImagePath"].ToString(); ; ; ;
-						user.FriendRequestStatus = string.IsNullOrEmpty(record["FriendRequestStatus"].ToString()) ? string.Empty : record["FriendRequestStatus"].ToString();
-						user.FriendRequestID = Convert.ToInt32(record["FriendRequestID"]);
-						user.sessionToken = string.Empty;
-						user.mobileNo = string.IsNullOrEmpty(record["MobileNo"].ToString()) ? string.Empty : record["MobileNo"].ToString();
-						user.emailID = string.IsNullOrEmpty(record["EmailID"].ToString()) ? string.Empty : record["EmailID"].ToString();
-						user.dob = string.IsNullOrEmpty(record["DOB"].ToString()) ? string.Empty : record["DOB"].ToString();
-						user.deviceId = string.Empty;
+						var user = new UserExtension
+						{
+							userID = Convert.ToInt32(record["UserID"]),
+							username = string.IsNullOrEmpty(record["UserName"].ToString()) ? string.Empty : record["UserName"].ToString(),
+							fullName = string.IsNullOrEmpty(record["FullName"].ToString()) ? string.Empty : record["FullName"].ToString(),
+							sex = string.IsNullOrEmpty(record["Sex"].ToString()) ? string.Empty : record["Sex"].ToString(),
+							imagePath = string.IsNullOrEmpty(record["ImagePath"].ToString()) ? string.Empty : record["ImagePath"].ToString(),
+							FriendRequestStatus = string.IsNullOrEmpty(record["FriendRequestStatus"].ToString())
+								? string.Empty
+								: record["FriendRequestStatus"].ToString(),
+							FriendRequestID = Convert.ToInt32(record["FriendRequestID"]),
+							sessionToken = string.Empty,
+							mobileNo = string.IsNullOrEmpty(record["MobileNo"].ToString()) ? string.Empty : record["MobileNo"].ToString(),
+							emailID = string.IsNullOrEmpty(record["EmailID"].ToString()) ? string.Empty : record["EmailID"].ToString(),
+							dob = string.IsNullOrEmpty(record["DOB"].ToString()) ? string.Empty : record["DOB"].ToString(),
+							deviceId = string.Empty
+						};
 
 						usersList.Add(user);
 					}
@@ -597,24 +633,28 @@ namespace StickManWebAPI.Controllers
 		[HttpPost]
 		public AudioMessagesWrapper GetAudioMessages(Friend friend)
 		{
-			AudioMessagesWrapper audioMessagesWrapper = new AudioMessagesWrapper();
-			List<AudioMessage> audioMessages = new List<AudioMessage>();
-			Reply reply = new Reply();
+			var audioMessagesWrapper = new AudioMessagesWrapper();
+			var audioMessages = new List<AudioMessage>();
+			var reply = new Reply();
 			long fileSize = 0;
 
 			try
 			{
-				SqlConnection con = new SqlConnection();
-				con.ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString;
+				var con = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
 
-				SqlCommand cmd = new SqlCommand();
-				cmd.CommandType = System.Data.CommandType.StoredProcedure;
-				cmd.Connection = con;
-				cmd.CommandText = "StickMan_usp_GetAudioFileMessages";
-				cmd.Parameters.Add("@UserID", System.Data.SqlDbType.Int, 32).Value = friend.UserId;
-				cmd.Parameters.Add("@SessionToken", System.Data.SqlDbType.VarChar).Value = friend.SessionToken;
-				SqlDataAdapter adp = new SqlDataAdapter(cmd);
-				DataSet ds = new DataSet();
+				var cmd = new SqlCommand
+				{
+					CommandType = CommandType.StoredProcedure,
+					Connection = con,
+					CommandText = "StickMan_usp_GetAudioFileMessages"
+				};
+				cmd.Parameters.Add("@UserID", SqlDbType.Int, 32).Value = friend.UserId;
+				cmd.Parameters.Add("@SessionToken", SqlDbType.VarChar).Value = friend.SessionToken;
+				var adp = new SqlDataAdapter(cmd);
+				var ds = new DataSet();
 				adp.Fill(ds);
 
 				reply.replyCode = Convert.ToInt32(ds.Tables[1].Rows[0]["ResponseCode"]);
@@ -624,15 +664,17 @@ namespace StickManWebAPI.Controllers
 				{
 					foreach (DataRow record in ds.Tables[0].Rows)
 					{
-						AudioMessage audioMessage = new AudioMessage();
-						audioMessage.message = record["AudioFilePath"].ToString();
-						audioMessage.filter = record["Filter"].ToString();
+						var audioMessage = new AudioMessage
+						{
+							message = record["AudioFilePath"].ToString(),
+							filter = record["Filter"].ToString()
+						};
 
 						FileInfo fileinfo = null;
-							
+
 						//= new FileInfo(record["AudioFilePath"].ToString());
 
-						if (!string.IsNullOrEmpty("~/Content/Audio/" + record["AudioFilePath"].ToString()) 
+						if (!string.IsNullOrEmpty("~/Content/Audio/" + record["AudioFilePath"].ToString())
 							&& File.Exists(System.Web.Hosting.HostingEnvironment.MapPath("~/Content/Audio/" + record["AudioFilePath"].ToString())))
 						{
 							fileSize = new FileInfo(System.Web.Hosting.HostingEnvironment.MapPath("~/Content/Audio/" + record["AudioFilePath"].ToString())).Length;
@@ -640,8 +682,8 @@ namespace StickManWebAPI.Controllers
 
 						audioMessage.fileSize = fileSize;
 						audioMessage.time = record["UploadTime"].ToString();
-                        audioMessage.SenderId = Convert.ToInt32(record["UserID"]);
-                        audioMessage.MessageType = record["MessageType"].ToString();
+						audioMessage.SenderId = Convert.ToInt32(record["UserID"]);
+						audioMessage.MessageType = record["MessageType"].ToString();
 						audioMessage.user = new User()
 						{
 							userID = record["MessageType"].ToString() == "Sent" ? Convert.ToInt32(record["RecieverID"]) : Convert.ToInt32(record["UserID"]),
@@ -680,6 +722,14 @@ namespace StickManWebAPI.Controllers
 			return audioMessagesWrapper;
 		}
 
+		private UserExtension GetAlreadySentFriendRequests(Friend friend)
+		{
+			var requests = GetPendingFriendRequests(friend);
+			var friendRequest = requests.users.FirstOrDefault(x => x.FriendRequestID == friend.FriendRequestId || x.userID == friend.RecieverUserId);
+
+			return friendRequest;
+		}
+
 		#region push
 		//Push sharp
 		public string PushSharpNotification(string deviceID, string message)
@@ -708,18 +758,18 @@ namespace StickManWebAPI.Controllers
 			//   app with!
 			//var appleCert = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Resources/CertificatesNew.p12"));
 
-            //var appleCert = System.Web.Hosting.HostingEnvironment.MapPath("~/utilities/Certificates_dis_final.p12");
+			//var appleCert = System.Web.Hosting.HostingEnvironment.MapPath("~/utilities/Certificates_dis_final.p12");
 
-            var appleCert = System.Web.Hosting.HostingEnvironment.MapPath("~/utilities/CertificatesKeshP2.p12");
+			var appleCert = System.Web.Hosting.HostingEnvironment.MapPath("~/utilities/CertificatesKeshP2.p12");
 
 			//IMPORTANT: If you are using a Development provisioning Profile, you must use the Sandbox push notification server 
 			//  (so you would leave the first arg in the ctor of ApplePushChannelSettings as 'false')
 			//  If you are using an AdHoc or AppStore provisioning profile, you must use the Production push notification server
 			//  (so you would change the first arg in the ctor of ApplePushChannelSettings to 'true')
-			push.RegisterAppleService(new ApplePushChannelSettings(appleCert,"123123",false)); //Extension method
-			//Fluent construction of an iOS notification
-			//IMPORTANT: For iOS you MUST MUST MUST use your own DeviceToken here that gets generated within your iOS app itself when the Application Delegate
-			//  for registered for remote notifications is called, and the device token is passed back to you
+			push.RegisterAppleService(new ApplePushChannelSettings(appleCert, "123123", false)); //Extension method
+																								 //Fluent construction of an iOS notification
+																								 //IMPORTANT: For iOS you MUST MUST MUST use your own DeviceToken here that gets generated within your iOS app itself when the Application Delegate
+																								 //  for registered for remote notifications is called, and the device token is passed back to you
 			push.QueueNotification(new AppleNotification()
 									   .ForDeviceToken(deviceID)
 									   .WithAlert(message)
@@ -729,7 +779,7 @@ namespace StickManWebAPI.Controllers
 			//Console.WriteLine("Waiting for Queue to Finish...");
 
 			//Stop and wait for the queues to drains
-			push.StopAllServices(waitForQueuesToFinish:true);
+			push.StopAllServices(waitForQueuesToFinish: true);
 
 			return "sucess";
 
@@ -739,7 +789,7 @@ namespace StickManWebAPI.Controllers
 
 		static string DeviceSubscriptionChanged(object sender, string oldSubscriptionId, string newSubscriptionId, INotification notification)
 		{
-			string str = String.Concat("Device Registration Changed:  Old-> ", oldSubscriptionId, "  New-> ", newSubscriptionId, " -> ", notification);
+			var str = String.Concat("Device Registration Changed:  Old-> ", oldSubscriptionId, "  New-> ", newSubscriptionId, " -> ", notification);
 
 			return str;
 			//Currently this event will only ever happen for Android GCM
