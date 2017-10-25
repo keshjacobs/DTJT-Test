@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Web.Hosting;
 using System.Web.Http;
 using StickManWebAPI.Models;
 using PushSharp.Apple;
@@ -114,7 +115,7 @@ namespace StickManWebAPI.Controllers
 
 								if (!Directory.Exists(mainDIR))
 								{
-									Directory.CreateDirectory(System.Web.Hosting.HostingEnvironment.MapPath(mainDIR));
+									Directory.CreateDirectory(HostingEnvironment.MapPath(mainDIR));
 									//System.Web.Hosting.HostingEnvironment.MapPath(mainDIR);
 								}
 							}
@@ -631,6 +632,341 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
+		public SearchResult GetBlockedFriends(Friend friend)
+		{
+			var searchResult = new SearchResult();
+			var reply = new Reply();
+			var userExtensionList = new List<UserExtension>();
+			try
+			{
+				var sqlConnection = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
+				var selectCommand = new SqlCommand
+				{
+					CommandType = CommandType.StoredProcedure,
+					Connection = sqlConnection,
+					CommandText = "StickMan_usp_GetBlockedFriends"
+				};
+				selectCommand.Parameters.Add("@UserID", SqlDbType.Int, 32).Value = friend.UserId;
+				selectCommand.Parameters.Add("@SessionToken", SqlDbType.VarChar).Value = friend.SessionToken;
+				var sqlDataAdapter = new SqlDataAdapter(selectCommand);
+				var dataSet = new DataSet();
+				sqlDataAdapter.Fill(dataSet);
+				reply.replyCode = Convert.ToInt32(dataSet.Tables[0].Rows[0]["ResponseCode"]);
+				reply.replyMessage = dataSet.Tables[0].Rows[0]["ResponseMesssage"].ToString();
+				if (reply.replyCode == 200 && dataSet.Tables[1].Rows.Count > 0)
+				{
+					foreach (DataRow row in (InternalDataCollectionBase)dataSet.Tables[1].Rows)
+					{
+						var userExtension = new UserExtension
+						{
+							userID = Convert.ToInt32(row["UserID"]),
+							username = row["UserName"].ToString(),
+							fullName = row["FullName"].ToString(),
+							imagePath = row["ImagePath"].ToString(),
+							sex = row["Sex"].ToString(),
+							mobileNo = row["MobileNo"].ToString(),
+							emailID = row["EmailID"].ToString(),
+							dob = row["DOB"].ToString()
+						};
+						userExtensionList.Add(userExtension);
+					}
+					searchResult.users = userExtensionList;
+				}
+				else if (reply.replyCode == 200)
+				{
+					if (dataSet.Tables[1].Rows.Count == 0)
+					{
+						reply.replyCode = Convert.ToInt32(EnumReply.noDataFound);
+						reply.replyMessage = "No Data Found";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				reply.replyCode = Convert.ToInt32(EnumReply.processFail);
+				reply.replyMessage = ex.Message;
+			}
+			searchResult.reply = reply;
+			return searchResult;
+		}
+
+		[HttpPost]
+		public string DeleteFriendRequest(string UserId, string ReceiverId)
+		{
+			try
+			{
+				var sqlConnection = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
+				sqlConnection.Open();
+				var sqlCommand = new SqlCommand
+				{
+					CommandType = CommandType.Text,
+					Connection = sqlConnection
+				};
+				sqlCommand.Parameters.Add("@UserID", SqlDbType.Int).Value = Convert.ToInt32(UserId);
+				sqlCommand.Parameters.Add("@RecieverID", SqlDbType.Int).Value = Convert.ToInt32(ReceiverId);
+				sqlCommand.CommandText = "Update StickMan_FriendRequest set FriendRequestStatus=2 Where UserID=@UserID  AND RecieverID=@RecieverID";
+				sqlCommand.ExecuteNonQuery();
+				return "Success";
+			}
+			catch
+			{
+				return "Failed";
+			}
+		}
+
+		[HttpPost]
+		public BlockfrndStatus BlockFriend(BlockfrndStatus values)
+		{
+			try
+			{
+				var sqlConnection = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
+				sqlConnection.Open();
+				var sqlCommand = new SqlCommand
+				{
+					CommandType = CommandType.Text,
+					Connection = sqlConnection
+				};
+				sqlCommand.Parameters.Add("@RecieverID", SqlDbType.Int, 32).Value = values.ReceiverId;
+				sqlCommand.Parameters.Add("@UserID", SqlDbType.Int, 32).Value = values.UserId;
+				sqlCommand.CommandText = "Update StickMan_FriendRequest set BlockedBy=@UserID Where (UserID=@UserID or RecieverID=@UserID) AND (RecieverID=@RecieverID or UserID=@RecieverID)";
+				sqlCommand.ExecuteNonQuery();
+				return values;
+			}
+			catch
+			{
+				return values;
+			}
+		}
+
+		[HttpPost]
+		public Unblock UnBlockFriend(Unblock values)
+		{
+			try
+			{
+				var sqlConnection = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
+				sqlConnection.Open();
+				var sqlCommand = new SqlCommand
+				{
+					CommandType = CommandType.Text,
+					Connection = sqlConnection
+				};
+				sqlCommand.Parameters.Add("@RecieverID", SqlDbType.Int, 32).Value = values.ReceiverId;
+				sqlCommand.Parameters.Add("@UserID", SqlDbType.Int, 32).Value = values.UserId;
+				sqlCommand.CommandText = "Update StickMan_FriendRequest set BlockedBy=null Where (UserID=@UserID or RecieverID=@UserID) AND (RecieverID=@RecieverID or UserID=@RecieverID)";
+				sqlCommand.ExecuteNonQuery();
+				return values;
+			}
+			catch
+			{
+				return values;
+			}
+		}
+
+		[HttpPost]
+		public DeletefrndStatus DeleteFriendRequests(DeletefrndStatus values)
+		{
+			try
+			{
+				var sqlConnection = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
+				sqlConnection.Open();
+				var sqlCommand = new SqlCommand
+				{
+					CommandType = CommandType.Text,
+					Connection = sqlConnection
+				};
+				sqlCommand.Parameters.Add("@RecieverID", SqlDbType.Int, 32).Value = values.ReceiverId;
+				sqlCommand.Parameters.Add("@UserID", SqlDbType.Int, 32).Value = values.UserId;
+				sqlCommand.CommandText = "Update StickMan_FriendRequest set FriendRequestStatus=2 Where (UserID=@UserID or RecieverID=@UserID) AND (RecieverID=@RecieverID or UserID=@RecieverID)";
+				sqlCommand.ExecuteNonQuery();
+				return values;
+			}
+			catch
+			{
+				return values;
+			}
+		}
+
+		[HttpPost]
+		public string CastMessageStatus(ReadStatus readstatus)
+		{
+			try
+			{
+				var sqlConnection = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
+				sqlConnection.Open();
+				var sqlCommand = new SqlCommand
+				{
+					CommandType = CommandType.Text,
+					Connection = sqlConnection,
+					CommandText = "Update StickMan_Users_Cast_AudioData_UploadInformation set ReadStatus=1 Where RecieverID=@RecieverID AND AudioFilePath=@FilePath"
+				};
+				sqlCommand.Parameters.AddWithValue("@RecieverID", Convert.ToInt32(readstatus.receiverId));
+				sqlCommand.Parameters.AddWithValue("@FilePath", readstatus.file);
+				sqlCommand.ExecuteNonQuery();
+				return "Success";
+			}
+			catch
+			{
+				return "Failed";
+			}
+		}
+
+		[HttpPost]
+		public string RowClickCount(ClickCount clickcount)
+		{
+			try
+			{
+				var sqlConnection = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
+				sqlConnection.Open();
+				var sqlCommand = new SqlCommand
+				{
+					CommandType = CommandType.Text,
+					Connection = sqlConnection,
+					CommandText = "Update Cast_AudioLog set ClickCount = clickcount + 1 Where AudioFilePath=@FilePath"
+				};
+				sqlCommand.Parameters.AddWithValue("@FilePath", clickcount.file);
+				sqlCommand.ExecuteNonQuery();
+				return "Success";
+			}
+			catch
+			{
+				return "Failed";
+			}
+		}
+
+		[HttpPost]
+		public string MessageStatus(ReadStatus readstatus)
+		{
+			try
+			{
+				var sqlConnection = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
+				sqlConnection.Open();
+				var sqlCommand = new SqlCommand
+				{
+					CommandType = CommandType.Text,
+					Connection = sqlConnection,
+					CommandText = "Update StickMan_Users_AudioData_UploadInformation set ReadStatus=1 Where RecieverID=@RecieverID AND AudioFilePath=@FilePath"
+				};
+				sqlCommand.Parameters.AddWithValue("@RecieverID", Convert.ToInt32(readstatus.receiverId));
+				sqlCommand.Parameters.AddWithValue("@FilePath", readstatus.file);
+				sqlCommand.ExecuteNonQuery();
+				return "Success";
+			}
+			catch
+			{
+				return "Failed";
+			}
+		}
+
+		[HttpPost]
+		public AudioMessagesWrapper messagereceipents(Friend friend)
+		{
+			return new AudioMessagesWrapper();
+		}
+
+		[HttpPost]
+		public AudioMessagesWrapper NewGetAudioMessages(Friend friend)
+		{
+			var audioMessagesWrapper = new AudioMessagesWrapper();
+			var newAudioMessageList = new List<NewAudioMessage>();
+			var reply = new Reply();
+			long num = 0;
+			try
+			{
+				var sqlConnection = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
+				var selectCommand = new SqlCommand
+				{
+					CommandType = CommandType.StoredProcedure,
+					Connection = sqlConnection,
+					CommandText = "StickMan_usp_NewGetAudioFileMessages"
+				};
+				selectCommand.Parameters.Add("@UserID", SqlDbType.Int, 32).Value = friend.UserId;
+				selectCommand.Parameters.AddWithValue("@SessionToken", SqlDbType.VarChar).Value = friend.SessionToken;
+				var sqlDataAdapter = new SqlDataAdapter(selectCommand);
+				var dataSet = new DataSet();
+				sqlDataAdapter.Fill(dataSet);
+				reply.replyCode = Convert.ToInt32(dataSet.Tables[1].Rows[0]["ResponseCode"]);
+				reply.replyMessage = dataSet.Tables[1].Rows[0]["ResponseMesssage"].ToString();
+				if (reply.replyCode == 200 && dataSet.Tables[0].Rows.Count > 0)
+				{
+					foreach (DataRow row in (InternalDataCollectionBase)dataSet.Tables[0].Rows)
+					{
+						var newAudioMessage = new NewAudioMessage
+						{
+							message = row["AudioFilePath"].ToString(),
+							filter = row["Filter"].ToString(),
+							id = Convert.ToInt32(row["NewAudioID"])
+						};
+						if (!string.IsNullOrEmpty("~/Content/Audio/" + row["AudioFilePath"]) && File.Exists(HostingEnvironment.MapPath("~/Content/Audio/" + row["AudioFilePath"])))
+							num = new FileInfo(HostingEnvironment.MapPath("~/Content/Audio/" + row["AudioFilePath"])).Length;
+						newAudioMessage.fileSize = num;
+						newAudioMessage.time = row["UploadTime"].ToString();
+						newAudioMessage.MessageType = row["MessageType"].ToString();
+						newAudioMessage.readstatus = (bool)row["ReadStatus"];
+						newAudioMessage.deletestatus = (bool)row["DeleteStatus"];
+						newAudioMessage.iscasted = (bool)row["IsCasted"];
+						newAudioMessage.user = new User()
+						{
+							userID = row["MessageType"].ToString() == "Sent" ? Convert.ToInt32(row["UserID"]) : Convert.ToInt32(row["UserID"]),
+							username = row["UserName"].ToString(),
+							sessionToken = friend.SessionToken,
+							fullName = row["FullName"].ToString(),
+							mobileNo = row["MobileNo"].ToString(),
+							emailID = row["EmailID"].ToString(),
+							dob = row["DOB"].ToString(),
+							sex = row["Sex"].ToString(),
+							imagePath = row["ImagePath"].ToString(),
+							deviceId = row["DeviceId"].ToString()
+						};
+						newAudioMessageList.Add(newAudioMessage);
+					}
+					audioMessagesWrapper.newaudioMessages = newAudioMessageList;
+				}
+				else if (reply.replyCode == 200)
+				{
+					if (dataSet.Tables[0].Rows.Count == 0)
+					{
+						reply.replyCode = Convert.ToInt32(EnumReply.noDataFound);
+						reply.replyMessage = "No Data Foundd";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				reply.replyCode = Convert.ToInt32(EnumReply.processFail);
+				reply.replyMessage = ex.Message + friend.UserId;
+			}
+			audioMessagesWrapper.reply = reply;
+			return audioMessagesWrapper;
+		}
+
+		[HttpPost]
 		public AudioMessagesWrapper GetAudioMessages(Friend friend)
 		{
 			var audioMessagesWrapper = new AudioMessagesWrapper();
@@ -674,10 +1010,10 @@ namespace StickManWebAPI.Controllers
 
 						//= new FileInfo(record["AudioFilePath"].ToString());
 
-						if (!string.IsNullOrEmpty("~/Content/Audio/" + record["AudioFilePath"].ToString())
-							&& File.Exists(System.Web.Hosting.HostingEnvironment.MapPath("~/Content/Audio/" + record["AudioFilePath"].ToString())))
+						if (!string.IsNullOrEmpty("~/Content/Audio/" + record["AudioFilePath"])
+							&& File.Exists(HostingEnvironment.MapPath("~/Content/Audio/" + record["AudioFilePath"])))
 						{
-							fileSize = new FileInfo(System.Web.Hosting.HostingEnvironment.MapPath("~/Content/Audio/" + record["AudioFilePath"].ToString())).Length;
+							fileSize = new FileInfo(HostingEnvironment.MapPath("~/Content/Audio/" + record["AudioFilePath"])).Length;
 						}
 
 						audioMessage.fileSize = fileSize;
@@ -722,6 +1058,162 @@ namespace StickManWebAPI.Controllers
 			return audioMessagesWrapper;
 		}
 
+		[HttpPost]
+		public AudioMessagesWrapper CastGetAudioMessages(Friend friend)
+		{
+			var audioMessagesWrapper = new AudioMessagesWrapper();
+			var audioMessageList = new List<AudioMessage>();
+			var reply = new Reply();
+			long num = 0;
+			try
+			{
+				var sqlConnection = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
+				var selectCommand = new SqlCommand
+				{
+					CommandType = CommandType.StoredProcedure,
+					Connection = sqlConnection,
+					CommandText = "StickMan_usp_Cast_GetAudioFileMessages"
+				};
+				selectCommand.Parameters.Add("@UserID", SqlDbType.Int, 32).Value = friend.UserId;
+				selectCommand.Parameters.AddWithValue("@SessionToken", SqlDbType.VarChar).Value = friend.SessionToken;
+				var sqlDataAdapter = new SqlDataAdapter(selectCommand);
+				var dataSet = new DataSet();
+				sqlDataAdapter.Fill(dataSet);
+				reply.replyCode = Convert.ToInt32(dataSet.Tables[1].Rows[0]["ResponseCode"]);
+				reply.replyMessage = dataSet.Tables[1].Rows[0]["ResponseMesssage"].ToString();
+				if (reply.replyCode == 200 && dataSet.Tables[0].Rows.Count > 0)
+				{
+					foreach (DataRow row in (InternalDataCollectionBase)dataSet.Tables[0].Rows)
+					{
+						var audioMessage = new AudioMessage
+						{
+							message = row["AudioFilePath"].ToString(),
+							filter = row["Filter"].ToString()
+						};
+						if (!string.IsNullOrEmpty("~/Content/Audio/" + row["AudioFilePath"]) && File.Exists(HostingEnvironment.MapPath("~/Content/Audio/" + row["AudioFilePath"])))
+							num = new FileInfo(HostingEnvironment.MapPath("~/Content/Audio/" + row["AudioFilePath"])).Length;
+						audioMessage.fileSize = num;
+						audioMessage.time = row["UploadTime"].ToString();
+						audioMessage.SenderId = Convert.ToInt32(row["UserID"]);
+						audioMessage.MessageType = row["MessageType"].ToString();
+						audioMessage.readstatus = (bool)row["ReadStatus"];
+						audioMessage.deletestatus = (bool)row["DeleteStatus"];
+						audioMessage.clickcount = Convert.ToInt32(row["ClickCount"]);
+						audioMessage.user = new User()
+						{
+							userID = row["MessageType"].ToString() == "Sent" ? Convert.ToInt32(row["RecieverID"]) : Convert.ToInt32(row["UserID"]),
+							username = row["UserName"].ToString(),
+							sessionToken = friend.SessionToken,
+							fullName = row["FullName"].ToString(),
+							mobileNo = row["MobileNo"].ToString(),
+							emailID = row["EmailID"].ToString(),
+							dob = row["DOB"].ToString(),
+							sex = row["Sex"].ToString(),
+							imagePath = row["ImagePath"].ToString(),
+							deviceId = row["DeviceId"].ToString()
+						};
+						audioMessageList.Add(audioMessage);
+					}
+					audioMessagesWrapper.audioMessages = audioMessageList;
+				}
+				else if (reply.replyCode == 200)
+				{
+					if (dataSet.Tables[0].Rows.Count == 0)
+					{
+						reply.replyCode = Convert.ToInt32(EnumReply.noDataFound);
+						reply.replyMessage = "No Data Foundd";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				reply.replyCode = Convert.ToInt32(EnumReply.processFail);
+				reply.replyMessage = ex.Message + friend.UserId;
+			}
+			audioMessagesWrapper.reply = reply;
+			return audioMessagesWrapper;
+		}
+
+		[HttpPost]
+		public AudioMessagesWrapper NewCastGetAudioMessages(Friend friend)
+		{
+			var audioMessagesWrapper = new AudioMessagesWrapper();
+			var newAudioMessageList = new List<NewAudioMessage>();
+			var reply = new Reply();
+			long num = 0;
+			try
+			{
+				var sqlConnection = new SqlConnection
+				{
+					ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+				};
+				var selectCommand = new SqlCommand
+				{
+					CommandType = CommandType.StoredProcedure,
+					Connection = sqlConnection,
+					CommandText = "StickMan_usp_Cast_NewGetAudioFileMessages"
+				};
+				selectCommand.Parameters.Add("@UserID", SqlDbType.Int, 32).Value = friend.UserId;
+				selectCommand.Parameters.AddWithValue("@SessionToken", SqlDbType.VarChar).Value = friend.SessionToken;
+				var sqlDataAdapter = new SqlDataAdapter(selectCommand);
+				var dataSet = new DataSet();
+				sqlDataAdapter.Fill(dataSet);
+				reply.replyCode = Convert.ToInt32(dataSet.Tables[1].Rows[0]["ResponseCode"]);
+				reply.replyMessage = dataSet.Tables[1].Rows[0]["ResponseMesssage"].ToString();
+				if (reply.replyCode == 200 && dataSet.Tables[0].Rows.Count > 0)
+				{
+					foreach (DataRow row in (InternalDataCollectionBase)dataSet.Tables[0].Rows)
+					{
+						var newAudioMessage = new NewAudioMessage
+						{
+							message = row["AudioFilePath"].ToString(),
+							filter = row["Filter"].ToString()
+						};
+						if (!string.IsNullOrEmpty("~/Content/Audio/" + row["AudioFilePath"]) && File.Exists(HostingEnvironment.MapPath("~/Content/Audio/" + row["AudioFilePath"])))
+							num = new FileInfo(HostingEnvironment.MapPath("~/Content/Audio/" + row["AudioFilePath"])).Length;
+						newAudioMessage.fileSize = num;
+						newAudioMessage.MessageType = row["MessageType"].ToString();
+						newAudioMessage.readstatus = (bool)row["ReadStatus"];
+						newAudioMessage.deletestatus = (bool)row["DeleteStatus"];
+						newAudioMessage.iscasted = (bool)row["IsCasted"];
+						newAudioMessage.clickcount = Convert.ToInt32(row["ClickCount"]);
+						newAudioMessage.user = new User()
+						{
+							userID = Convert.ToInt32(row["UserID"]),
+							username = row["UserName"].ToString(),
+							sessionToken = friend.SessionToken,
+							fullName = row["FullName"].ToString(),
+							mobileNo = row["MobileNo"].ToString(),
+							emailID = row["EmailID"].ToString(),
+							dob = row["DOB"].ToString(),
+							sex = row["Sex"].ToString(),
+							deviceId = row["DeviceId"].ToString()
+						};
+						newAudioMessageList.Add(newAudioMessage);
+					}
+					audioMessagesWrapper.newaudioMessages = newAudioMessageList;
+				}
+				else if (reply.replyCode == 200)
+				{
+					if (dataSet.Tables[0].Rows.Count == 0)
+					{
+						reply.replyCode = Convert.ToInt32(EnumReply.noDataFound);
+						reply.replyMessage = "No Data Foundd";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				reply.replyCode = Convert.ToInt32(EnumReply.processFail);
+				reply.replyMessage = ex.Message + friend.UserId;
+			}
+			audioMessagesWrapper.reply = reply;
+			return audioMessagesWrapper;
+		}
+
 		private UserExtension GetAlreadySentFriendRequests(Friend friend)
 		{
 			var requests = GetPendingFriendRequests(friend);
@@ -760,7 +1252,7 @@ namespace StickManWebAPI.Controllers
 
 			//var appleCert = System.Web.Hosting.HostingEnvironment.MapPath("~/utilities/Certificates_dis_final.p12");
 
-			var appleCert = System.Web.Hosting.HostingEnvironment.MapPath("~/utilities/CertificatesKeshP2.p12");
+			var appleCert = HostingEnvironment.MapPath("~/utilities/CertificatesKeshP2.p12");
 
 			//IMPORTANT: If you are using a Development provisioning Profile, you must use the Sandbox push notification server 
 			//  (so you would leave the first arg in the ctor of ApplePushChannelSettings as 'false')
