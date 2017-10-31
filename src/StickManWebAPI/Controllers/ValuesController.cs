@@ -7,15 +7,25 @@ using System.IO;
 using System.Linq;
 using System.Web.Hosting;
 using System.Web.Http;
+using Newtonsoft.Json;
 using StickManWebAPI.Models;
 using PushSharp.Apple;
 using PushSharp;
 using PushSharp.Core;
+using StickMan.Database;
+using StickMan.Database.UnitOfWork;
 
 namespace StickManWebAPI.Controllers
 {
 	public class ValuesController : ApiController
 	{
+		private readonly IUnitOfWork _unitOfWork;
+
+		public ValuesController(IUnitOfWork unitOfWork)
+		{
+			_unitOfWork = unitOfWork;
+		}
+
 		// GET api/values
 		//public IEnumerable<string> Get()
 		public string Get()
@@ -48,7 +58,7 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
-		public UserWrapper signUp(string username, string fullName, string password, string mobileNo, string emailID, string dob, string sex, string imagePath, string deviceId)
+		public UserWrapper signUp(SignUpModel signUpModel)
 		{
 			var userWrapper = new UserWrapper();
 			var reply = new Reply();
@@ -57,11 +67,11 @@ namespace StickManWebAPI.Controllers
 			try
 			{
 				//required field checks
-				if (!string.IsNullOrWhiteSpace(username))
+				if (!string.IsNullOrWhiteSpace(signUpModel.Username))
 				{
-					if (!string.IsNullOrWhiteSpace(emailID))
+					if (!string.IsNullOrWhiteSpace(signUpModel.EmailID))
 					{
-						if (!string.IsNullOrWhiteSpace(password))
+						if (!string.IsNullOrWhiteSpace(signUpModel.Password))
 						{
 							var con = new SqlConnection
 							{
@@ -76,15 +86,15 @@ namespace StickManWebAPI.Controllers
 								CommandText = "StickMan_usp_CreateUpdate_User"
 							};
 							cmd.Parameters.Add("@UserID", SqlDbType.Int).Value = 0;
-							cmd.Parameters.Add("@UserName", SqlDbType.VarChar, 500).Value = username;
-							cmd.Parameters.Add("@FullName", SqlDbType.VarChar, 500).Value = fullName;
-							cmd.Parameters.Add("@Password", SqlDbType.VarChar, 500).Value = password;
-							cmd.Parameters.Add("@MobileNo", SqlDbType.VarChar, 500).Value = mobileNo;
-							cmd.Parameters.Add("@EmailID", SqlDbType.VarChar, 500).Value = emailID;
-							cmd.Parameters.Add("@DOB", SqlDbType.VarChar, 100).Value = dob;
-							cmd.Parameters.Add("@Sex", SqlDbType.VarChar, 500).Value = sex;
-							cmd.Parameters.Add("@ImagePath", SqlDbType.VarChar, 1024).Value = imagePath;
-							cmd.Parameters.Add("@DeviceId", SqlDbType.VarChar, 1024).Value = deviceId;
+							cmd.Parameters.Add("@UserName", SqlDbType.VarChar, 500).Value = signUpModel.Username;
+							cmd.Parameters.Add("@FullName", SqlDbType.VarChar, 500).Value = signUpModel.FullName;
+							cmd.Parameters.Add("@Password", SqlDbType.VarChar, 500).Value = signUpModel.Password;
+							cmd.Parameters.Add("@MobileNo", SqlDbType.VarChar, 500).Value = signUpModel.MobileNo;
+							cmd.Parameters.Add("@EmailID", SqlDbType.VarChar, 500).Value = signUpModel.EmailID;
+							cmd.Parameters.Add("@DOB", SqlDbType.VarChar, 100).Value = signUpModel.Dob;
+							cmd.Parameters.Add("@Sex", SqlDbType.VarChar, 500).Value = signUpModel.Sex;
+							cmd.Parameters.Add("@ImagePath", SqlDbType.VarChar, 1024).Value = signUpModel.ImagePath;
+							cmd.Parameters.Add("@DeviceId", SqlDbType.VarChar, 1024).Value = signUpModel.DeviceId;
 
 							var adp = new SqlDataAdapter(cmd);
 							var ds = new DataSet();
@@ -150,7 +160,7 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
-		public UserWrapper Login(string username, string password, string deviceId)
+		public UserWrapper Login(LoginModel login)
 		{
 			var userWrapper = new UserWrapper();
 			var reply = new Reply();
@@ -168,9 +178,9 @@ namespace StickManWebAPI.Controllers
 					Connection = con,
 					CommandText = "StickMan_usp_Login_User"
 				};
-				cmd.Parameters.Add("@UserName", SqlDbType.VarChar, 32).Value = username;
-				cmd.Parameters.Add("@Password", SqlDbType.VarChar, 1024).Value = password;
-				cmd.Parameters.Add("@DeviceId", SqlDbType.VarChar, 1024).Value = deviceId;
+				cmd.Parameters.Add("@UserName", SqlDbType.VarChar, 32).Value = login.Username;
+				cmd.Parameters.Add("@Password", SqlDbType.VarChar, 1024).Value = login.Password;
+				cmd.Parameters.Add("@DeviceId", SqlDbType.VarChar, 1024).Value = login.DeviceId;
 				var adp = new SqlDataAdapter(cmd);
 				var ds = new DataSet();
 				adp.Fill(ds);
@@ -284,20 +294,10 @@ namespace StickManWebAPI.Controllers
 			var deviceID = string.Empty;
 			var user = new User();
 
-			var friendRequest = GetAlreadySentFriendRequests(friend);
-			if (friendRequest != null)
+			var friendRequests = _unitOfWork.FriendRequestRepository.GetMany(friend.UserId, friend.RecieverUserId);
+			if (friendRequests.Any())
 			{
-				response.FriendRequestDetail = new FriendRequest
-				{
-					FriendRequestId = friendRequest.FriendRequestID,
-					FriendRequestState = friendRequest.FriendRequestStatus
-				};
-				response.user = friendRequest;
-				response.reply = new Reply
-				{
-					replyCode = 400,
-					replyMessage = "Such request already sent"
-				};
+				return GetAlreadySentResponse(friendRequests, response);
 			}
 
 			try
@@ -1214,12 +1214,21 @@ namespace StickManWebAPI.Controllers
 			return audioMessagesWrapper;
 		}
 
-		private UserExtension GetAlreadySentFriendRequests(Friend friend)
+		private static SendFriendRequest GetAlreadySentResponse(ICollection<StickMan_FriendRequest> friendRequests, SendFriendRequest response)
 		{
-			var requests = GetPendingFriendRequests(friend);
-			var friendRequest = requests.users.FirstOrDefault(x => x.FriendRequestID == friend.FriendRequestId || x.userID == friend.RecieverUserId);
+			var friendRequest = friendRequests.FirstOrDefault();
+			response.FriendRequestDetail = new FriendRequest
+			{
+				FriendRequestId = friendRequest.FriendRequestID
+			};
 
-			return friendRequest;
+			response.reply = new Reply
+			{
+				replyCode = 400,
+				replyMessage = "Such request already sent"
+			};
+
+			return response;
 		}
 
 		#region push

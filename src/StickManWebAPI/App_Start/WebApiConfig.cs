@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Http;
+﻿using System.Web.Http;
 
 namespace StickManWebAPI
 {
@@ -21,11 +18,11 @@ namespace StickManWebAPI
 			//);
 
 			config.Routes.MapHttpRoute(
-            name: "ApiByAction",
-            routeTemplate: "api/{controller}/{action}",
-            defaults: new { action = "Get" }
-        );
-			
+				name: "ApiByAction",
+				routeTemplate: "api/{controller}/{action}",
+				defaults: new { action = "Get" }
+			);
+
 		}
 	}
 }
