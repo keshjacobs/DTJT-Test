@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 
 namespace StickManWebAPI.Controllers
 {
@@ -10,7 +6,7 @@ namespace StickManWebAPI.Controllers
 	{
 		public ActionResult Index()
 		{
-			return View();
+			return Redirect("Swagger");
 		}
 	}
 }
