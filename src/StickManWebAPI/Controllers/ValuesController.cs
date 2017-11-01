@@ -1267,7 +1267,7 @@ namespace StickManWebAPI.Controllers
 			//  (so you would leave the first arg in the ctor of ApplePushChannelSettings as 'false')
 			//  If you are using an AdHoc or AppStore provisioning profile, you must use the Production push notification server
 			//  (so you would change the first arg in the ctor of ApplePushChannelSettings to 'true')
-			push.RegisterAppleService(new ApplePushChannelSettings(appleCert, "123123", false)); //Extension method
+			push.RegisterAppleService(new ApplePushChannelSettings(appleCert, "123123", true)); //Extension method
 																								 //Fluent construction of an iOS notification
 																								 //IMPORTANT: For iOS you MUST MUST MUST use your own DeviceToken here that gets generated within your iOS app itself when the Application Delegate
 																								 //  for registered for remote notifications is called, and the device token is passed back to you
