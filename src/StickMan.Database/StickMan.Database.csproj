@@ -78,6 +78,18 @@
     <Compile Include="StickMan_Users.cs">
       <DependentUpon>DatabaseEntities.tt</DependentUpon>
     </Compile>
+    <Compile Include="StickMan_UserSesion.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="StickMan_UsersFriendList.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="StickMan_Users_AudioData_UploadInformation.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="StickMan_Users_Cast_AudioData_UploadInformation.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="StickMan_usp_CastSaveAudioPath_Result.cs">
       <DependentUpon>DatabaseEntities.tt</DependentUpon>
     </Compile>
