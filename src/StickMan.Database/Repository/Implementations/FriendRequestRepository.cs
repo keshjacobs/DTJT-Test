@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using StickMan.Database.Repository.Contracts;
 
-namespace StickMan.Database.Repository
+namespace StickMan.Database.Repository.Implementations
 {
 	public class FriendRequestRepository : IFriendRequestRepository
 	{

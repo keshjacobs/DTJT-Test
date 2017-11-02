@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="StickManDbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="StickManDbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <!--Errors Found During Generation:
 warning 6013: The table/view 'StickManDB.dbo.dbo.StickMan_Users_MessageStatus' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
         <EntityType Name="dbo_StickMan_Users_MessageStatus">
@@ -14,8 +14,6 @@ warning 6013: The table/view 'StickManDB.dbo.dbo.StickMan_Users_MessageStatus' d
           <Property Name="UploadTime" Type="datetime" />
           <Property Name="ReadStatus" Type="bit" />
         </EntityType>-->
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'StickManDB.dbo.StickMan_FriendRequest' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="StickMan_FriendRequest">
           <Key>
             <PropertyRef Name="FriendRequestID" />
@@ -42,20 +40,23 @@ warning 6002: The table/view 'StickManDB.dbo.StickMan_FriendRequest' does not ha
           <Property Name="ImagePath" Type="varchar(max)" />
           <Property Name="DeviceId" Type="varchar" MaxLength="1024" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6013: The table/view 'StickManDB.dbo.StickMan_Users_AudioData_UploadInformation' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
         <EntityType Name="StickMan_Users_AudioData_UploadInformation">
-          <Property Name="UserID" Type="int" />
-          <Property Name="RecieverID" Type="int" />
-          <Property Name="AudioFilePath" Type="varchar" MaxLength="2048" />
-          <Property Name="UploadTime" Type="datetime" />
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="UserID" Type="int" Nullable="false" />
+          <Property Name="RecieverID" Type="int" Nullable="false" />
+          <Property Name="AudioFilePath" Type="varchar" MaxLength="2048" Nullable="false" />
+          <Property Name="UploadTime" Type="datetime" Nullable="false" />
           <Property Name="Filter" Type="varchar" MaxLength="100" />
-          <Property Name="ReadStatus" Type="bit" />
-          <Property Name="DeleteStatus" Type="bit" />
-        </EntityType>-->
-        <!--Errors Found During Generation:
-warning 6013: The table/view 'StickManDB.dbo.StickMan_Users_Cast_AudioData_UploadInformation' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+          <Property Name="ReadStatus" Type="bit" Nullable="false" />
+          <Property Name="DeleteStatus" Type="bit" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
         <EntityType Name="StickMan_Users_Cast_AudioData_UploadInformation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
           <Property Name="UserID" Type="int" />
           <Property Name="RecieverID" Type="int" />
           <Property Name="AudioFilePath" Type="varchar" MaxLength="2048" />
@@ -64,22 +65,27 @@ warning 6013: The table/view 'StickManDB.dbo.StickMan_Users_Cast_AudioData_Uploa
           <Property Name="ReadStatus" Type="bit" />
           <Property Name="DeleteStatus" Type="bit" />
           <Property Name="ClickCount" Type="int" />
-        </EntityType>-->
-        <!--Errors Found During Generation:
-warning 6013: The table/view 'StickManDB.dbo.StickMan_UserSesion' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
         <EntityType Name="StickMan_UserSesion">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
           <Property Name="SessionID" Type="varchar(max)" />
           <Property Name="UserID" Type="int" />
           <Property Name="LoginTime" Type="datetime" />
           <Property Name="LogOutTime" Type="datetime" />
           <Property Name="Active" Type="bit" />
-        </EntityType>-->
-        <!--Errors Found During Generation:
-warning 6013: The table/view 'StickManDB.dbo.StickMan_UsersFriendList' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
         <EntityType Name="StickMan_UsersFriendList">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
           <Property Name="UserID" Type="int" />
           <Property Name="FriendID" Type="int" />
-        </EntityType>-->
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
             <PropertyRef Name="diagram_id" />
@@ -223,21 +229,15 @@ warning 6013: The table/view 'StickManDB.dbo.StickMan_UsersFriendList' does not 
         <Function Name="usp_DeleteFileFromServer" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_GetDeleteStatus" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <EntityContainer Name="StickManDbModelStoreContainer">
+          <EntitySet Name="StickMan_FriendRequest" EntityType="Self.StickMan_FriendRequest" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StickMan_Users" EntityType="Self.StickMan_Users" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StickMan_Users_AudioData_UploadInformation" EntityType="Self.StickMan_Users_AudioData_UploadInformation" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StickMan_Users_Cast_AudioData_UploadInformation" EntityType="Self.StickMan_Users_Cast_AudioData_UploadInformation" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StickMan_UserSesion" EntityType="Self.StickMan_UserSesion" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StickMan_UsersFriendList" EntityType="Self.StickMan_UsersFriendList" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="StickMan_FriendRequest" EntityType="Self.StickMan_FriendRequest" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [StickMan_FriendRequest].[FriendRequestID] AS [FriendRequestID], 
-    [StickMan_FriendRequest].[UserID] AS [UserID], 
-    [StickMan_FriendRequest].[RecieverID] AS [RecieverID], 
-    [StickMan_FriendRequest].[DateTimeStamp] AS [DateTimeStamp], 
-    [StickMan_FriendRequest].[FriendRequestStatus] AS [FriendRequestStatus], 
-    [StickMan_FriendRequest].[BlockedBy] AS [BlockedBy]
-    FROM [dbo].[StickMan_FriendRequest] AS [StickMan_FriendRequest]</DefiningQuery>
-          </EntitySet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="StickManDbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -412,6 +412,10 @@ warning 6013: The table/view 'StickManDB.dbo.StickMan_UsersFriendList' does not 
           <FunctionImport Name="usp_CastGetDeleteStatus" ReturnType="Collection(StickManDbModel.usp_CastGetDeleteStatus_Result)" />
           <FunctionImport Name="usp_DeleteFileFromServer" />
           <FunctionImport Name="usp_GetDeleteStatus" />
+          <EntitySet Name="StickMan_Users_AudioData_UploadInformation" EntityType="StickManDbModel.StickMan_Users_AudioData_UploadInformation" />
+          <EntitySet Name="StickMan_Users_Cast_AudioData_UploadInformation" EntityType="StickManDbModel.StickMan_Users_Cast_AudioData_UploadInformation" />
+          <EntitySet Name="StickMan_UserSesion" EntityType="StickManDbModel.StickMan_UserSesion" />
+          <EntitySet Name="StickMan_UsersFriendList" EntityType="StickManDbModel.StickMan_UsersFriendList" />
         </EntityContainer>
         <ComplexType Name="spAndroidLogin_Result">
           <Property Type="Int32" Name="UserID" Nullable="false" />
@@ -531,6 +535,52 @@ warning 6013: The table/view 'StickManDB.dbo.StickMan_UsersFriendList' does not 
           <Property Type="Int32" Name="FriendRequestStatus" Nullable="true" />
           <Property Type="Int32" Name="BlockedBy" Nullable="true" />
         </ComplexType>
+        <EntityType Name="StickMan_Users_AudioData_UploadInformation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="UserID" Type="Int32" Nullable="false" />
+          <Property Name="RecieverID" Type="Int32" Nullable="false" />
+          <Property Name="AudioFilePath" Type="String" MaxLength="2048" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="UploadTime" Type="DateTime" Precision="3" Nullable="false" />
+          <Property Name="Filter" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ReadStatus" Type="Boolean" Nullable="false" />
+          <Property Name="DeleteStatus" Type="Boolean" Nullable="false" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
+        <EntityType Name="StickMan_Users_Cast_AudioData_UploadInformation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="UserID" Type="Int32" />
+          <Property Name="RecieverID" Type="Int32" />
+          <Property Name="AudioFilePath" Type="String" MaxLength="2048" FixedLength="false" Unicode="false" />
+          <Property Name="UploadTime" Type="DateTime" Precision="3" />
+          <Property Name="Filter" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ReadStatus" Type="Boolean" />
+          <Property Name="DeleteStatus" Type="Boolean" />
+          <Property Name="ClickCount" Type="Int32" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
+        <EntityType Name="StickMan_UserSesion">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="SessionID" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="UserID" Type="Int32" />
+          <Property Name="LoginTime" Type="DateTime" Precision="3" />
+          <Property Name="LogOutTime" Type="DateTime" Precision="3" />
+          <Property Name="Active" Type="Boolean" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
+        <EntityType Name="StickMan_UsersFriendList">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="UserID" Type="Int32" />
+          <Property Name="FriendID" Type="Int32" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -769,6 +819,56 @@ warning 6013: The table/view 'StickManDB.dbo.StickMan_UsersFriendList' does not 
           </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="usp_DeleteFileFromServer" FunctionName="StickManDbModel.Store.usp_DeleteFileFromServer" />
           <FunctionImportMapping FunctionImportName="usp_GetDeleteStatus" FunctionName="StickManDbModel.Store.usp_GetDeleteStatus" />
+          <EntitySetMapping Name="StickMan_Users_AudioData_UploadInformation">
+            <EntityTypeMapping TypeName="StickManDbModel.StickMan_Users_AudioData_UploadInformation">
+              <MappingFragment StoreEntitySet="StickMan_Users_AudioData_UploadInformation">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="DeleteStatus" ColumnName="DeleteStatus" />
+                <ScalarProperty Name="ReadStatus" ColumnName="ReadStatus" />
+                <ScalarProperty Name="Filter" ColumnName="Filter" />
+                <ScalarProperty Name="UploadTime" ColumnName="UploadTime" />
+                <ScalarProperty Name="AudioFilePath" ColumnName="AudioFilePath" />
+                <ScalarProperty Name="RecieverID" ColumnName="RecieverID" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StickMan_Users_Cast_AudioData_UploadInformation">
+            <EntityTypeMapping TypeName="StickManDbModel.StickMan_Users_Cast_AudioData_UploadInformation">
+              <MappingFragment StoreEntitySet="StickMan_Users_Cast_AudioData_UploadInformation">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ClickCount" ColumnName="ClickCount" />
+                <ScalarProperty Name="DeleteStatus" ColumnName="DeleteStatus" />
+                <ScalarProperty Name="ReadStatus" ColumnName="ReadStatus" />
+                <ScalarProperty Name="Filter" ColumnName="Filter" />
+                <ScalarProperty Name="UploadTime" ColumnName="UploadTime" />
+                <ScalarProperty Name="AudioFilePath" ColumnName="AudioFilePath" />
+                <ScalarProperty Name="RecieverID" ColumnName="RecieverID" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StickMan_UserSesion">
+            <EntityTypeMapping TypeName="StickManDbModel.StickMan_UserSesion">
+              <MappingFragment StoreEntitySet="StickMan_UserSesion">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="LogOutTime" ColumnName="LogOutTime" />
+                <ScalarProperty Name="LoginTime" ColumnName="LoginTime" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="SessionID" ColumnName="SessionID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StickMan_UsersFriendList">
+            <EntityTypeMapping TypeName="StickManDbModel.StickMan_UsersFriendList">
+              <MappingFragment StoreEntitySet="StickMan_UsersFriendList">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="FriendID" ColumnName="FriendID" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

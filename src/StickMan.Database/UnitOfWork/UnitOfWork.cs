@@ -1,11 +1,14 @@
-﻿using System;
-using StickMan.Database.Repository;
+using System;
+using StickMan.Database.Repository.Contracts;
+using StickMan.Database.Repository.Implementations;
 
 namespace StickMan.Database.UnitOfWork
 {
 	public class UnitOfWork : IUnitOfWork, IDisposable
 	{
 		private IFriendRequestRepository _friendRequestRepository;
+		private IMessageRepository _messageRepository;
+		private IUserRepository _userRepository;
 
 		private readonly EfStickManContext _context;
 		private bool _disposed;
@@ -20,7 +23,14 @@ namespace StickMan.Database.UnitOfWork
 			_context.SaveChanges();
 		}
 
-		public IFriendRequestRepository FriendRequestRepository => _friendRequestRepository ?? (_friendRequestRepository = new FriendRequestRepository(_context));
+		public IFriendRequestRepository FriendRequestRepository =>
+			_friendRequestRepository ?? (_friendRequestRepository = new FriendRequestRepository(_context));
+
+		public IMessageRepository MessageRepository =>
+			_messageRepository ?? (_messageRepository = new MessageRepository(_context));
+
+		public IUserRepository UserRepository =>
+			_userRepository ?? (_userRepository = new UserRepository(_context));
 
 		public void Dispose()
 		{

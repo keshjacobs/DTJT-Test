@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
-namespace StickMan.Database.Repository
+namespace StickMan.Database.Repository.Contracts
 {
 	public interface IFriendRequestRepository
 	{
