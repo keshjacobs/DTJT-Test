@@ -9,7 +9,7 @@ namespace StickMan.Database.UnitOfWork
 
 		IFriendRequestRepository FriendRequestRepository { get; }
 
-		IAudioDataUploadInfoRepository AudioDataUploadInfoRepository { get; }
+		IMessageRepository MessageRepository { get; }
 
 		IUserRepository UserRepository { get; }
 	}

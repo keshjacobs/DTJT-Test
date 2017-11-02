@@ -2,6 +2,9 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using FluentScheduler;
+using Microsoft.Practices.Unity;
+using StickManWebAPI.Scheduler;
 
 namespace StickManWebAPI
 {
@@ -12,8 +15,10 @@ namespace StickManWebAPI
 	{
 		protected void Application_Start()
 		{
+			var container = new UnityContainer();
+
 			AreaRegistration.RegisterAllAreas();
-			UnityConfig.RegisterComponents();
+			UnityConfig.RegisterComponents(container);
 			WebApiConfig.Register(GlobalConfiguration.Configuration);
 			FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
 			RouteConfig.RegisterRoutes(RouteTable.Routes);
@@ -23,6 +28,9 @@ namespace StickManWebAPI
 			config.Formatters.JsonFormatter.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
 
 			config.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+
+			JobManager.JobFactory = new StructureMapJobFactory(container);
+			JobManager.Initialize(new JobsRegistry());
 		}
 	}
 }

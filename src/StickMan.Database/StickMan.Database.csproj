@@ -68,8 +68,8 @@
     </Compile>
     <Compile Include="Repository\Contracts\IUserRepository.cs" />
     <Compile Include="Repository\Implementations\UserRepository.cs" />
-    <Compile Include="Repository\Implementations\AudioDataUploadInfoRepository.cs" />
-    <Compile Include="Repository\Contracts\IAudioDataUploadInfoRepository.cs" />
+    <Compile Include="Repository\Implementations\MessageRepository.cs" />
+    <Compile Include="Repository\Contracts\IMessageRepository.cs" />
     <Compile Include="Repository\Contracts\IFriendRequestRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\Implementations\FriendRequestRepository.cs" />

@@ -44,13 +44,13 @@ warning 6013: The table/view 'StickManDB.dbo.dbo.StickMan_Users_MessageStatus' d
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="UserID" Type="int" />
-          <Property Name="RecieverID" Type="int" />
-          <Property Name="AudioFilePath" Type="varchar" MaxLength="2048" />
-          <Property Name="UploadTime" Type="datetime" />
+          <Property Name="UserID" Type="int" Nullable="false" />
+          <Property Name="RecieverID" Type="int" Nullable="false" />
+          <Property Name="AudioFilePath" Type="varchar" MaxLength="2048" Nullable="false" />
+          <Property Name="UploadTime" Type="datetime" Nullable="false" />
           <Property Name="Filter" Type="varchar" MaxLength="100" />
-          <Property Name="ReadStatus" Type="bit" />
-          <Property Name="DeleteStatus" Type="bit" />
+          <Property Name="ReadStatus" Type="bit" Nullable="false" />
+          <Property Name="DeleteStatus" Type="bit" Nullable="false" />
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
         </EntityType>
         <EntityType Name="StickMan_Users_Cast_AudioData_UploadInformation">
@@ -539,13 +539,13 @@ warning 6013: The table/view 'StickManDB.dbo.dbo.StickMan_Users_MessageStatus' d
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="UserID" Type="Int32" />
-          <Property Name="RecieverID" Type="Int32" />
-          <Property Name="AudioFilePath" Type="String" MaxLength="2048" FixedLength="false" Unicode="false" />
-          <Property Name="UploadTime" Type="DateTime" Precision="3" />
+          <Property Name="UserID" Type="Int32" Nullable="false" />
+          <Property Name="RecieverID" Type="Int32" Nullable="false" />
+          <Property Name="AudioFilePath" Type="String" MaxLength="2048" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="UploadTime" Type="DateTime" Precision="3" Nullable="false" />
           <Property Name="Filter" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="ReadStatus" Type="Boolean" />
-          <Property Name="DeleteStatus" Type="Boolean" />
+          <Property Name="ReadStatus" Type="Boolean" Nullable="false" />
+          <Property Name="DeleteStatus" Type="Boolean" Nullable="false" />
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="StickMan_Users_Cast_AudioData_UploadInformation">

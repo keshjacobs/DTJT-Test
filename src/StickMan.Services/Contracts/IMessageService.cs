@@ -6,5 +6,7 @@ namespace StickMan.Services.Contracts
 	public interface IMessageService
 	{
 		IEnumerable<TimelineModel> GetTimeline(int userId);
+
+		void CleanUpMessages();
 	}
 }

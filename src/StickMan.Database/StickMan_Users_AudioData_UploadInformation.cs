@@ -14,13 +14,13 @@ namespace StickMan.Database
     
     public partial class StickMan_Users_AudioData_UploadInformation
     {
-        public Nullable<int> UserID { get; set; }
-        public Nullable<int> RecieverID { get; set; }
+        public int UserID { get; set; }
+        public int RecieverID { get; set; }
         public string AudioFilePath { get; set; }
-        public Nullable<System.DateTime> UploadTime { get; set; }
+        public System.DateTime UploadTime { get; set; }
         public string Filter { get; set; }
-        public Nullable<bool> ReadStatus { get; set; }
-        public Nullable<bool> DeleteStatus { get; set; }
+        public bool ReadStatus { get; set; }
+        public bool DeleteStatus { get; set; }
         public int Id { get; set; }
     }
 }

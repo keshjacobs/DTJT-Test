@@ -1,4 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Web.Hosting;
 using StickMan.Database;
 using StickMan.Database.UnitOfWork;
 using StickMan.Services.Contracts;
@@ -19,7 +23,8 @@ namespace StickMan.Services.Implementation
 		{
 			var timeline = new List<TimelineModel>();
 
-			var messagesInfo = _unitOfWork.AudioDataUploadInfoRepository.GetSentReceivedMessagesInfo(userId);
+			var messagesInfo = _unitOfWork.MessageRepository.GetSentReceivedMessagesInfo(userId)
+				.OrderByDescending(m => m.UploadTime);
 
 			foreach (var message in messagesInfo)
 			{
@@ -28,7 +33,7 @@ namespace StickMan.Services.Implementation
 					AudioPath = message.AudioFilePath
 				};
 
-				if (message.DeleteStatus.GetValueOrDefault())
+				if (message.DeleteStatus)
 				{
 					FillDeletedMessageInfo(timelineMessage);
 				}
@@ -45,9 +50,31 @@ namespace StickMan.Services.Implementation
 			return timeline;
 		}
 
+		public void CleanUpMessages()
+		{
+			var date = DateTime.UtcNow.AddDays(-2);
+
+			var messages = _unitOfWork.MessageRepository.GetMessagesOlderThanDate(date);
+
+			foreach (var message in messages)
+			{
+				var absolutePath = HostingEnvironment.MapPath("~/Content/Audio/" + message.AudioFilePath);
+
+				if (File.Exists(absolutePath))
+				{
+					File.Delete(absolutePath);
+				}
+
+				message.DeleteStatus = true;
+				_unitOfWork.MessageRepository.Update(message);
+			}
+
+			_unitOfWork.Save();
+		}
+
 		private static void FillExistingMessageInfo(int userId, TimelineModel timelineMessage, StickMan_Users_AudioData_UploadInformation message)
 		{
-			timelineMessage.Emoji = message.ReadStatus.GetValueOrDefault() ? Emoji.Grimacing : Emoji.SmilingImp;
+			timelineMessage.Emoji = message.ReadStatus ? Emoji.Grimacing : Emoji.SmilingImp;
 
 			if (message.UserID == userId)
 			{
@@ -71,10 +98,11 @@ namespace StickMan.Services.Implementation
 
 		private void FillUser(TimelineModel timelineMessage, StickMan_Users_AudioData_UploadInformation message, int userId)
 		{
-			var id = message.UserID == userId ? message.UserID : message.RecieverID;
+			var id = message.UserID == userId ? message.RecieverID : message.UserID;
 
-			var user = _unitOfWork.UserRepository.Get(id.GetValueOrDefault());
+			var user = _unitOfWork.UserRepository.Get(id);
 			timelineMessage.UserName = user.UserName;
+			timelineMessage.UserId = id;
 		}
 	}
 }

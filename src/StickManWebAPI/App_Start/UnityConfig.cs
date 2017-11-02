@@ -6,10 +6,8 @@ namespace StickManWebAPI
 {
 	public static class UnityConfig
 	{
-		public static void RegisterComponents()
+		public static void RegisterComponents(UnityContainer container)
 		{
-			var container = new UnityContainer();
-
 			DiRegistrations.Register(container);
 
 			GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
