@@ -57,13 +57,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DatabaseEntities.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Repository\Contracts\IUserRepository.cs" />
-    <Compile Include="Repository\Implementations\UserRepository.cs" />
-    <Compile Include="Repository\Implementations\MessageRepository.cs" />
-    <Compile Include="Repository\Contracts\IMessageRepository.cs" />
-    <Compile Include="Repository\Contracts\IFriendRequestRepository.cs" />
+    <Compile Include="Repository\IRepository.cs" />
+    <Compile Include="Repository\Repository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repository\Implementations\FriendRequestRepository.cs" />
     <Compile Include="spAndroidLogin_Result.cs">
       <DependentUpon>DatabaseEntities.tt</DependentUpon>
     </Compile>

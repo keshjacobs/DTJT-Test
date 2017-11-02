@@ -176,6 +176,7 @@
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\AudioFileController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MessageController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
@@ -198,6 +199,7 @@
     <Compile Include="Models\SearchUser.cs" />
     <Compile Include="Models\SignUpModel.cs" />
     <Compile Include="Models\Unblock.cs" />
+    <Compile Include="Models\FileContent.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\userProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

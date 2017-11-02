@@ -7,6 +7,8 @@ namespace StickMan.Services.Contracts
 	{
 		IEnumerable<TimelineModel> GetTimeline(int userId);
 
+		void SaveCastMessage(string filePath, int userId);
+
 		void CleanUpMessages();
 	}
 }

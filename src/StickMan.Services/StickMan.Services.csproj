@@ -35,8 +35,14 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\MessageConstants.cs" />
+    <Compile Include="Contracts\IPathProvider.cs" />
     <Compile Include="Contracts\IMessageService.cs" />
+    <Compile Include="Contracts\ISessionService.cs" />
+    <Compile Include="Exceptions\InvalidSessionException.cs" />
     <Compile Include="Implementation\MessageService.cs" />
+    <Compile Include="Implementation\PathProvider.cs" />
+    <Compile Include="Implementation\SessionService.cs" />
     <Compile Include="Models\Message\Emoji.cs" />
     <Compile Include="Models\Message\MessageArrow.cs" />
     <Compile Include="Models\Message\MessageStatus.cs" />

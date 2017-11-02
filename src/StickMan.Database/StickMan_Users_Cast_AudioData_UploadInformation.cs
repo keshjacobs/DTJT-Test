@@ -14,7 +14,15 @@ namespace StickMan.Database
     
     public partial class StickMan_Users_Cast_AudioData_UploadInformation
     {
-        public Nullable<int> UserID { get; set; }
+	    public StickMan_Users_Cast_AudioData_UploadInformation()
+	    {
+		    ReadStatus = false;
+		    DeleteStatus = false;
+		    ClickCount = 0;
+			UploadTime = DateTime.UtcNow;
+	    }
+
+		public Nullable<int> UserID { get; set; }
         public Nullable<int> RecieverID { get; set; }
         public string AudioFilePath { get; set; }
         public Nullable<System.DateTime> UploadTime { get; set; }

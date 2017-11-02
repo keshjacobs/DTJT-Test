@@ -1,21 +1,20 @@
 using System;
-using StickMan.Database.Repository.Contracts;
-using StickMan.Database.Repository.Implementations;
+using System.Collections;
+using StickMan.Database.Repository;
 
 namespace StickMan.Database.UnitOfWork
 {
 	public class UnitOfWork : IUnitOfWork, IDisposable
 	{
-		private IFriendRequestRepository _friendRequestRepository;
-		private IMessageRepository _messageRepository;
-		private IUserRepository _userRepository;
-
 		private readonly EfStickManContext _context;
 		private bool _disposed;
+		private readonly Hashtable _repositories;
 
 		public UnitOfWork()
 		{
+			_repositories = new Hashtable();
 			_context = new EfStickManContext();
+			_context.Configuration.AutoDetectChangesEnabled = false;
 		}
 
 		public void Save()
@@ -23,14 +22,17 @@ namespace StickMan.Database.UnitOfWork
 			_context.SaveChanges();
 		}
 
-		public IFriendRequestRepository FriendRequestRepository =>
-			_friendRequestRepository ?? (_friendRequestRepository = new FriendRequestRepository(_context));
+		public IRepository<TData> Repository<TData>() where TData : class
+		{
+			var type = typeof(TData).Name;
 
-		public IMessageRepository MessageRepository =>
-			_messageRepository ?? (_messageRepository = new MessageRepository(_context));
+			if (!_repositories.ContainsKey(type))
+			{
+				_repositories.Add(type, new Repository<TData>(_context));
+			}
 
-		public IUserRepository UserRepository =>
-			_userRepository ?? (_userRepository = new UserRepository(_context));
+			return (IRepository<TData>)_repositories[type];
+		}
 
 		public void Dispose()
 		{

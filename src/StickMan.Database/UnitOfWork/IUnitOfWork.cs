@@ -1,4 +1,4 @@
-using StickMan.Database.Repository.Contracts;
+using StickMan.Database.Repository;
 
 namespace StickMan.Database.UnitOfWork
 {
@@ -6,10 +6,6 @@ namespace StickMan.Database.UnitOfWork
 	{
 		void Save();
 
-		IFriendRequestRepository FriendRequestRepository { get; }
-
-		IMessageRepository MessageRepository { get; }
-
-		IUserRepository UserRepository { get; }
+		IRepository<TData> Repository<TData>() where TData : class;
 	}
 }

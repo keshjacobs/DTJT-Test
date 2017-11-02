@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Web.Hosting;
 using System.Web.Http;
-using Newtonsoft.Json;
 using StickManWebAPI.Models;
 using PushSharp.Apple;
 using PushSharp;
@@ -220,10 +219,8 @@ namespace StickManWebAPI.Controllers
 		public AudioWrapper SaveAudioPath(AudioContent audioContent)
 		{
 			var audioWrapper = new AudioWrapper();
-			//List<AudioWrapper> audioWrapperList = new List<AudioWrapper>();
 			var reply = new Reply();
 			var pushInfo = new PushInfo();
-
 
 			try
 			{
@@ -237,9 +234,9 @@ namespace StickManWebAPI.Controllers
 					Connection = con,
 					CommandText = "StickMan_usp_SaveAudioPath"
 				};
+
 				foreach (var currentrecieverId in audioContent.recieverId)
 				{
-
 					cmd.Parameters.Add("@UserID", SqlDbType.Int, 32).Value = audioContent.userId;
 					cmd.Parameters.Add("@RecieverID", SqlDbType.Int, 32).Value = currentrecieverId;
 					cmd.Parameters.Add("@FilePath", SqlDbType.VarChar, 2048).Value = audioContent.filePath;
@@ -294,7 +291,7 @@ namespace StickManWebAPI.Controllers
 			var deviceID = string.Empty;
 			var user = new User();
 
-			var friendRequests = _unitOfWork.FriendRequestRepository.GetMany(friend.UserId, friend.RecieverUserId);
+			var friendRequests = _unitOfWork.Repository<StickMan_FriendRequest>().Get(x => x.UserID == friend.UserId && x.RecieverID == friend.RecieverUserId);
 			if (friendRequests.Any())
 			{
 				return GetAlreadySentResponse(friendRequests, response);
@@ -1214,7 +1211,7 @@ namespace StickManWebAPI.Controllers
 			return audioMessagesWrapper;
 		}
 
-		private static SendFriendRequest GetAlreadySentResponse(ICollection<StickMan_FriendRequest> friendRequests, SendFriendRequest response)
+		private static SendFriendRequest GetAlreadySentResponse(IEnumerable<StickMan_FriendRequest> friendRequests, SendFriendRequest response)
 		{
 			var friendRequest = friendRequests.FirstOrDefault();
 			response.FriendRequestDetail = new FriendRequest

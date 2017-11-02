@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web.Hosting;
 using StickMan.Database;
 using StickMan.Database.UnitOfWork;
 using StickMan.Services.Contracts;
@@ -13,17 +12,20 @@ namespace StickMan.Services.Implementation
 	public class MessageService : IMessageService
 	{
 		private readonly IUnitOfWork _unitOfWork;
+		private readonly IPathProvider _pathProvider;
 
-		public MessageService(IUnitOfWork unitOfWork)
+		public MessageService(IUnitOfWork unitOfWork, IPathProvider pathProvider)
 		{
 			_unitOfWork = unitOfWork;
+			_pathProvider = pathProvider;
 		}
 
 		public IEnumerable<TimelineModel> GetTimeline(int userId)
 		{
 			var timeline = new List<TimelineModel>();
 
-			var messagesInfo = _unitOfWork.MessageRepository.GetSentReceivedMessagesInfo(userId)
+			var messagesInfo = _unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>()
+				.Get(x => x.UserID == userId || x.RecieverID == userId)
 				.OrderByDescending(m => m.UploadTime);
 
 			foreach (var message in messagesInfo)
@@ -50,15 +52,32 @@ namespace StickMan.Services.Implementation
 			return timeline;
 		}
 
+		public void SaveCastMessage(string filePath, int userId)
+		{
+			var message = new StickMan_Users_Cast_AudioData_UploadInformation
+			{
+				AudioFilePath = filePath,
+				UserID = userId,
+				ReadStatus = false,
+				DeleteStatus = false,
+				ClickCount = 0,
+				UploadTime = DateTime.UtcNow,
+			};
+
+			_unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().Insert(message);
+			_unitOfWork.Save();
+		}
+
 		public void CleanUpMessages()
 		{
 			var date = DateTime.UtcNow.AddDays(-2);
 
-			var messages = _unitOfWork.MessageRepository.GetMessagesOlderThanDate(date);
+			var messages = _unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>()
+				.Get(x => x.UploadTime < date && !x.DeleteStatus);
 
 			foreach (var message in messages)
 			{
-				var absolutePath = HostingEnvironment.MapPath("~/Content/Audio/" + message.AudioFilePath);
+				var absolutePath = _pathProvider.BuildAudioPath(message.AudioFilePath);
 
 				if (File.Exists(absolutePath))
 				{
@@ -66,7 +85,7 @@ namespace StickMan.Services.Implementation
 				}
 
 				message.DeleteStatus = true;
-				_unitOfWork.MessageRepository.Update(message);
+				_unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>().Update(message);
 			}
 
 			_unitOfWork.Save();
@@ -100,7 +119,7 @@ namespace StickMan.Services.Implementation
 		{
 			var id = message.UserID == userId ? message.RecieverID : message.UserID;
 
-			var user = _unitOfWork.UserRepository.Get(id);
+			var user = _unitOfWork.Repository<StickMan_Users>().GetSingle(x => x.UserID == id);
 			timelineMessage.UserName = user.UserName;
 			timelineMessage.UserId = id;
 		}

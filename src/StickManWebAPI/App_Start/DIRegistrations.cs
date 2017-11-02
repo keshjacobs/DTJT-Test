@@ -11,6 +11,8 @@ namespace StickManWebAPI
 		{
 			container.RegisterType<IUnitOfWork, UnitOfWork>();
 			container.RegisterType<IMessageService, MessageService>();
+			container.RegisterType<IPathProvider, PathProvider>();
+			container.RegisterType<ISessionService, SessionService>();
 		}
 	}
 }
