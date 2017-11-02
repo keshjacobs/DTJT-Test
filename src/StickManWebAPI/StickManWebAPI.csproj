@@ -24,6 +24,7 @@
     <IISExpressUseClassicPipelineMode />
     <TargetFrameworkProfile />
     <UseGlobalApplicationHostFile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -173,6 +174,7 @@
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MessageController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -316,6 +318,10 @@
     <ProjectReference Include="..\StickMan.Database\StickMan.Database.csproj">
       <Project>{a2cc6f3e-4649-4a1f-8300-55d2c4bf730d}</Project>
       <Name>StickMan.Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StickMan.Services\StickMan.Services.csproj">
+      <Project>{F942E96F-56E8-4094-8188-BCE659BD1D55}</Project>
+      <Name>StickMan.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

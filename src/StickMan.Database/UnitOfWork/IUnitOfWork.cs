@@ -1,4 +1,5 @@
-﻿using StickMan.Database.Repository;
+using StickMan.Database.Repository;
+using StickMan.Database.Repository.Contracts;
 
 namespace StickMan.Database.UnitOfWork
 {
@@ -7,5 +8,9 @@ namespace StickMan.Database.UnitOfWork
 		void Save();
 
 		IFriendRequestRepository FriendRequestRepository { get; }
+
+		IAudioDataUploadInfoRepository AudioDataUploadInfoRepository { get; }
+
+		IUserRepository UserRepository { get; }
 	}
 }
