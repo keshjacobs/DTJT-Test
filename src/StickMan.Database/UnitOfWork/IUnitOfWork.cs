@@ -1,4 +1,3 @@
-using StickMan.Database.Repository;
 using StickMan.Database.Repository.Contracts;
 
 namespace StickMan.Database.UnitOfWork
