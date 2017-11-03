@@ -1,9 +1,7 @@
-using System.Collections.Generic;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Web;
 using System.Web.Http;
 using StickMan.Services.Contracts;
 using StickMan.Services.Exceptions;
@@ -23,43 +21,13 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
-		public HttpResponseMessage Upload(FileContent content)
+		public HttpResponseMessage UploadBase64([FromBody]Base64FileContent content)
 		{
-			try
+			if (content == null)
 			{
-				_sessionService.Validate(content.UserId, content.SessionToken);
-			}
-			catch (InvalidSessionException)
-			{
-				return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Invalid session");
+				return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Body of the request is required");
 			}
 
-			HttpResponseMessage result;
-			var httpRequest = HttpContext.Current.Request;
-			if (httpRequest.Files.Count > 0)
-			{
-				var files = new List<string>();
-				foreach (string file in httpRequest.Files)
-				{
-					var postedFile = httpRequest.Files[file];
-					var filePath = _pathProvider.BuildAudioPath(content.FileName);
-					postedFile.SaveAs(filePath);
-
-					files.Add(filePath);
-				}
-				result = Request.CreateResponse(HttpStatusCode.Created, files);
-			}
-			else
-			{
-				result = Request.CreateResponse(HttpStatusCode.BadRequest, "Files were not found");
-			}
-
-			return result;
-		}
-
-		[HttpGet]
-		public HttpResponseMessage Download([FromUri]FileContent content)
-		{
 			try
 			{
 				_sessionService.Validate(content.UserId, content.SessionToken);
@@ -70,23 +38,9 @@ namespace StickManWebAPI.Controllers
 			}
 
 			var filePath = _pathProvider.BuildAudioPath(Path.Combine(content.UserId.ToString(), content.FileName));
+			File.WriteAllBytes(filePath, Convert.FromBase64String(content.Base64Content));
 
-			using (var fileStream = File.OpenRead(filePath))
-			{
-				var fileResult = new HttpResponseMessage(HttpStatusCode.OK)
-				{
-					Content = new StreamContent(fileStream)
-				};
-
-				fileResult.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-				{
-					FileName = content.FileName
-				};
-
-				fileResult.Content.Headers.ContentType = new MediaTypeHeaderValue("audio/caf");
-
-				return fileResult;
-			}
+			return Request.CreateResponse(HttpStatusCode.OK, content.FileName);
 		}
 	}
 }

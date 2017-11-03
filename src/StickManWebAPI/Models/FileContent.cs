@@ -8,4 +8,9 @@ namespace StickManWebAPI.Models
 
 		public string FileName { get; set; }
 	}
+
+	public class Base64FileContent : FileContent
+	{
+		public string Base64Content { get; set; }
+	}
 }
