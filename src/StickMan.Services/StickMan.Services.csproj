@@ -43,10 +43,12 @@
     <Compile Include="Implementation\MessageService.cs" />
     <Compile Include="Implementation\PathProvider.cs" />
     <Compile Include="Implementation\SessionService.cs" />
+    <Compile Include="Models\Message\CastMessage.cs" />
     <Compile Include="Models\Message\Emoji.cs" />
     <Compile Include="Models\Message\MessageArrow.cs" />
     <Compile Include="Models\Message\MessageStatus.cs" />
     <Compile Include="Models\Message\TimelineModel.cs" />
+    <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

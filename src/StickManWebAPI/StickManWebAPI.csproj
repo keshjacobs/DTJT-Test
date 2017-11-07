@@ -23,7 +23,8 @@
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <TargetFrameworkProfile />
-    <UseGlobalApplicationHostFile>True</UseGlobalApplicationHostFile>
+    <UseGlobalApplicationHostFile>
+    </UseGlobalApplicationHostFile>
     <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -188,6 +189,7 @@
     <Compile Include="Models\AudioMessagesWrapper.cs" />
     <Compile Include="Models\BlockfrndStatus.cs" />
     <Compile Include="Models\ClickCount.cs" />
+    <Compile Include="Models\ClickCountReply.cs" />
     <Compile Include="Models\DeletefrndStatus.cs" />
     <Compile Include="Models\Friend.cs" />
     <Compile Include="Models\LoginModel.cs" />

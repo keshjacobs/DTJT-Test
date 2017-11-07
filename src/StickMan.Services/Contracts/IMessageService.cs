@@ -9,6 +9,10 @@ namespace StickMan.Services.Contracts
 
 		void SaveCastMessage(string filePath, int userId);
 
+		int IncreaseCastClickCount(int castMessageId);
+
+		IEnumerable<CastMessage> GetCastMessages();
+
 		void CleanUpMessages();
 	}
 }

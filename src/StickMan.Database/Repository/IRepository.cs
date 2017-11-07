@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace StickMan.Database.Repository
@@ -11,6 +12,8 @@ namespace StickMan.Database.Repository
 		TEntity GetSingle(Expression<Func<TEntity, bool>> filter);
 
 		IEnumerable<TEntity> GetAll();
+
+		IQueryable<TEntity> GetQueryAll();
 
 		void Insert(TEntity entity);
 

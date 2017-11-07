@@ -707,7 +707,7 @@ namespace StickManWebAPI.Controllers
 				};
 				sqlCommand.Parameters.Add("@UserID", SqlDbType.Int).Value = Convert.ToInt32(UserId);
 				sqlCommand.Parameters.Add("@RecieverID", SqlDbType.Int).Value = Convert.ToInt32(ReceiverId);
-				sqlCommand.CommandText = "Update StickMan_FriendRequest set FriendRequestStatus=2 Where UserID=@UserID  AND RecieverID=@RecieverID";
+				sqlCommand.CommandText = "Update StickMan_FriendRequest set FriendRequestStatus=2 Where (UserID=@UserID  AND RecieverID=@RecieverID) OR (RecieverID=@UserID  AND UserID=@RecieverID)";
 				sqlCommand.ExecuteNonQuery();
 				return "Success";
 			}

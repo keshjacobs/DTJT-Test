@@ -30,7 +30,12 @@ namespace StickMan.Database.Repository
 
 		public IEnumerable<TEntity> GetAll()
 		{
-			return _entities.ToList();
+			return GetQueryAll().ToList();
+		}
+
+		public IQueryable<TEntity> GetQueryAll()
+		{
+			return _entities;
 		}
 
 		public void Insert(TEntity entity)

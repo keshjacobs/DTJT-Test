@@ -50,5 +50,26 @@ namespace StickManWebAPI.Controllers
 				replyMessage = "Cast message sucessfully saved"
 			};
 		}
+
+		[HttpPost]
+		public ClickCountReply ClickOnCastMessage(int castMessageId)
+		{
+			var clickCount = _messageService.IncreaseCastClickCount(castMessageId);
+
+			return new ClickCountReply
+			{
+				replyCode = (int)EnumReply.processOk,
+				replyMessage = "Cast message clicked",
+				ClickCount = clickCount
+			};
+		}
+
+		[HttpGet]
+		public IEnumerable<CastMessage> GetCastMessages()
+		{
+			var messages = _messageService.GetCastMessages();
+
+			return messages;
+		}
 	}
 }
