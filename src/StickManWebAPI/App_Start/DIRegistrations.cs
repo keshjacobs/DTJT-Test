@@ -13,6 +13,9 @@ namespace StickManWebAPI
 			container.RegisterType<IMessageService, MessageService>();
 			container.RegisterType<IPathProvider, PathProvider>();
 			container.RegisterType<ISessionService, SessionService>();
+			container.RegisterType<IUserService, UserService>();
+			container.RegisterType<IPushNotificationService, PushNotificationService>();
+			container.RegisterType<IFriendRequestService, FriendRequestService>();
 		}
 	}
 }

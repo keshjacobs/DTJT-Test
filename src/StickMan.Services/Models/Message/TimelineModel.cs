@@ -2,6 +2,8 @@ namespace StickMan.Services.Models.Message
 {
 	public class TimelineModel
 	{
+		public int MessageId { get; set; }
+
 		public Emoji Emoji { get; set; }
 
 		public string UserName { get; set; }

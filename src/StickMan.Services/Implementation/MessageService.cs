@@ -33,7 +33,8 @@ namespace StickMan.Services.Implementation
 			{
 				var timelineMessage = new TimelineModel
 				{
-					AudioPath = message.AudioFilePath
+					AudioPath = message.AudioFilePath,
+					MessageId = message.Id
 				};
 
 				if (message.DeleteStatus)
@@ -67,6 +68,18 @@ namespace StickMan.Services.Implementation
 
 			_unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().Insert(message);
 			_unitOfWork.Save();
+		}
+
+		public void ReadMessage(int id)
+		{
+			var message = _unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>().GetSingle(x => x.Id == id);
+
+			if (!message.ReadStatus)
+			{
+				message.ReadStatus = true;
+				_unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>().Update(message);
+				_unitOfWork.Save();
+			}
 		}
 
 		public int IncreaseCastClickCount(int castMessageId)

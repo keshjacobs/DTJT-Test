@@ -30,19 +30,42 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Client, Version=4.5.14.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Client.4.5.14\lib\net45\ServiceStack.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Common, Version=4.5.14.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Common.4.5.14\lib\net45\ServiceStack.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces, Version=4.0.0.0, Culture=neutral, PublicKeyToken=e06fbc6124f57c43, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Interfaces.4.5.14\lib\portable-wp80+sl5+net45+win8+wpa81+monotouch+monoandroid+xamarin.ios10\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Text, Version=4.5.14.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Text.4.5.14\lib\net45\ServiceStack.Text.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\MessageConstants.cs" />
+    <Compile Include="Contracts\IFriendRequestService.cs" />
     <Compile Include="Contracts\IPathProvider.cs" />
     <Compile Include="Contracts\IMessageService.cs" />
+    <Compile Include="Contracts\IPushNotificationService.cs" />
     <Compile Include="Contracts\ISessionService.cs" />
+    <Compile Include="Contracts\IUserService.cs" />
     <Compile Include="Exceptions\InvalidSessionException.cs" />
+    <Compile Include="Implementation\FriendRequestService.cs" />
+    <Compile Include="Models\Push\AndroidData.cs" />
+    <Compile Include="Models\Push\AndroidNotification.cs" />
     <Compile Include="Implementation\MessageService.cs" />
     <Compile Include="Implementation\PathProvider.cs" />
+    <Compile Include="Implementation\PushNotificationService.cs" />
     <Compile Include="Implementation\SessionService.cs" />
+    <Compile Include="Implementation\UserService.cs" />
     <Compile Include="Models\Message\CastMessage.cs" />
     <Compile Include="Models\Message\Emoji.cs" />
     <Compile Include="Models\Message\MessageArrow.cs" />
@@ -52,11 +75,21 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PushSharp.Apple\PushSharp.Apple.csproj">
+      <Project>{83C67156-893D-4AFF-9169-DB34771989CB}</Project>
+      <Name>PushSharp.Apple</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PushSharp.Core\PushSharp.Core.csproj">
+      <Project>{836F225F-6CD9-48DE-910C-70F8A7CF54AA}</Project>
+      <Name>PushSharp.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\StickMan.Database\StickMan.Database.csproj">
       <Project>{a2cc6f3e-4649-4a1f-8300-55d2c4bf730d}</Project>
       <Name>StickMan.Database</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

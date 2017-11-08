@@ -27,6 +27,18 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
+		public Reply ReadMessage(int messageId)
+		{
+			_messageService.ReadMessage(messageId);
+
+			return new Reply
+			{
+				replyCode = 200,
+				replyMessage = $"Message {messageId} was read"
+			};
+		}
+
+		[HttpPost]
 		public Reply SaveCastAudioPath(CastAudioContent audioContent)
 		{
 			try

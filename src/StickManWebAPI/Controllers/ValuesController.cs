@@ -4,56 +4,25 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
 using System.Web.Hosting;
 using System.Web.Http;
 using StickManWebAPI.Models;
-using PushSharp.Apple;
-using PushSharp;
-using PushSharp.Core;
 using StickMan.Database;
-using StickMan.Database.UnitOfWork;
+using StickMan.Services.Contracts;
 
 namespace StickManWebAPI.Controllers
 {
 	public class ValuesController : ApiController
 	{
-		private readonly IUnitOfWork _unitOfWork;
+		private readonly IPushNotificationService _pushNotificationService;
+		private readonly IFriendRequestService _friendRequestService;
 
-		public ValuesController(IUnitOfWork unitOfWork)
+		public ValuesController(
+			IPushNotificationService pushNotificationService,
+			IFriendRequestService friendRequestService)
 		{
-			_unitOfWork = unitOfWork;
-		}
-
-		// GET api/values
-		//public IEnumerable<string> Get()
-		public string Get()
-		{
-			//string str = PushSharpNotification();
-
-			return "ff";
-			//return new string[] { "value1", "value2" };
-		}
-
-		// GET api/values/5
-		public string Get(int id)
-		{
-			return "value";
-		}
-
-		// POST api/values
-		public void Post([FromBody]string value)
-		{
-		}
-
-		// PUT api/values/5
-		public void Put(int id, [FromBody]string value)
-		{
-		}
-
-		// DELETE api/values/5
-		public void Delete(int id)
-		{
+			_pushNotificationService = pushNotificationService;
+			_friendRequestService = friendRequestService;
 		}
 
 		[HttpPost]
@@ -252,11 +221,11 @@ namespace StickManWebAPI.Controllers
 					//push message to reciever
 					if (reply.replyCode == 200)
 					{
-						var deviceID = ds.Tables[0].Rows[0]["DeviceID"].ToString();
+						var deviceId = ds.Tables[0].Rows[0]["DeviceID"].ToString();
 
-						if (!string.IsNullOrEmpty(deviceID))
+						if (!string.IsNullOrEmpty(deviceId))
 						{
-							PushSharpNotification(deviceID, "New audio file recieved!!");
+							_pushNotificationService.SendMessagePush(audioContent.userId, deviceId);
 							pushInfo.pushStatus = "Sent";
 						}
 						else
@@ -265,8 +234,7 @@ namespace StickManWebAPI.Controllers
 						}
 					}
 
-
-					//audioWrapper.pushInfo = pushInfo;
+					audioWrapper.pushInfo = pushInfo;
 
 
 					//audioWrapperList.Add(audioWrapper);
@@ -288,13 +256,30 @@ namespace StickManWebAPI.Controllers
 			var response = new SendFriendRequest();
 			var reply = new Reply();
 			var requestDetails = new FriendRequest();
-			var deviceID = string.Empty;
-			var user = new User();
 
-			var friendRequests = _unitOfWork.Repository<StickMan_FriendRequest>().Get(x => x.UserID == friend.UserId && x.RecieverID == friend.RecieverUserId);
-			if (friendRequests.Any())
+			var friendRequest = _friendRequestService.GetFriendRequest(friend.UserId, friend.RecieverUserId);
+			if (friendRequest != null)
 			{
-				return GetAlreadySentResponse(friendRequests, response);
+				return GetAlreadySentResponse(friendRequest, response);
+			}
+
+			var backFriendRequest = _friendRequestService.GetFriendRequest(friend.RecieverUserId, friend.UserId);
+			if (backFriendRequest != null)
+			{
+				_friendRequestService.AcceptFriendRequest(backFriendRequest.FriendRequestID);
+				return new SendFriendRequest
+				{
+					FriendRequestDetail = new FriendRequest
+					{
+						FriendRequestId = backFriendRequest.FriendRequestID,
+						FriendRequestState = "Accepted"
+					},
+					reply = new Reply
+					{
+						replyCode = 200,
+						replyMessage = "This client already sent request to you, so his request was accepted"
+					}
+				};
 			}
 
 			try
@@ -319,7 +304,7 @@ namespace StickManWebAPI.Controllers
 
 				reply.replyCode = Convert.ToInt32(ds.Tables[0].Rows[0]["ResponseCode"]);
 				reply.replyMessage = ds.Tables[0].Rows[0]["ResponseMesssage"].ToString();
-				deviceID = ds.Tables[0].Rows[0]["DeviceID"].ToString();
+				var deviceId = ds.Tables[0].Rows[0]["DeviceID"].ToString();
 
 				requestDetails.FriendRequestId = Convert.ToInt32(ds.Tables[0].Rows[0]["FriendRequestId"]);
 				requestDetails.FriendRequestState = ds.Tables[0].Rows[0]["FriendRequestState"].ToString();
@@ -329,6 +314,8 @@ namespace StickManWebAPI.Controllers
 				//creating user object
 				if (reply.replyCode == 200 && ds.Tables[1].Rows.Count > 0)
 				{
+					var user = new User();
+
 					foreach (DataRow record in ds.Tables[1].Rows)
 					{
 						user.userID = Convert.ToInt32(record["UserID"]);
@@ -346,10 +333,10 @@ namespace StickManWebAPI.Controllers
 					//send push notification
 					if (Convert.ToInt32(ds.Tables[0].Rows[0]["ResponseCode"]) == 200)
 					{
-						var message = user.username + " sent you a friend request.";
-
-						if (!string.IsNullOrEmpty(deviceID))
-							PushSharpNotification(deviceID, message);
+						if (!string.IsNullOrEmpty(deviceId))
+						{
+							_pushNotificationService.SendFriendRequestPush(user.userID, deviceId);
+						}
 					}
 
 					response.user = user;
@@ -1211,9 +1198,8 @@ namespace StickManWebAPI.Controllers
 			return audioMessagesWrapper;
 		}
 
-		private static SendFriendRequest GetAlreadySentResponse(IEnumerable<StickMan_FriendRequest> friendRequests, SendFriendRequest response)
+		private static SendFriendRequest GetAlreadySentResponse(StickMan_FriendRequest friendRequest, SendFriendRequest response)
 		{
-			var friendRequest = friendRequests.FirstOrDefault();
 			response.FriendRequestDetail = new FriendRequest
 			{
 				FriendRequestId = friendRequest.FriendRequestID
@@ -1227,107 +1213,5 @@ namespace StickManWebAPI.Controllers
 
 			return response;
 		}
-
-		#region push
-		//Push sharp
-		public string PushSharpNotification(string deviceID, string message)
-		{
-
-			//Create our push services broker
-			var push = new PushBroker();
-
-			//Wire up the events for all the services that the broker registers
-			push.OnNotificationSent += NotificationSent;
-			push.OnChannelException += ChannelException;
-			push.OnServiceException += ServiceException;
-			push.OnNotificationFailed += NotificationFailed;
-			push.OnDeviceSubscriptionExpired += DeviceSubscriptionExpired;
-			//push.OnDeviceSubscriptionChanged += DeviceSubscriptionChanged;
-			push.OnChannelCreated += ChannelCreated;
-			push.OnChannelDestroyed += ChannelDestroyed;
-
-
-			//-------------------------
-			// APPLE NOTIFICATIONS
-			//-------------------------
-			//Configure and start Apple APNS
-			// IMPORTANT: Make sure you use the right Push certificate.  Apple allows you to generate one for connecting to Sandbox,
-			//   and one for connecting to Production.  You must use the right one, to match the provisioning profile you build your
-			//   app with!
-			//var appleCert = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Resources/CertificatesNew.p12"));
-
-			//var appleCert = System.Web.Hosting.HostingEnvironment.MapPath("~/utilities/Certificates_dis_final.p12");
-
-			var appleCert = HostingEnvironment.MapPath("~/utilities/CertificatesKeshP2.p12");
-
-			//IMPORTANT: If you are using a Development provisioning Profile, you must use the Sandbox push notification server 
-			//  (so you would leave the first arg in the ctor of ApplePushChannelSettings as 'false')
-			//  If you are using an AdHoc or AppStore provisioning profile, you must use the Production push notification server
-			//  (so you would change the first arg in the ctor of ApplePushChannelSettings to 'true')
-			push.RegisterAppleService(new ApplePushChannelSettings(appleCert, "123123", true)); //Extension method
-																								 //Fluent construction of an iOS notification
-																								 //IMPORTANT: For iOS you MUST MUST MUST use your own DeviceToken here that gets generated within your iOS app itself when the Application Delegate
-																								 //  for registered for remote notifications is called, and the device token is passed back to you
-			push.QueueNotification(new AppleNotification()
-									   .ForDeviceToken(deviceID)
-									   .WithAlert(message)
-									   .WithBadge(7)
-									   .WithSound("sound.caf"));
-
-			//Console.WriteLine("Waiting for Queue to Finish...");
-
-			//Stop and wait for the queues to drains
-			push.StopAllServices(waitForQueuesToFinish: true);
-
-			return "sucess";
-
-			//Console.WriteLine("Queue Finished, press return to exit...");
-			//Console.ReadLine();
-		}
-
-		static string DeviceSubscriptionChanged(object sender, string oldSubscriptionId, string newSubscriptionId, INotification notification)
-		{
-			var str = String.Concat("Device Registration Changed:  Old-> ", oldSubscriptionId, "  New-> ", newSubscriptionId, " -> ", notification);
-
-			return str;
-			//Currently this event will only ever happen for Android GCM
-			//Console.WriteLine("Device Registration Changed:  Old-> " + oldSubscriptionId + "  New-> " + newSubscriptionId + " -> " + notification);
-		}
-
-		static void NotificationSent(object sender, INotification notification)
-		{
-			Console.WriteLine("Sent: " + sender + " -> " + notification);
-		}
-
-		static void NotificationFailed(object sender, INotification notification, Exception notificationFailureException)
-		{
-			Console.WriteLine("Failure: " + sender + " -> " + notificationFailureException.Message + " -> " + notification);
-		}
-
-		static void ChannelException(object sender, IPushChannel channel, Exception exception)
-		{
-			Console.WriteLine("Channel Exception: " + sender + " -> " + exception);
-		}
-
-		static void ServiceException(object sender, Exception exception)
-		{
-			Console.WriteLine("Service Exception: " + sender + " -> " + exception);
-		}
-
-		static void DeviceSubscriptionExpired(object sender, string expiredDeviceSubscriptionId, DateTime timestamp, INotification notification)
-		{
-			Console.WriteLine("Device Subscription Expired: " + sender + " -> " + expiredDeviceSubscriptionId);
-		}
-
-		static void ChannelDestroyed(object sender)
-		{
-			Console.WriteLine("Channel Destroyed for: " + sender);
-		}
-
-		static void ChannelCreated(object sender, IPushChannel pushChannel)
-		{
-			Console.WriteLine("Channel Created for: " + sender);
-		}
-		#endregion push
 	}
 }

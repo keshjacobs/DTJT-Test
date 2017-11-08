@@ -10,7 +10,7 @@ namespace StickManWebAPI.Models
 
 	public class AudioContent
 	{
-		public string userId { get; set; }
+		public int userId { get; set; }
 		public List<string> recieverId { get; set; }
 		public string filePath { get; set; }
 		public string sessionToken { get; set; }
