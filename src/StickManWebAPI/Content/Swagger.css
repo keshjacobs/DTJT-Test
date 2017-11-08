@@ -1,0 +1,22 @@
+﻿.swagger-section .swagger-ui-wrap {
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    max-width: 1170px;
+}
+
+.swagger-section #header {
+    background-color: #2B5EA8;
+}
+
+.swagger-section #header #logo {
+    padding-left: 85px;
+    background-image: url("/Content/img/HLI_logo.svg");
+    background-size: 65px 100%;
+}
+
+.swagger-section #explore {
+    background-color: #5bc0de
+}
+
+.swagger-section #explore:hover {
+    background-color: #31b0d5
+}

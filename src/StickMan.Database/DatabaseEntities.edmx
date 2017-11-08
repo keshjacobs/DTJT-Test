@@ -1,0 +1,895 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="StickManDbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'StickManDB.dbo.dbo.StickMan_Users_MessageStatus' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="dbo_StickMan_Users_MessageStatus">
+          <Property Name="UserID" Type="int" />
+          <Property Name="RecieverID" Type="int" />
+          <Property Name="AudioFilePath" Type="varchar" MaxLength="2048" />
+          <Property Name="UploadTime" Type="datetime" />
+          <Property Name="ReadStatus" Type="bit" />
+        </EntityType>-->
+        <EntityType Name="StickMan_FriendRequest">
+          <Key>
+            <PropertyRef Name="FriendRequestID" />
+          </Key>
+          <Property Name="FriendRequestID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserID" Type="int" />
+          <Property Name="RecieverID" Type="int" />
+          <Property Name="DateTimeStamp" Type="datetime" />
+          <Property Name="FriendRequestStatus" Type="int" />
+          <Property Name="BlockedBy" Type="int" />
+        </EntityType>
+        <EntityType Name="StickMan_Users">
+          <Key>
+            <PropertyRef Name="UserID" />
+          </Key>
+          <Property Name="UserID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserName" Type="varchar" MaxLength="32" />
+          <Property Name="FullName" Type="varchar" MaxLength="64" />
+          <Property Name="Password" Type="varchar" MaxLength="32" />
+          <Property Name="MobileNo" Type="varchar" MaxLength="32" />
+          <Property Name="EmailID" Type="varchar" MaxLength="32" />
+          <Property Name="DOB" Type="date" />
+          <Property Name="Sex" Type="varchar" MaxLength="8" />
+          <Property Name="ImagePath" Type="varchar(max)" />
+          <Property Name="DeviceId" Type="varchar" MaxLength="1024" />
+        </EntityType>
+        <EntityType Name="StickMan_Users_AudioData_UploadInformation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="UserID" Type="int" Nullable="false" />
+          <Property Name="RecieverID" Type="int" Nullable="false" />
+          <Property Name="AudioFilePath" Type="varchar" MaxLength="2048" Nullable="false" />
+          <Property Name="UploadTime" Type="datetime" Nullable="false" />
+          <Property Name="Filter" Type="varchar" MaxLength="100" />
+          <Property Name="ReadStatus" Type="bit" Nullable="false" />
+          <Property Name="DeleteStatus" Type="bit" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
+        <EntityType Name="StickMan_Users_Cast_AudioData_UploadInformation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="UserID" Type="int" />
+          <Property Name="RecieverID" Type="int" />
+          <Property Name="AudioFilePath" Type="varchar" MaxLength="2048" />
+          <Property Name="UploadTime" Type="datetime" />
+          <Property Name="Filter" Type="varchar" MaxLength="100" />
+          <Property Name="ReadStatus" Type="bit" />
+          <Property Name="DeleteStatus" Type="bit" />
+          <Property Name="ClickCount" Type="int" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
+        <EntityType Name="StickMan_UserSesion">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="SessionID" Type="varchar(max)" />
+          <Property Name="UserID" Type="int" />
+          <Property Name="LoginTime" Type="datetime" />
+          <Property Name="LogOutTime" Type="datetime" />
+          <Property Name="Active" Type="bit" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
+        <EntityType Name="StickMan_UsersFriendList">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="UserID" Type="int" />
+          <Property Name="FriendID" Type="int" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
+        </EntityType>
+        <Function Name="fn_diagramobjects" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="int" />
+        <Function Name="sp_alterdiagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+          <Parameter Name="version" Type="int" Mode="In" />
+          <Parameter Name="definition" Type="varbinary(max)" Mode="In" />
+        </Function>
+        <Function Name="sp_creatediagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+          <Parameter Name="version" Type="int" Mode="In" />
+          <Parameter Name="definition" Type="varbinary(max)" Mode="In" />
+        </Function>
+        <Function Name="sp_dropdiagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+        </Function>
+        <Function Name="sp_helpdiagramdefinition" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+        </Function>
+        <Function Name="sp_helpdiagrams" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+        </Function>
+        <Function Name="sp_renamediagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+          <Parameter Name="new_diagramname" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="sp_upgraddiagrams" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="spAndroidLogin" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="login" Type="nvarchar" Mode="In" />
+          <Parameter Name="password" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="spAndroidRegister" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="login" Type="varchar" Mode="In" />
+          <Parameter Name="name" Type="varchar" Mode="In" />
+          <Parameter Name="password" Type="varchar" Mode="In" />
+          <Parameter Name="email" Type="varchar" Mode="In" />
+          <Parameter Name="DOB" Type="varchar" Mode="In" />
+          <Parameter Name="sex" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="StickMan_usp_Cast_GetAudioFileMessages" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="SessionToken" Type="varchar" Mode="In" />
+          <Parameter Name="UserID" Type="int" Mode="In" />
+        </Function>
+        <Function Name="StickMan_usp_CastSaveAudioPath" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="UserID" Type="int" Mode="In" />
+          <Parameter Name="RecieverID" Type="int" Mode="In" />
+          <Parameter Name="FilePath" Type="varchar" Mode="In" />
+          <Parameter Name="Filter" Type="varchar" Mode="In" />
+          <Parameter Name="SessionToken" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="StickMan_usp_CreateFB_User" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="UserID" Type="int" Mode="In" />
+          <Parameter Name="UserName" Type="varchar" Mode="In" />
+          <Parameter Name="FullName" Type="varchar" Mode="In" />
+          <Parameter Name="Password" Type="varchar" Mode="In" />
+          <Parameter Name="MobileNo" Type="varchar" Mode="In" />
+          <Parameter Name="EmailID" Type="varchar" Mode="In" />
+          <Parameter Name="DOB" Type="date" Mode="In" />
+          <Parameter Name="Sex" Type="varchar" Mode="In" />
+          <Parameter Name="ImagePath" Type="varchar(max)" Mode="In" />
+          <Parameter Name="DeviceId" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="StickMan_usp_CreateUpdate_User" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="UserID" Type="int" Mode="In" />
+          <Parameter Name="UserName" Type="varchar" Mode="In" />
+          <Parameter Name="FullName" Type="varchar" Mode="In" />
+          <Parameter Name="Password" Type="varchar" Mode="In" />
+          <Parameter Name="MobileNo" Type="varchar" Mode="In" />
+          <Parameter Name="EmailID" Type="varchar" Mode="In" />
+          <Parameter Name="DOB" Type="date" Mode="In" />
+          <Parameter Name="Sex" Type="varchar" Mode="In" />
+          <Parameter Name="ImagePath" Type="varchar(max)" Mode="In" />
+          <Parameter Name="DeviceId" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="StickMan_usp_DeleteStatus" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="StickMan_usp_FbLogin_User" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="UserName" Type="varchar" Mode="In" />
+          <Parameter Name="EmailID" Type="varchar" Mode="In" />
+          <Parameter Name="DeviceId" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="StickMan_usp_GetAudioFileMessages" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="SessionToken" Type="varchar" Mode="In" />
+          <Parameter Name="UserID" Type="int" Mode="In" />
+        </Function>
+        <Function Name="StickMan_usp_GetBlockedFriends" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="SessionToken" Type="varchar" Mode="In" />
+          <Parameter Name="UserId" Type="int" Mode="In" />
+        </Function>
+        <Function Name="StickMan_usp_GetFriends" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="SessionToken" Type="varchar" Mode="In" />
+          <Parameter Name="UserId" Type="int" Mode="In" />
+        </Function>
+        <Function Name="StickMan_usp_GetPendingFriendRequests" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="SessionToken" Type="varchar" Mode="In" />
+          <Parameter Name="UserId" Type="int" Mode="In" />
+        </Function>
+        <Function Name="StickMan_usp_GetUsersList" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="SessionToken" Type="varchar" Mode="In" />
+          <Parameter Name="UserId" Type="int" Mode="In" />
+          <Parameter Name="SearchKeyword" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="StickMan_usp_Login_User" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="UserName" Type="varchar" Mode="In" />
+          <Parameter Name="Password" Type="varchar" Mode="In" />
+          <Parameter Name="DeviceId" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="StickMan_usp_ResponseFriendRequest" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="UserID" Type="int" Mode="In" />
+          <Parameter Name="RespondingToUserID" Type="int" Mode="In" />
+          <Parameter Name="FriendRequestID" Type="int" Mode="In" />
+          <Parameter Name="FriendRequestReply" Type="int" Mode="In" />
+          <Parameter Name="SessionToken" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="StickMan_usp_SaveAudioPath" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="UserID" Type="int" Mode="In" />
+          <Parameter Name="RecieverID" Type="int" Mode="In" />
+          <Parameter Name="FilePath" Type="varchar" Mode="In" />
+          <Parameter Name="Filter" Type="varchar" Mode="In" />
+          <Parameter Name="SessionToken" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="StickMan_usp_SendFriendRequest" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="SenderID" Type="int" Mode="In" />
+          <Parameter Name="RecieverID" Type="int" Mode="In" />
+          <Parameter Name="SessionToken" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="usp_CastGetDeleteStatus" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="usp_DeleteFileFromServer" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="usp_GetDeleteStatus" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <EntityContainer Name="StickManDbModelStoreContainer">
+          <EntitySet Name="StickMan_FriendRequest" EntityType="Self.StickMan_FriendRequest" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StickMan_Users" EntityType="Self.StickMan_Users" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StickMan_Users_AudioData_UploadInformation" EntityType="Self.StickMan_Users_AudioData_UploadInformation" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StickMan_Users_Cast_AudioData_UploadInformation" EntityType="Self.StickMan_Users_Cast_AudioData_UploadInformation" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StickMan_UserSesion" EntityType="Self.StickMan_UserSesion" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StickMan_UsersFriendList" EntityType="Self.StickMan_UsersFriendList" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="StickManDbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="StickMan_Users">
+          <Key>
+            <PropertyRef Name="UserID" />
+          </Key>
+          <Property Name="UserID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserName" Type="String" MaxLength="32" FixedLength="false" Unicode="false" />
+          <Property Name="FullName" Type="String" MaxLength="64" FixedLength="false" Unicode="false" />
+          <Property Name="Password" Type="String" MaxLength="32" FixedLength="false" Unicode="false" />
+          <Property Name="MobileNo" Type="String" MaxLength="32" FixedLength="false" Unicode="false" />
+          <Property Name="EmailID" Type="String" MaxLength="32" FixedLength="false" Unicode="false" />
+          <Property Name="DOB" Type="DateTime" Precision="0" />
+          <Property Name="Sex" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="ImagePath" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="DeviceId" Type="String" MaxLength="1024" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="sysdiagram">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="StickMan_FriendRequest">
+          <Key>
+            <PropertyRef Name="FriendRequestID" />
+          </Key>
+          <Property Name="FriendRequestID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserID" Type="Int32" />
+          <Property Name="RecieverID" Type="Int32" />
+          <Property Name="DateTimeStamp" Type="DateTime" Precision="3" />
+          <Property Name="FriendRequestStatus" Type="Int32" />
+          <Property Name="BlockedBy" Type="Int32" />
+        </EntityType>
+        <EntityContainer Name="EfStickManConnectionString" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="StickMan_Users" EntityType="Self.StickMan_Users" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
+          <EntitySet Name="StickMan_FriendRequest" EntityType="Self.StickMan_FriendRequest" />
+          <FunctionImport Name="sp_alterdiagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+            <Parameter Name="version" Mode="In" Type="Int32" />
+            <Parameter Name="definition" Mode="In" Type="Binary" />
+          </FunctionImport>
+          <FunctionImport Name="sp_creatediagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+            <Parameter Name="version" Mode="In" Type="Int32" />
+            <Parameter Name="definition" Mode="In" Type="Binary" />
+          </FunctionImport>
+          <FunctionImport Name="sp_dropdiagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="sp_helpdiagramdefinition">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="sp_helpdiagrams">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="sp_renamediagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+            <Parameter Name="new_diagramname" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="sp_upgraddiagrams" />
+          <FunctionImport Name="spAndroidLogin" ReturnType="Collection(StickManDbModel.spAndroidLogin_Result)">
+            <Parameter Name="login" Mode="In" Type="String" />
+            <Parameter Name="password" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="spAndroidRegister">
+            <Parameter Name="login" Mode="In" Type="String" />
+            <Parameter Name="name" Mode="In" Type="String" />
+            <Parameter Name="password" Mode="In" Type="String" />
+            <Parameter Name="email" Mode="In" Type="String" />
+            <Parameter Name="DOB" Mode="In" Type="String" />
+            <Parameter Name="sex" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="StickMan_usp_Cast_GetAudioFileMessages" ReturnType="Collection(StickManDbModel.StickMan_usp_Cast_GetAudioFileMessages_Result)">
+            <Parameter Name="SessionToken" Mode="In" Type="String" />
+            <Parameter Name="UserID" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="StickMan_usp_CastSaveAudioPath" ReturnType="Collection(StickManDbModel.StickMan_usp_CastSaveAudioPath_Result)">
+            <Parameter Name="UserID" Mode="In" Type="Int32" />
+            <Parameter Name="RecieverID" Mode="In" Type="Int32" />
+            <Parameter Name="FilePath" Mode="In" Type="String" />
+            <Parameter Name="Filter" Mode="In" Type="String" />
+            <Parameter Name="SessionToken" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="StickMan_usp_CreateFB_User" ReturnType="Collection(StickManDbModel.StickMan_usp_CreateFB_User_Result)">
+            <Parameter Name="UserID" Mode="In" Type="Int32" />
+            <Parameter Name="UserName" Mode="In" Type="String" />
+            <Parameter Name="FullName" Mode="In" Type="String" />
+            <Parameter Name="Password" Mode="In" Type="String" />
+            <Parameter Name="MobileNo" Mode="In" Type="String" />
+            <Parameter Name="EmailID" Mode="In" Type="String" />
+            <Parameter Name="DOB" Mode="In" Type="DateTime" />
+            <Parameter Name="Sex" Mode="In" Type="String" />
+            <Parameter Name="ImagePath" Mode="In" Type="String" />
+            <Parameter Name="DeviceId" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="StickMan_usp_CreateUpdate_User" ReturnType="Collection(StickManDbModel.StickMan_usp_CreateUpdate_User_Result)">
+            <Parameter Name="UserID" Mode="In" Type="Int32" />
+            <Parameter Name="UserName" Mode="In" Type="String" />
+            <Parameter Name="FullName" Mode="In" Type="String" />
+            <Parameter Name="Password" Mode="In" Type="String" />
+            <Parameter Name="MobileNo" Mode="In" Type="String" />
+            <Parameter Name="EmailID" Mode="In" Type="String" />
+            <Parameter Name="DOB" Mode="In" Type="DateTime" />
+            <Parameter Name="Sex" Mode="In" Type="String" />
+            <Parameter Name="ImagePath" Mode="In" Type="String" />
+            <Parameter Name="DeviceId" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="StickMan_usp_DeleteStatus" ReturnType="Collection(Int32)" />
+          <FunctionImport Name="StickMan_usp_FbLogin_User" ReturnType="Collection(StickManDbModel.StickMan_usp_FbLogin_User_Result)">
+            <Parameter Name="UserName" Mode="In" Type="String" />
+            <Parameter Name="EmailID" Mode="In" Type="String" />
+            <Parameter Name="DeviceId" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="StickMan_usp_GetAudioFileMessages" ReturnType="Collection(StickManDbModel.StickMan_usp_GetAudioFileMessages_Result)">
+            <Parameter Name="SessionToken" Mode="In" Type="String" />
+            <Parameter Name="UserID" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="StickMan_usp_GetBlockedFriends" ReturnType="Collection(StickManDbModel.StickMan_usp_GetBlockedFriends_Result)">
+            <Parameter Name="SessionToken" Mode="In" Type="String" />
+            <Parameter Name="UserId" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="StickMan_usp_GetFriends" ReturnType="Collection(StickManDbModel.StickMan_usp_GetFriends_Result)">
+            <Parameter Name="SessionToken" Mode="In" Type="String" />
+            <Parameter Name="UserId" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="StickMan_usp_GetPendingFriendRequests" ReturnType="Collection(StickManDbModel.StickMan_usp_GetPendingFriendRequests_Result)">
+            <Parameter Name="SessionToken" Mode="In" Type="String" />
+            <Parameter Name="UserId" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="StickMan_usp_GetUsersList" ReturnType="Collection(StickManDbModel.StickMan_usp_GetUsersList_Result)">
+            <Parameter Name="SessionToken" Mode="In" Type="String" />
+            <Parameter Name="UserId" Mode="In" Type="Int32" />
+            <Parameter Name="SearchKeyword" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="StickMan_usp_Login_User" ReturnType="Collection(StickManDbModel.StickMan_usp_Login_User_Result)">
+            <Parameter Name="UserName" Mode="In" Type="String" />
+            <Parameter Name="Password" Mode="In" Type="String" />
+            <Parameter Name="DeviceId" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="StickMan_usp_ResponseFriendRequest" ReturnType="Collection(StickManDbModel.StickMan_usp_ResponseFriendRequest_Result)">
+            <Parameter Name="UserID" Mode="In" Type="Int32" />
+            <Parameter Name="RespondingToUserID" Mode="In" Type="Int32" />
+            <Parameter Name="FriendRequestID" Mode="In" Type="Int32" />
+            <Parameter Name="FriendRequestReply" Mode="In" Type="Int32" />
+            <Parameter Name="SessionToken" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="StickMan_usp_SaveAudioPath" ReturnType="Collection(StickManDbModel.StickMan_usp_SaveAudioPath_Result)">
+            <Parameter Name="UserID" Mode="In" Type="Int32" />
+            <Parameter Name="RecieverID" Mode="In" Type="Int32" />
+            <Parameter Name="FilePath" Mode="In" Type="String" />
+            <Parameter Name="Filter" Mode="In" Type="String" />
+            <Parameter Name="SessionToken" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="StickMan_usp_SendFriendRequest" ReturnType="Collection(StickManDbModel.StickMan_usp_SendFriendRequest_Result)">
+            <Parameter Name="SenderID" Mode="In" Type="Int32" />
+            <Parameter Name="RecieverID" Mode="In" Type="Int32" />
+            <Parameter Name="SessionToken" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="usp_CastGetDeleteStatus" ReturnType="Collection(StickManDbModel.usp_CastGetDeleteStatus_Result)" />
+          <FunctionImport Name="usp_DeleteFileFromServer" />
+          <FunctionImport Name="usp_GetDeleteStatus" />
+          <EntitySet Name="StickMan_Users_AudioData_UploadInformation" EntityType="StickManDbModel.StickMan_Users_AudioData_UploadInformation" />
+          <EntitySet Name="StickMan_Users_Cast_AudioData_UploadInformation" EntityType="StickManDbModel.StickMan_Users_Cast_AudioData_UploadInformation" />
+          <EntitySet Name="StickMan_UserSesion" EntityType="StickManDbModel.StickMan_UserSesion" />
+          <EntitySet Name="StickMan_UsersFriendList" EntityType="StickManDbModel.StickMan_UsersFriendList" />
+        </EntityContainer>
+        <ComplexType Name="spAndroidLogin_Result">
+          <Property Type="Int32" Name="UserID" Nullable="false" />
+          <Property Type="String" Name="UserName" Nullable="true" MaxLength="32" />
+          <Property Type="String" Name="FullName" Nullable="true" MaxLength="64" />
+          <Property Type="String" Name="Password" Nullable="true" MaxLength="32" />
+          <Property Type="String" Name="MobileNo" Nullable="true" MaxLength="32" />
+          <Property Type="String" Name="EmailID" Nullable="true" MaxLength="32" />
+          <Property Type="DateTime" Name="DOB" Nullable="true" />
+          <Property Type="String" Name="Sex" Nullable="true" MaxLength="8" />
+          <Property Type="String" Name="ImagePath" Nullable="true" />
+          <Property Type="String" Name="DeviceId" Nullable="true" MaxLength="1024" />
+        </ComplexType>
+        <ComplexType Name="StickMan_usp_Cast_GetAudioFileMessages_Result">
+          <Property Type="String" Name="UserName" Nullable="true" MaxLength="32" />
+          <Property Type="String" Name="FullName" Nullable="true" MaxLength="64" />
+          <Property Type="String" Name="MobileNo" Nullable="true" MaxLength="32" />
+          <Property Type="String" Name="EmailID" Nullable="true" MaxLength="32" />
+          <Property Type="DateTime" Name="DOB" Nullable="true" />
+          <Property Type="String" Name="Sex" Nullable="true" MaxLength="8" />
+          <Property Type="String" Name="ImagePath" Nullable="true" />
+          <Property Type="String" Name="DeviceId" Nullable="true" MaxLength="1024" />
+          <Property Type="Int32" Name="UserID" Nullable="true" />
+          <Property Type="Int32" Name="RecieverID" Nullable="true" />
+          <Property Type="String" Name="AudioFilePath" Nullable="true" MaxLength="2048" />
+          <Property Type="String" Name="Filter" Nullable="true" MaxLength="100" />
+          <Property Type="DateTime" Name="UploadTime" Nullable="true" Precision="23" />
+          <Property Type="String" Name="MessageType" Nullable="false" MaxLength="9" />
+          <Property Type="Boolean" Name="ReadStatus" Nullable="false" />
+          <Property Type="Boolean" Name="DeleteStatus" Nullable="false" />
+          <Property Type="Int32" Name="ClickCount" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="StickMan_usp_CastSaveAudioPath_Result">
+          <Property Type="String" Name="ResponseMesssage" Nullable="false" MaxLength="34" />
+          <Property Type="Int32" Name="ResponseCode" Nullable="false" />
+          <Property Type="String" Name="DeviceID" Nullable="true" MaxLength="1024" />
+        </ComplexType>
+        <ComplexType Name="StickMan_usp_CreateFB_User_Result">
+          <Property Type="Int32" Name="UserID" Nullable="false" />
+          <Property Type="String" Name="Message" Nullable="false" MaxLength="15" />
+          <Property Type="Int32" Name="ResponseCode" Nullable="false" />
+          <Property Type="Int32" Name="Token" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="StickMan_usp_CreateUpdate_User_Result">
+          <Property Type="Int32" Name="UserID" Nullable="false" />
+          <Property Type="String" Name="Message" Nullable="false" MaxLength="29" />
+          <Property Type="Int32" Name="ResponseCode" Nullable="false" />
+          <Property Type="Int32" Name="Token" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="StickMan_usp_FbLogin_User_Result">
+          <Property Type="String" Name="Message" Nullable="false" MaxLength="19" />
+          <Property Type="Int32" Name="UserId" Nullable="false" />
+          <Property Type="Int32" Name="ResponseCode" Nullable="false" />
+          <Property Type="Int32" Name="Token" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="StickMan_usp_GetAudioFileMessages_Result">
+          <Property Type="String" Name="UserName" Nullable="true" MaxLength="32" />
+          <Property Type="String" Name="FullName" Nullable="true" MaxLength="64" />
+          <Property Type="String" Name="MobileNo" Nullable="true" MaxLength="32" />
+          <Property Type="String" Name="EmailID" Nullable="true" MaxLength="32" />
+          <Property Type="DateTime" Name="DOB" Nullable="true" />
+          <Property Type="String" Name="Sex" Nullable="true" MaxLength="8" />
+          <Property Type="String" Name="ImagePath" Nullable="true" />
+          <Property Type="String" Name="DeviceId" Nullable="true" MaxLength="1024" />
+          <Property Type="Int32" Name="UserID" Nullable="true" />
+          <Property Type="Int32" Name="RecieverID" Nullable="true" />
+          <Property Type="String" Name="AudioFilePath" Nullable="true" MaxLength="2048" />
+          <Property Type="String" Name="Filter" Nullable="true" MaxLength="100" />
+          <Property Type="DateTime" Name="UploadTime" Nullable="true" Precision="23" />
+          <Property Type="String" Name="MessageType" Nullable="false" MaxLength="9" />
+          <Property Type="Boolean" Name="ReadStatus" Nullable="false" />
+          <Property Type="Boolean" Name="DeleteStatus" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="StickMan_usp_GetBlockedFriends_Result">
+          <Property Type="String" Name="ResponseMesssage" Nullable="false" MaxLength="13" />
+          <Property Type="Int32" Name="ResponseCode" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="StickMan_usp_GetFriends_Result">
+          <Property Type="String" Name="ResponseMesssage" Nullable="false" MaxLength="13" />
+          <Property Type="Int32" Name="ResponseCode" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="StickMan_usp_GetPendingFriendRequests_Result">
+          <Property Type="String" Name="ResponseMesssage" Nullable="false" MaxLength="13" />
+          <Property Type="Int32" Name="ResponseCode" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="StickMan_usp_GetUsersList_Result">
+          <Property Type="String" Name="ResponseMesssage" Nullable="false" MaxLength="13" />
+          <Property Type="Int32" Name="ResponseCode" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="StickMan_usp_Login_User_Result">
+          <Property Type="String" Name="Message" Nullable="false" MaxLength="19" />
+          <Property Type="Int32" Name="UserId" Nullable="false" />
+          <Property Type="Int32" Name="ResponseCode" Nullable="false" />
+          <Property Type="Int32" Name="Token" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="StickMan_usp_ResponseFriendRequest_Result">
+          <Property Type="String" Name="ResponseMesssage" Nullable="false" MaxLength="14" />
+          <Property Type="Int32" Name="ResponseCode" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="StickMan_usp_SaveAudioPath_Result">
+          <Property Type="String" Name="ResponseMesssage" Nullable="false" MaxLength="34" />
+          <Property Type="Int32" Name="ResponseCode" Nullable="false" />
+          <Property Type="String" Name="DeviceID" Nullable="true" MaxLength="1024" />
+        </ComplexType>
+        <ComplexType Name="StickMan_usp_SendFriendRequest_Result">
+          <Property Type="String" Name="DeviceID" Nullable="true" MaxLength="1024" />
+          <Property Type="Decimal" Name="FriendRequestId" Nullable="true" Precision="38" Scale="0" />
+          <Property Type="String" Name="FriendRequestState" Nullable="false" MaxLength="7" />
+          <Property Type="String" Name="ResponseMesssage" Nullable="false" MaxLength="32" />
+          <Property Type="Int32" Name="ResponseCode" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="usp_CastGetDeleteStatus_Result">
+          <Property Type="Int32" Name="FriendRequestID" Nullable="false" />
+          <Property Type="Int32" Name="UserID" Nullable="true" />
+          <Property Type="Int32" Name="RecieverID" Nullable="true" />
+          <Property Type="DateTime" Name="DateTimeStamp" Nullable="true" Precision="23" />
+          <Property Type="Int32" Name="FriendRequestStatus" Nullable="true" />
+          <Property Type="Int32" Name="BlockedBy" Nullable="true" />
+        </ComplexType>
+        <EntityType Name="StickMan_Users_AudioData_UploadInformation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="UserID" Type="Int32" Nullable="false" />
+          <Property Name="RecieverID" Type="Int32" Nullable="false" />
+          <Property Name="AudioFilePath" Type="String" MaxLength="2048" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="UploadTime" Type="DateTime" Precision="3" Nullable="false" />
+          <Property Name="Filter" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ReadStatus" Type="Boolean" Nullable="false" />
+          <Property Name="DeleteStatus" Type="Boolean" Nullable="false" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
+        <EntityType Name="StickMan_Users_Cast_AudioData_UploadInformation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="UserID" Type="Int32" />
+          <Property Name="RecieverID" Type="Int32" />
+          <Property Name="AudioFilePath" Type="String" MaxLength="2048" FixedLength="false" Unicode="false" />
+          <Property Name="UploadTime" Type="DateTime" Precision="3" />
+          <Property Name="Filter" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ReadStatus" Type="Boolean" />
+          <Property Name="DeleteStatus" Type="Boolean" />
+          <Property Name="ClickCount" Type="Int32" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
+        <EntityType Name="StickMan_UserSesion">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="SessionID" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="UserID" Type="Int32" />
+          <Property Name="LoginTime" Type="DateTime" Precision="3" />
+          <Property Name="LogOutTime" Type="DateTime" Precision="3" />
+          <Property Name="Active" Type="Boolean" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
+        <EntityType Name="StickMan_UsersFriendList">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="UserID" Type="Int32" />
+          <Property Name="FriendID" Type="Int32" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="StickManDbModelStoreContainer" CdmEntityContainer="EfStickManConnectionString">
+          <EntitySetMapping Name="StickMan_Users">
+            <EntityTypeMapping TypeName="StickManDbModel.StickMan_Users">
+              <MappingFragment StoreEntitySet="StickMan_Users">
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="MobileNo" ColumnName="MobileNo" />
+                <ScalarProperty Name="EmailID" ColumnName="EmailID" />
+                <ScalarProperty Name="DOB" ColumnName="DOB" />
+                <ScalarProperty Name="Sex" ColumnName="Sex" />
+                <ScalarProperty Name="ImagePath" ColumnName="ImagePath" />
+                <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="StickManDbModel.sysdiagram">
+              <MappingFragment StoreEntitySet="sysdiagrams">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="definition" ColumnName="definition" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StickMan_FriendRequest">
+            <EntityTypeMapping TypeName="StickManDbModel.StickMan_FriendRequest">
+              <MappingFragment StoreEntitySet="StickMan_FriendRequest">
+                <ScalarProperty Name="FriendRequestID" ColumnName="FriendRequestID" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="RecieverID" ColumnName="RecieverID" />
+                <ScalarProperty Name="DateTimeStamp" ColumnName="DateTimeStamp" />
+                <ScalarProperty Name="FriendRequestStatus" ColumnName="FriendRequestStatus" />
+                <ScalarProperty Name="BlockedBy" ColumnName="BlockedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="sp_alterdiagram" FunctionName="StickManDbModel.Store.sp_alterdiagram" />
+          <FunctionImportMapping FunctionImportName="sp_creatediagram" FunctionName="StickManDbModel.Store.sp_creatediagram" />
+          <FunctionImportMapping FunctionImportName="sp_dropdiagram" FunctionName="StickManDbModel.Store.sp_dropdiagram" />
+          <FunctionImportMapping FunctionImportName="sp_helpdiagramdefinition" FunctionName="StickManDbModel.Store.sp_helpdiagramdefinition" />
+          <FunctionImportMapping FunctionImportName="sp_helpdiagrams" FunctionName="StickManDbModel.Store.sp_helpdiagrams" />
+          <FunctionImportMapping FunctionImportName="sp_renamediagram" FunctionName="StickManDbModel.Store.sp_renamediagram" />
+          <FunctionImportMapping FunctionImportName="sp_upgraddiagrams" FunctionName="StickManDbModel.Store.sp_upgraddiagrams" />
+          <FunctionImportMapping FunctionImportName="spAndroidLogin" FunctionName="StickManDbModel.Store.spAndroidLogin">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.spAndroidLogin_Result">
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="MobileNo" ColumnName="MobileNo" />
+                <ScalarProperty Name="EmailID" ColumnName="EmailID" />
+                <ScalarProperty Name="DOB" ColumnName="DOB" />
+                <ScalarProperty Name="Sex" ColumnName="Sex" />
+                <ScalarProperty Name="ImagePath" ColumnName="ImagePath" />
+                <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="spAndroidRegister" FunctionName="StickManDbModel.Store.spAndroidRegister" />
+          <FunctionImportMapping FunctionImportName="StickMan_usp_Cast_GetAudioFileMessages" FunctionName="StickManDbModel.Store.StickMan_usp_Cast_GetAudioFileMessages">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.StickMan_usp_Cast_GetAudioFileMessages_Result">
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="MobileNo" ColumnName="MobileNo" />
+                <ScalarProperty Name="EmailID" ColumnName="EmailID" />
+                <ScalarProperty Name="DOB" ColumnName="DOB" />
+                <ScalarProperty Name="Sex" ColumnName="Sex" />
+                <ScalarProperty Name="ImagePath" ColumnName="ImagePath" />
+                <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="RecieverID" ColumnName="RecieverID" />
+                <ScalarProperty Name="AudioFilePath" ColumnName="AudioFilePath" />
+                <ScalarProperty Name="Filter" ColumnName="Filter" />
+                <ScalarProperty Name="UploadTime" ColumnName="UploadTime" />
+                <ScalarProperty Name="MessageType" ColumnName="MessageType" />
+                <ScalarProperty Name="ReadStatus" ColumnName="ReadStatus" />
+                <ScalarProperty Name="DeleteStatus" ColumnName="DeleteStatus" />
+                <ScalarProperty Name="ClickCount" ColumnName="ClickCount" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="StickMan_usp_CastSaveAudioPath" FunctionName="StickManDbModel.Store.StickMan_usp_CastSaveAudioPath">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.StickMan_usp_CastSaveAudioPath_Result">
+                <ScalarProperty Name="ResponseMesssage" ColumnName="ResponseMesssage" />
+                <ScalarProperty Name="ResponseCode" ColumnName="ResponseCode" />
+                <ScalarProperty Name="DeviceID" ColumnName="DeviceID" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="StickMan_usp_CreateFB_User" FunctionName="StickManDbModel.Store.StickMan_usp_CreateFB_User">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.StickMan_usp_CreateFB_User_Result">
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="Message" ColumnName="Message" />
+                <ScalarProperty Name="ResponseCode" ColumnName="ResponseCode" />
+                <ScalarProperty Name="Token" ColumnName="Token" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="StickMan_usp_CreateUpdate_User" FunctionName="StickManDbModel.Store.StickMan_usp_CreateUpdate_User">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.StickMan_usp_CreateUpdate_User_Result">
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="Message" ColumnName="Message" />
+                <ScalarProperty Name="ResponseCode" ColumnName="ResponseCode" />
+                <ScalarProperty Name="Token" ColumnName="Token" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="StickMan_usp_DeleteStatus" FunctionName="StickManDbModel.Store.StickMan_usp_DeleteStatus" />
+          <FunctionImportMapping FunctionImportName="StickMan_usp_FbLogin_User" FunctionName="StickManDbModel.Store.StickMan_usp_FbLogin_User">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.StickMan_usp_FbLogin_User_Result">
+                <ScalarProperty Name="Message" ColumnName="Message" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="ResponseCode" ColumnName="ResponseCode" />
+                <ScalarProperty Name="Token" ColumnName="Token" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="StickMan_usp_GetAudioFileMessages" FunctionName="StickManDbModel.Store.StickMan_usp_GetAudioFileMessages">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.StickMan_usp_GetAudioFileMessages_Result">
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="MobileNo" ColumnName="MobileNo" />
+                <ScalarProperty Name="EmailID" ColumnName="EmailID" />
+                <ScalarProperty Name="DOB" ColumnName="DOB" />
+                <ScalarProperty Name="Sex" ColumnName="Sex" />
+                <ScalarProperty Name="ImagePath" ColumnName="ImagePath" />
+                <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="RecieverID" ColumnName="RecieverID" />
+                <ScalarProperty Name="AudioFilePath" ColumnName="AudioFilePath" />
+                <ScalarProperty Name="Filter" ColumnName="Filter" />
+                <ScalarProperty Name="UploadTime" ColumnName="UploadTime" />
+                <ScalarProperty Name="MessageType" ColumnName="MessageType" />
+                <ScalarProperty Name="ReadStatus" ColumnName="ReadStatus" />
+                <ScalarProperty Name="DeleteStatus" ColumnName="DeleteStatus" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="StickMan_usp_GetBlockedFriends" FunctionName="StickManDbModel.Store.StickMan_usp_GetBlockedFriends">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.StickMan_usp_GetBlockedFriends_Result">
+                <ScalarProperty Name="ResponseMesssage" ColumnName="ResponseMesssage" />
+                <ScalarProperty Name="ResponseCode" ColumnName="ResponseCode" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="StickMan_usp_GetFriends" FunctionName="StickManDbModel.Store.StickMan_usp_GetFriends">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.StickMan_usp_GetFriends_Result">
+                <ScalarProperty Name="ResponseMesssage" ColumnName="ResponseMesssage" />
+                <ScalarProperty Name="ResponseCode" ColumnName="ResponseCode" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="StickMan_usp_GetPendingFriendRequests" FunctionName="StickManDbModel.Store.StickMan_usp_GetPendingFriendRequests">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.StickMan_usp_GetPendingFriendRequests_Result">
+                <ScalarProperty Name="ResponseMesssage" ColumnName="ResponseMesssage" />
+                <ScalarProperty Name="ResponseCode" ColumnName="ResponseCode" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="StickMan_usp_GetUsersList" FunctionName="StickManDbModel.Store.StickMan_usp_GetUsersList">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.StickMan_usp_GetUsersList_Result">
+                <ScalarProperty Name="ResponseMesssage" ColumnName="ResponseMesssage" />
+                <ScalarProperty Name="ResponseCode" ColumnName="ResponseCode" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="StickMan_usp_Login_User" FunctionName="StickManDbModel.Store.StickMan_usp_Login_User">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.StickMan_usp_Login_User_Result">
+                <ScalarProperty Name="Message" ColumnName="Message" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="ResponseCode" ColumnName="ResponseCode" />
+                <ScalarProperty Name="Token" ColumnName="Token" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="StickMan_usp_ResponseFriendRequest" FunctionName="StickManDbModel.Store.StickMan_usp_ResponseFriendRequest">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.StickMan_usp_ResponseFriendRequest_Result">
+                <ScalarProperty Name="ResponseMesssage" ColumnName="ResponseMesssage" />
+                <ScalarProperty Name="ResponseCode" ColumnName="ResponseCode" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="StickMan_usp_SaveAudioPath" FunctionName="StickManDbModel.Store.StickMan_usp_SaveAudioPath">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.StickMan_usp_SaveAudioPath_Result">
+                <ScalarProperty Name="ResponseMesssage" ColumnName="ResponseMesssage" />
+                <ScalarProperty Name="ResponseCode" ColumnName="ResponseCode" />
+                <ScalarProperty Name="DeviceID" ColumnName="DeviceID" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="StickMan_usp_SendFriendRequest" FunctionName="StickManDbModel.Store.StickMan_usp_SendFriendRequest">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.StickMan_usp_SendFriendRequest_Result">
+                <ScalarProperty Name="DeviceID" ColumnName="DeviceID" />
+                <ScalarProperty Name="FriendRequestId" ColumnName="FriendRequestId" />
+                <ScalarProperty Name="FriendRequestState" ColumnName="FriendRequestState" />
+                <ScalarProperty Name="ResponseMesssage" ColumnName="ResponseMesssage" />
+                <ScalarProperty Name="ResponseCode" ColumnName="ResponseCode" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="usp_CastGetDeleteStatus" FunctionName="StickManDbModel.Store.usp_CastGetDeleteStatus">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="StickManDbModel.usp_CastGetDeleteStatus_Result">
+                <ScalarProperty Name="FriendRequestID" ColumnName="FriendRequestID" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="RecieverID" ColumnName="RecieverID" />
+                <ScalarProperty Name="DateTimeStamp" ColumnName="DateTimeStamp" />
+                <ScalarProperty Name="FriendRequestStatus" ColumnName="FriendRequestStatus" />
+                <ScalarProperty Name="BlockedBy" ColumnName="BlockedBy" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="usp_DeleteFileFromServer" FunctionName="StickManDbModel.Store.usp_DeleteFileFromServer" />
+          <FunctionImportMapping FunctionImportName="usp_GetDeleteStatus" FunctionName="StickManDbModel.Store.usp_GetDeleteStatus" />
+          <EntitySetMapping Name="StickMan_Users_AudioData_UploadInformation">
+            <EntityTypeMapping TypeName="StickManDbModel.StickMan_Users_AudioData_UploadInformation">
+              <MappingFragment StoreEntitySet="StickMan_Users_AudioData_UploadInformation">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="DeleteStatus" ColumnName="DeleteStatus" />
+                <ScalarProperty Name="ReadStatus" ColumnName="ReadStatus" />
+                <ScalarProperty Name="Filter" ColumnName="Filter" />
+                <ScalarProperty Name="UploadTime" ColumnName="UploadTime" />
+                <ScalarProperty Name="AudioFilePath" ColumnName="AudioFilePath" />
+                <ScalarProperty Name="RecieverID" ColumnName="RecieverID" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StickMan_Users_Cast_AudioData_UploadInformation">
+            <EntityTypeMapping TypeName="StickManDbModel.StickMan_Users_Cast_AudioData_UploadInformation">
+              <MappingFragment StoreEntitySet="StickMan_Users_Cast_AudioData_UploadInformation">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ClickCount" ColumnName="ClickCount" />
+                <ScalarProperty Name="DeleteStatus" ColumnName="DeleteStatus" />
+                <ScalarProperty Name="ReadStatus" ColumnName="ReadStatus" />
+                <ScalarProperty Name="Filter" ColumnName="Filter" />
+                <ScalarProperty Name="UploadTime" ColumnName="UploadTime" />
+                <ScalarProperty Name="AudioFilePath" ColumnName="AudioFilePath" />
+                <ScalarProperty Name="RecieverID" ColumnName="RecieverID" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StickMan_UserSesion">
+            <EntityTypeMapping TypeName="StickManDbModel.StickMan_UserSesion">
+              <MappingFragment StoreEntitySet="StickMan_UserSesion">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="LogOutTime" ColumnName="LogOutTime" />
+                <ScalarProperty Name="LoginTime" ColumnName="LoginTime" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="SessionID" ColumnName="SessionID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StickMan_UsersFriendList">
+            <EntityTypeMapping TypeName="StickManDbModel.StickMan_UsersFriendList">
+              <MappingFragment StoreEntitySet="StickMan_UsersFriendList">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="FriendID" ColumnName="FriendID" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
