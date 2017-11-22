@@ -18,7 +18,7 @@ namespace StickMan.Services.Implementation
 			_unitOfWork = unitOfWork;
 		}
 
-		public void SaveMessage(string filePath, int userId)
+		public void SaveMessage(string filePath, int userId, string title)
 		{
 			var message = new StickMan_Users_Cast_AudioData_UploadInformation
 			{
@@ -27,7 +27,8 @@ namespace StickMan.Services.Implementation
 				ReadStatus = false,
 				DeleteStatus = false,
 				ClickCount = 0,
-				UploadTime = DateTime.UtcNow
+				UploadTime = DateTime.UtcNow,
+				Title = title
 			};
 
 			_unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().Insert(message);
@@ -78,6 +79,22 @@ namespace StickMan.Services.Implementation
 			return castMessages;
 		}
 
+		public string ChangeTitle(int userId, int castId, string newTitle)
+		{
+			var castMessage = _unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().GetSingle(m => m.Id == castId);
+
+			if (castMessage.UserID != userId)
+			{
+				throw new UnauthorizedAccessException();
+			}
+
+			castMessage.Title = newTitle;
+			_unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().Update(castMessage);
+			_unitOfWork.Save();
+
+			return newTitle;
+		}
+
 		private IEnumerable<CastMessage> GetMergedMessagesInfo(IEnumerable<StickMan_Users_Cast_AudioData_UploadInformation> messages, ICollection<StickMan_Users> users)
 		{
 			var castMessages = new List<CastMessage>();
@@ -86,37 +103,48 @@ namespace StickMan.Services.Implementation
 			{
 				var user = users.FirstOrDefault(u => u.UserID == uploadInfo.UserID);
 
-				var message = new CastMessage
-				{
-					MessageInfo = new AudioInfo
-					{
-						Id = uploadInfo.Id,
-						AudioFilePath = uploadInfo.AudioFilePath,
-						UploadTime = uploadInfo.UploadTime.GetValueOrDefault(),
-						Clicks = uploadInfo.ClickCount.GetValueOrDefault()
-					}
-				};
-
-				if (user != null)
-				{
-					message.User = new UserModel
-					{
-						UserId = user.UserID,
-						ImagePath = user.ImagePath,
-						UserName = user.UserName,
-						DOB = user.DOB,
-						DeviceId = user.DeviceId,
-						Email = user.EmailID,
-						FullName = user.FullName,
-						MobileNo = user.MobileNo,
-						Sex = user.Sex
-					};
-				}
+				var message = CreateCastMessage(uploadInfo);
+				FillUserInfo(user, message);
 
 				castMessages.Add(message);
 			}
 
 			return castMessages;
+		}
+
+		private static CastMessage CreateCastMessage(StickMan_Users_Cast_AudioData_UploadInformation uploadInfo)
+		{
+			var message = new CastMessage
+			{
+				MessageInfo = new CastAudioInfo
+				{
+					Id = uploadInfo.Id,
+					AudioFilePath = uploadInfo.AudioFilePath,
+					UploadTime = uploadInfo.UploadTime.GetValueOrDefault(),
+					Clicks = uploadInfo.ClickCount.GetValueOrDefault(),
+					Title = uploadInfo.Title
+				}
+			};
+			return message;
+		}
+
+		private static void FillUserInfo(StickMan_Users user, CastMessage message)
+		{
+			if (user != null)
+			{
+				message.User = new UserModel
+				{
+					UserId = user.UserID,
+					ImagePath = user.ImagePath,
+					UserName = user.UserName,
+					DOB = user.DOB,
+					DeviceId = user.DeviceId,
+					Email = user.EmailID,
+					FullName = user.FullName,
+					MobileNo = user.MobileNo,
+					Sex = user.Sex
+				};
+			}
 		}
 	}
 }

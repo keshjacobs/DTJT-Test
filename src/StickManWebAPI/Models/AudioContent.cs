@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using StickManWebAPI.Models.Response;
 
 namespace StickManWebAPI.Models
 {
@@ -17,12 +18,17 @@ namespace StickManWebAPI.Models
 		public string filter { get; set; }
 	}
 
-	public class CastAudioContent
+	public class SessionData
 	{
 		public int UserId { get; set; }
 
+		public string SessionToken { get; set; }
+	}
+
+	public class CastAudioContent : SessionData
+	{
 		public string FilePath { get; set; }
 
-		public string SessionToken { get; set; }
+		public string Title { get; set; }
 	}
 }

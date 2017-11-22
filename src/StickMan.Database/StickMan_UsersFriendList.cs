@@ -14,8 +14,8 @@ namespace StickMan.Database
     
     public partial class StickMan_UsersFriendList
     {
-        public Nullable<int> UserID { get; set; }
-        public Nullable<int> FriendID { get; set; }
+        public int UserID { get; set; }
+        public int FriendID { get; set; }
         public int Id { get; set; }
     }
 }

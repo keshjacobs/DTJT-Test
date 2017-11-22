@@ -15,8 +15,8 @@ namespace StickMan.Database
     public partial class StickMan_FriendRequest
     {
         public int FriendRequestID { get; set; }
-        public Nullable<int> UserID { get; set; }
-        public Nullable<int> RecieverID { get; set; }
+        public int UserID { get; set; }
+        public int RecieverID { get; set; }
         public Nullable<System.DateTime> DateTimeStamp { get; set; }
         public Nullable<int> FriendRequestStatus { get; set; }
         public Nullable<int> BlockedBy { get; set; }

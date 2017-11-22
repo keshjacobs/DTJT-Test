@@ -5,6 +5,7 @@ using StickMan.Services.Contracts;
 using StickMan.Services.Exceptions;
 using StickMan.Services.Models.Message;
 using StickManWebAPI.Models;
+using StickManWebAPI.Models.Response;
 
 namespace StickManWebAPI.Controllers
 {
@@ -69,7 +70,7 @@ namespace StickManWebAPI.Controllers
 				};
 			}
 
-			_castMessageService.SaveMessage(audioContent.FilePath, audioContent.UserId);
+			_castMessageService.SaveMessage(audioContent.FilePath, audioContent.UserId, audioContent.Title);
 
 			return new Reply
 			{

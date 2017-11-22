@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using StickManWebAPI.Models.Response;
 
 namespace StickManWebAPI.Models
 {

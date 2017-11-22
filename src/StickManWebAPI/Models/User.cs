@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using StickManWebAPI.Models.Response;
 
 namespace StickManWebAPI.Models
 {
@@ -47,11 +48,5 @@ namespace StickManWebAPI.Models
 		public int FriendRequestID { get; set; }
 		public string FriendRequestStatus { get; set; }
 
-	}
-
-	public class Reply
-	{
-		public int replyCode { get; set; }
-		public string replyMessage { get; set; }
 	}
 }

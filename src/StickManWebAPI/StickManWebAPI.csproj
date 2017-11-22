@@ -179,6 +179,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AudioFileController.cs" />
     <Compile Include="Controllers\CastController.cs" />
+    <Compile Include="Models\ChangeTitleModel.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MessageController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
@@ -190,7 +191,9 @@
     <Compile Include="Models\AudioMessagesWrapper.cs" />
     <Compile Include="Models\BlockfrndStatus.cs" />
     <Compile Include="Models\ClickCount.cs" />
-    <Compile Include="Models\ClickCountReply.cs" />
+    <Compile Include="Models\Response\Reply.cs" />
+    <Compile Include="Models\Response\ChangeTitleReply.cs" />
+    <Compile Include="Models\Response\ClickCountReply.cs" />
     <Compile Include="Models\DeletefrndStatus.cs" />
     <Compile Include="Models\Friend.cs" />
     <Compile Include="Models\LoginModel.cs" />
