@@ -195,11 +195,13 @@
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\NewAudioMessage.cs" />
+    <Compile Include="Models\PaginationModel.cs" />
     <Compile Include="Models\PushInfo.cs" />
     <Compile Include="Models\ReadStatus.cs" />
     <Compile Include="Models\ReplyCodes.cs" />
     <Compile Include="Models\SearchUser.cs" />
     <Compile Include="Models\SignUpModel.cs" />
+    <Compile Include="Models\TimelineRequestModel.cs" />
     <Compile Include="Models\Unblock.cs" />
     <Compile Include="Models\FileContent.cs" />
     <Compile Include="Models\User.cs" />

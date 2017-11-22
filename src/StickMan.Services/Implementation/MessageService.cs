@@ -21,13 +21,16 @@ namespace StickMan.Services.Implementation
 			_pathProvider = pathProvider;
 		}
 
-		public IEnumerable<TimelineModel> GetTimeline(int userId)
+		public IEnumerable<TimelineModel> GetTimeline(int userId, int page, int size)
 		{
 			var timeline = new List<TimelineModel>();
 
 			var messagesInfo = _unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>()
-				.Get(x => x.UserID == userId || x.RecieverID == userId)
-				.OrderByDescending(m => m.UploadTime);
+				.GetQuery(x => x.UserID == userId || x.RecieverID == userId)
+				.OrderByDescending(m => m.UploadTime)
+				.Skip(page * size)
+				.Take(size)
+				.ToList();
 
 			foreach (var message in messagesInfo)
 			{
@@ -63,7 +66,7 @@ namespace StickMan.Services.Implementation
 				ReadStatus = false,
 				DeleteStatus = false,
 				ClickCount = 0,
-				UploadTime = DateTime.UtcNow,
+				UploadTime = DateTime.UtcNow
 			};
 
 			_unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().Insert(message);
@@ -93,13 +96,15 @@ namespace StickMan.Services.Implementation
 			return castMessage.ClickCount.GetValueOrDefault();
 		}
 
-		public IEnumerable<CastMessage> GetCastMessages()
+		public IEnumerable<CastMessage> GetCastMessages(int page, int size)
 		{
 			var castUploadInfo = _unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>()
 				.GetQueryAll()
 				.OrderByDescending(u => u.UploadTime)
-				.Take(30)
+				.Skip(page * size)
+				.Take(size)
 				.ToList();
+
 			var castMessages = new List<CastMessage>();
 			var userIds = castUploadInfo.Select(i => i.UserID).Distinct();
 			var users = _unitOfWork.Repository<StickMan_Users>().Get(u => userIds.Any(m => m == u.UserID)).ToList();

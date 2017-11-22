@@ -14,11 +14,15 @@ namespace StickMan.Database.Repository
 
 		public Repository(EfStickManContext context)
 		{
-			_context = context;
 			_entities = context.Set<TEntity>();
 		}
 
 		public IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter)
+		{
+			return GetQuery(filter).ToList();
+		}
+
+		public IEnumerable<TEntity> GetQuery(Expression<Func<TEntity, bool>> filter)
 		{
 			return _entities.Where(filter);
 		}

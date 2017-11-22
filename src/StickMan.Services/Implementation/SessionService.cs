@@ -20,7 +20,7 @@ namespace StickMan.Services.Implementation
 			try
 			{
 				var session = _unitOfWork.Repository<StickMan_UserSesion>()
-					.Get(s => s.UserID == userId && s.SessionID == sessionId);
+					.GetSingle(s => s.UserID == userId && s.SessionID == sessionId);
 
 				if (session == null)
 				{

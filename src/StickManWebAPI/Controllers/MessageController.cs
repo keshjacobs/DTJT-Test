@@ -21,9 +21,19 @@ namespace StickManWebAPI.Controllers
 		[HttpGet]
 		public IEnumerable<TimelineModel> GetTimeline(int userId)
 		{
-			var timeline = _messageService.GetTimeline(userId);
+			var timeline = _messageService.GetTimeline(userId, 0, 30);
 
 			return timeline;
+		}
+
+		[HttpGet]
+		public IEnumerable<TimelineModel> GetPagedTimeline([FromUri]TimelineRequestModel timeline)
+		{
+			_sessionService.Validate(timeline.UserId, timeline.SessionToken);
+
+			var messages = _messageService.GetTimeline(timeline.UserId, timeline.Pagination.PageNumber, timeline.Pagination.PageSize);
+
+			return messages;
 		}
 
 		[HttpPost]
@@ -77,9 +87,9 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpGet]
-		public IEnumerable<CastMessage> GetCastMessages()
+		public IEnumerable<CastMessage> GetCastMessages([FromUri]PaginationModel pagination)
 		{
-			var messages = _messageService.GetCastMessages();
+			var messages = _messageService.GetCastMessages(pagination.PageNumber, pagination.PageSize);
 
 			return messages;
 		}
