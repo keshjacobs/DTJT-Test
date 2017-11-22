@@ -57,22 +57,6 @@ namespace StickMan.Services.Implementation
 			return timeline;
 		}
 
-		public void SaveCastMessage(string filePath, int userId)
-		{
-			var message = new StickMan_Users_Cast_AudioData_UploadInformation
-			{
-				AudioFilePath = filePath,
-				UserID = userId,
-				ReadStatus = false,
-				DeleteStatus = false,
-				ClickCount = 0,
-				UploadTime = DateTime.UtcNow
-			};
-
-			_unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().Insert(message);
-			_unitOfWork.Save();
-		}
-
 		public void ReadMessage(int id)
 		{
 			var message = _unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>().GetSingle(x => x.Id == id);
@@ -83,67 +67,6 @@ namespace StickMan.Services.Implementation
 				_unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>().Update(message);
 				_unitOfWork.Save();
 			}
-		}
-
-		public int IncreaseCastClickCount(int castMessageId)
-		{
-			var castMessage = _unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().GetSingle(m => m.Id == castMessageId);
-
-			castMessage.ClickCount++;
-			_unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().Update(castMessage);
-			_unitOfWork.Save();
-
-			return castMessage.ClickCount.GetValueOrDefault();
-		}
-
-		public IEnumerable<CastMessage> GetCastMessages(int page, int size)
-		{
-			var castUploadInfo = _unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>()
-				.GetQueryAll()
-				.OrderByDescending(u => u.UploadTime)
-				.Skip(page * size)
-				.Take(size)
-				.ToList();
-
-			var castMessages = new List<CastMessage>();
-			var userIds = castUploadInfo.Select(i => i.UserID).Distinct();
-			var users = _unitOfWork.Repository<StickMan_Users>().Get(u => userIds.Any(m => m == u.UserID)).ToList();
-
-			foreach (var uploadInfo in castUploadInfo)
-			{
-				var user = users.FirstOrDefault(u => u.UserID == uploadInfo.UserID);
-
-				var message = new CastMessage
-				{
-					MessageInfo = new AudioInfo
-					{
-						Id = uploadInfo.Id,
-						AudioFilePath = uploadInfo.AudioFilePath,
-						UploadTime = uploadInfo.UploadTime.GetValueOrDefault(),
-						Clicks = uploadInfo.ClickCount.GetValueOrDefault()
-					}
-				};
-
-				if (user != null)
-				{
-					message.User = new UserModel
-					{
-						UserId = user.UserID,
-						ImagePath = user.ImagePath,
-						UserName = user.UserName,
-						DOB = user.DOB,
-						DeviceId = user.DeviceId,
-						Email = user.EmailID,
-						FullName = user.FullName,
-						MobileNo = user.MobileNo,
-						Sex = user.Sex
-					};
-				}
-
-				castMessages.Add(message);
-			}
-
-			return castMessages;
 		}
 
 		public void CleanUpMessages()

@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\MessageConstants.cs" />
+    <Compile Include="Contracts\ICastMessageService.cs" />
     <Compile Include="Contracts\IFriendRequestService.cs" />
     <Compile Include="Contracts\IPathProvider.cs" />
     <Compile Include="Contracts\IMessageService.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="Contracts\ISessionService.cs" />
     <Compile Include="Contracts\IUserService.cs" />
     <Compile Include="Exceptions\InvalidSessionException.cs" />
+    <Compile Include="Implementation\CastMessageService.cs" />
     <Compile Include="Implementation\FriendRequestService.cs" />
     <Compile Include="Models\Push\AndroidData.cs" />
     <Compile Include="Models\Push\AndroidNotification.cs" />

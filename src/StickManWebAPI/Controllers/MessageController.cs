@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Web.Http;
 using StickMan.Services.Contracts;
@@ -7,15 +8,18 @@ using StickManWebAPI.Models;
 
 namespace StickManWebAPI.Controllers
 {
+	// TODO Remove obsolete endpoints
 	public class MessageController : ApiController
 	{
 		private readonly IMessageService _messageService;
+		private readonly ICastMessageService _castMessageService;
 		private readonly ISessionService _sessionService;
 
-		public MessageController(IMessageService messageService, ISessionService sessionService)
+		public MessageController(IMessageService messageService, ISessionService sessionService, ICastMessageService castMessageService)
 		{
 			_messageService = messageService;
 			_sessionService = sessionService;
+			_castMessageService = castMessageService;
 		}
 
 		[HttpGet]
@@ -48,6 +52,7 @@ namespace StickManWebAPI.Controllers
 			};
 		}
 
+		[Obsolete]
 		[HttpPost]
 		public Reply SaveCastAudioPath(CastAudioContent audioContent)
 		{
@@ -64,7 +69,7 @@ namespace StickManWebAPI.Controllers
 				};
 			}
 
-			_messageService.SaveCastMessage(audioContent.FilePath, audioContent.UserId);
+			_castMessageService.SaveMessage(audioContent.FilePath, audioContent.UserId);
 
 			return new Reply
 			{
@@ -73,10 +78,11 @@ namespace StickManWebAPI.Controllers
 			};
 		}
 
+		[Obsolete]
 		[HttpPost]
 		public ClickCountReply ClickOnCastMessage(int castMessageId)
 		{
-			var clickCount = _messageService.IncreaseCastClickCount(castMessageId);
+			var clickCount = _castMessageService.ReadMessage(castMessageId);
 
 			return new ClickCountReply
 			{
@@ -86,10 +92,11 @@ namespace StickManWebAPI.Controllers
 			};
 		}
 
+		[Obsolete]
 		[HttpGet]
 		public IEnumerable<CastMessage> GetCastMessages([FromUri]PaginationModel pagination)
 		{
-			var messages = _messageService.GetCastMessages(pagination.PageNumber, pagination.PageSize);
+			var messages = _castMessageService.GetMessages(pagination.PageNumber, pagination.PageSize);
 
 			return messages;
 		}
