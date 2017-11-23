@@ -9,6 +9,7 @@ using StickManWebAPI.Models;
 
 namespace StickManWebAPI.Controllers
 {
+	[Obsolete]
 	public class AudioFileController : ApiController
 	{
 		private readonly IPathProvider _pathProvider;

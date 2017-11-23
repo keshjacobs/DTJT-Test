@@ -18,7 +18,7 @@ namespace StickMan.Services.Implementation
 			_unitOfWork = unitOfWork;
 		}
 
-		public void SaveMessage(string filePath, int userId, string title)
+		public void Save(string filePath, int userId, string title)
 		{
 			var message = new StickMan_Users_Cast_AudioData_UploadInformation
 			{

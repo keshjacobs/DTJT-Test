@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using StickMan.Services.Contracts;
 using StickMan.Services.Exceptions;
 using StickMan.Services.Models.Message;
 using StickManWebAPI.Models;
+using StickManWebAPI.Models.Request;
 using StickManWebAPI.Models.Response;
 
 namespace StickManWebAPI.Controllers
@@ -13,11 +17,13 @@ namespace StickManWebAPI.Controllers
 	{
 		private readonly ICastMessageService _castMessageService;
 		private readonly ISessionService _sessionService;
+		private readonly IPathProvider _pathProvider;
 
-		public CastController(ICastMessageService castMessageService, ISessionService sessionService)
+		public CastController(ICastMessageService castMessageService, ISessionService sessionService, IPathProvider pathProvider)
 		{
 			_castMessageService = castMessageService;
 			_sessionService = sessionService;
+			_pathProvider = pathProvider;
 		}
 
 		[HttpGet]
@@ -37,28 +43,27 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
-		public Reply SaveAudioPath(CastAudioContent audioContent)
+		public HttpResponseMessage Send(CastMessageToUpload message)
 		{
+			if (string.IsNullOrEmpty(message.Base64Content))
+			{
+				return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Message content is required");
+			}
+
 			try
 			{
-				_sessionService.Validate(audioContent.UserId, audioContent.SessionToken);
+				_sessionService.Validate(message.UserId, message.SessionToken);
 			}
-			catch (InvalidSessionException ex)
+			catch (InvalidSessionException)
 			{
-				return new Reply
-				{
-					replyCode = (int)EnumReply.processFail,
-					replyMessage = ex.Message
-				};
+				return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Invalid session");
 			}
 
-			_castMessageService.SaveMessage(audioContent.FilePath, audioContent.UserId, audioContent.Title);
+			var filePath = _pathProvider.BuildAudioPath(Path.Combine(message.UserId.ToString(), message.FileName));
+			File.WriteAllBytes(filePath, Convert.FromBase64String(message.Base64Content));
+			_castMessageService.Save(filePath, message.UserId, message.Title);
 
-			return new Reply
-			{
-				replyCode = (int)EnumReply.processOk,
-				replyMessage = "Cast message sucessfully saved"
-			};
+			return Request.CreateResponse(HttpStatusCode.OK, message.FileName);
 		}
 
 		[HttpPost]

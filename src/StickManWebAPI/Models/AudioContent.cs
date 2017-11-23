@@ -17,18 +17,4 @@ namespace StickManWebAPI.Models
 		public string sessionToken { get; set; }
 		public string filter { get; set; }
 	}
-
-	public class SessionData
-	{
-		public int UserId { get; set; }
-
-		public string SessionToken { get; set; }
-	}
-
-	public class CastAudioContent : SessionData
-	{
-		public string FilePath { get; set; }
-
-		public string Title { get; set; }
-	}
 }

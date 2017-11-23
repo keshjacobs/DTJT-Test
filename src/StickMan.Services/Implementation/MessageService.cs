@@ -5,7 +5,6 @@ using System.Linq;
 using StickMan.Database;
 using StickMan.Database.UnitOfWork;
 using StickMan.Services.Contracts;
-using StickMan.Services.Models;
 using StickMan.Services.Models.Message;
 
 namespace StickMan.Services.Implementation
@@ -19,6 +18,22 @@ namespace StickMan.Services.Implementation
 		{
 			_unitOfWork = unitOfWork;
 			_pathProvider = pathProvider;
+		}
+
+		public void Save(string filePath, int userId, int receiverId)
+		{
+			var message = new StickMan_Users_AudioData_UploadInformation
+			{
+				AudioFilePath = filePath,
+				UserID = userId,
+				RecieverID = receiverId,
+				ReadStatus = false,
+				DeleteStatus = false,
+				UploadTime = DateTime.UtcNow,
+			};
+
+			_unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>().Insert(message);
+			_unitOfWork.Save();
 		}
 
 		public IEnumerable<TimelineModel> GetTimeline(int userId, int page, int size)
