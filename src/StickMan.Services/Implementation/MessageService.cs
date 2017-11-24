@@ -20,19 +20,23 @@ namespace StickMan.Services.Implementation
 			_pathProvider = pathProvider;
 		}
 
-		public void Save(string filePath, int userId, int receiverId)
+		public void Save(string filePath, int userId, IEnumerable<int> receiverIds)
 		{
-			var message = new StickMan_Users_AudioData_UploadInformation
+			foreach (var receiverId in receiverIds)
 			{
-				AudioFilePath = filePath,
-				UserID = userId,
-				RecieverID = receiverId,
-				ReadStatus = false,
-				DeleteStatus = false,
-				UploadTime = DateTime.UtcNow,
-			};
+				var message = new StickMan_Users_AudioData_UploadInformation
+				{
+					AudioFilePath = filePath,
+					UserID = userId,
+					RecieverID = receiverId,
+					ReadStatus = false,
+					DeleteStatus = false,
+					UploadTime = DateTime.UtcNow
+				};
 
-			_unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>().Insert(message);
+				_unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>().Insert(message);
+			}
+
 			_unitOfWork.Save();
 		}
 

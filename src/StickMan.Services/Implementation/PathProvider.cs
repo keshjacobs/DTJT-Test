@@ -8,7 +8,17 @@ namespace StickMan.Services.Implementation
 	{
 		public string BuildAudioPath(string fileName)
 		{
-			var path = HostingEnvironment.MapPath(Path.Combine("~/Content/Audio/", fileName));
+			if (fileName.StartsWith("/"))
+			{
+				fileName = fileName.TrimStart('/');
+			}
+
+			if (fileName.StartsWith("\\"))
+			{
+				fileName = fileName.TrimStart('\\');
+			}
+
+			var path = HostingEnvironment.MapPath(Path.Combine("~/Content/Audio", fileName));
 
 			return path;
 		}

@@ -17,13 +17,13 @@ namespace StickManWebAPI.Controllers
 	{
 		private readonly ICastMessageService _castMessageService;
 		private readonly ISessionService _sessionService;
-		private readonly IPathProvider _pathProvider;
+		private readonly IFileService _fileService;
 
-		public CastController(ICastMessageService castMessageService, ISessionService sessionService, IPathProvider pathProvider)
+		public CastController(ICastMessageService castMessageService, ISessionService sessionService, IFileService fileService)
 		{
 			_castMessageService = castMessageService;
 			_sessionService = sessionService;
-			_pathProvider = pathProvider;
+			_fileService = fileService;
 		}
 
 		[HttpGet]
@@ -43,11 +43,11 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
-		public HttpResponseMessage Send(CastMessageToUpload message)
+		public Reply Send(CastMessageToUpload message)
 		{
 			if (string.IsNullOrEmpty(message.Base64Content))
 			{
-				return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Message content is required");
+				return new Reply(HttpStatusCode.BadRequest, "Message content is required");
 			}
 
 			try
@@ -56,14 +56,14 @@ namespace StickManWebAPI.Controllers
 			}
 			catch (InvalidSessionException)
 			{
-				return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Invalid session");
+				return new Reply(HttpStatusCode.BadRequest, "Invalid session");
 			}
 
-			var filePath = _pathProvider.BuildAudioPath(Path.Combine(message.UserId.ToString(), message.FileName));
-			File.WriteAllBytes(filePath, Convert.FromBase64String(message.Base64Content));
-			_castMessageService.Save(filePath, message.UserId, message.Title);
+			_fileService.SaveFile(message.UserId, message.FileName, message.Base64Content);
 
-			return Request.CreateResponse(HttpStatusCode.OK, message.FileName);
+			_castMessageService.Save(message.FileName, message.UserId, message.Title);
+
+			return new Reply(HttpStatusCode.OK, message.FileName);
 		}
 
 		[HttpPost]

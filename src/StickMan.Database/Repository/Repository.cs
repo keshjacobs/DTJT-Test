@@ -14,6 +14,7 @@ namespace StickMan.Database.Repository
 
 		public Repository(EfStickManContext context)
 		{
+			_context = context;
 			_entities = context.Set<TEntity>();
 		}
 

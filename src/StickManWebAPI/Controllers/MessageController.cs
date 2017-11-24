@@ -19,17 +19,17 @@ namespace StickManWebAPI.Controllers
 		private readonly IMessageService _messageService;
 		private readonly ICastMessageService _castMessageService;
 		private readonly ISessionService _sessionService;
-		private readonly IPathProvider _pathProvider;
+		private readonly IFileService _fileService;
 
-		public MessageController(IMessageService messageService, ISessionService sessionService, ICastMessageService castMessageService, IPathProvider pathProvider)
+		public MessageController(IMessageService messageService, ISessionService sessionService, ICastMessageService castMessageService, IFileService fileService)
 		{
 			_messageService = messageService;
 			_sessionService = sessionService;
 			_castMessageService = castMessageService;
-			_pathProvider = pathProvider;
+			_fileService = fileService;
 		}
 
-	    [Obsolete]
+		[Obsolete]
 		[HttpGet]
 		public IEnumerable<TimelineModel> GetTimeline(int userId)
 		{
@@ -61,11 +61,11 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
-		public HttpResponseMessage Send(RegularMessageToUpload message)
+		public Reply Send(RegularMessageToUpload message)
 		{
 			if (string.IsNullOrEmpty(message.Base64Content))
 			{
-				return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Message content is required");
+				return new Reply(HttpStatusCode.BadRequest, "Message content is required");
 			}
 
 			try
@@ -74,14 +74,14 @@ namespace StickManWebAPI.Controllers
 			}
 			catch (InvalidSessionException)
 			{
-				return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Invalid session");
+				return new Reply(HttpStatusCode.BadRequest, "Invalid session");
 			}
 
-			var filePath = _pathProvider.BuildAudioPath(Path.Combine(message.UserId.ToString(), message.FileName));
-			File.WriteAllBytes(filePath, Convert.FromBase64String(message.Base64Content));
-			_messageService.Save(filePath, message.UserId, message.ReceiverId);
+			_fileService.SaveFile(message.UserId, message.FileName, message.Base64Content);
 
-			return Request.CreateResponse(HttpStatusCode.OK, message.FileName);
+			_messageService.Save(message.FileName, message.UserId, message.ReceiverIds);
+
+			return new Reply(HttpStatusCode.OK, message.FileName);
 		}
 
 		[Obsolete]
