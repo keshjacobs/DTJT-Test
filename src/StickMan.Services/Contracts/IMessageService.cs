@@ -5,7 +5,7 @@ namespace StickMan.Services.Contracts
 {
 	public interface IMessageService
 	{
-		void Save(string filePath, int userId, IEnumerable<int> receiverIds);
+		IEnumerable<int> Save(string filePath, int userId, IEnumerable<int> receiverIds);
 
 		IEnumerable<TimelineModel> GetTimeline(int userId, int page, int size);
 

@@ -206,6 +206,8 @@
     <Compile Include="Models\PushInfo.cs" />
     <Compile Include="Models\ReadStatus.cs" />
     <Compile Include="Models\ReplyCodes.cs" />
+    <Compile Include="Models\Response\SendCastMessageReply.cs" />
+    <Compile Include="Models\Response\SendMessageReply.cs" />
     <Compile Include="Models\SearchUser.cs" />
     <Compile Include="Models\Request\SessionData.cs" />
     <Compile Include="Models\SignUpModel.cs" />

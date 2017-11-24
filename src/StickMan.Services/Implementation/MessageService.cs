@@ -20,8 +20,9 @@ namespace StickMan.Services.Implementation
 			_pathProvider = pathProvider;
 		}
 
-		public void Save(string filePath, int userId, IEnumerable<int> receiverIds)
+		public IEnumerable<int> Save(string filePath, int userId, IEnumerable<int> receiverIds)
 		{
+			var messages = new List<StickMan_Users_AudioData_UploadInformation>();
 			foreach (var receiverId in receiverIds)
 			{
 				var message = new StickMan_Users_AudioData_UploadInformation
@@ -35,9 +36,12 @@ namespace StickMan.Services.Implementation
 				};
 
 				_unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>().Insert(message);
+				messages.Add(message);
 			}
 
 			_unitOfWork.Save();
+
+			return messages.Select(m => m.Id);
 		}
 
 		public IEnumerable<TimelineModel> GetTimeline(int userId, int page, int size)

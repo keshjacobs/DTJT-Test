@@ -79,9 +79,12 @@ namespace StickManWebAPI.Controllers
 
 			_fileService.SaveFile(message.UserId, message.FileName, message.Base64Content);
 
-			_messageService.Save(message.FileName, message.UserId, message.ReceiverIds);
+			var ids = _messageService.Save(message.FileName, message.UserId, message.ReceiverIds);
 
-			return new Reply(HttpStatusCode.OK, message.FileName);
+			return new SendMessageReply(HttpStatusCode.OK, message.FileName)
+			{
+				MessageIds = ids
+			};
 		}
 
 		[Obsolete]

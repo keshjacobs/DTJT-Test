@@ -18,7 +18,7 @@ namespace StickMan.Services.Implementation
 			_unitOfWork = unitOfWork;
 		}
 
-		public void Save(string filePath, int userId, string title)
+		public int Save(string filePath, int userId, string title)
 		{
 			var message = new StickMan_Users_Cast_AudioData_UploadInformation
 			{
@@ -33,6 +33,8 @@ namespace StickMan.Services.Implementation
 
 			_unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().Insert(message);
 			_unitOfWork.Save();
+
+			return message.Id;
 		}
 
 		public int ReadMessage(int castMessageId)

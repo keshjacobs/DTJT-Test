@@ -61,9 +61,12 @@ namespace StickManWebAPI.Controllers
 
 			_fileService.SaveFile(message.UserId, message.FileName, message.Base64Content);
 
-			_castMessageService.Save(message.FileName, message.UserId, message.Title);
+			var id = _castMessageService.Save(message.FileName, message.UserId, message.Title);
 
-			return new Reply(HttpStatusCode.OK, message.FileName);
+			return new SendCastMessageReply(HttpStatusCode.OK, message.FileName)
+			{
+				CastMessageId = id
+			};
 		}
 
 		[HttpPost]
