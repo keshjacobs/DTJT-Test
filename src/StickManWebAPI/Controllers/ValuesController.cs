@@ -9,6 +9,7 @@ using System.Web.Http;
 using StickManWebAPI.Models;
 using StickMan.Database;
 using StickMan.Services.Contracts;
+using StickManWebAPI.Models.Response;
 
 namespace StickManWebAPI.Controllers
 {
@@ -363,7 +364,6 @@ namespace StickManWebAPI.Controllers
 			var searchResult = new SearchResult();
 			var reply = new Reply();
 			var usersList = new List<UserExtension>();
-
 
 			try
 			{

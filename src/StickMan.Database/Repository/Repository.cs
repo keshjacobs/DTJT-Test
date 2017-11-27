@@ -20,6 +20,11 @@ namespace StickMan.Database.Repository
 
 		public IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter)
 		{
+			return GetQuery(filter).ToList();
+		}
+
+		public IEnumerable<TEntity> GetQuery(Expression<Func<TEntity, bool>> filter)
+		{
 			return _entities.Where(filter);
 		}
 

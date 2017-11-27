@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Net;
 using System.Web.Http;
 using StickMan.Services.Contracts;
 using StickMan.Services.Exceptions;
 using StickMan.Services.Models.Message;
 using StickManWebAPI.Models;
+using StickManWebAPI.Models.Response;
 
 namespace StickManWebAPI.Controllers
 {
@@ -11,19 +13,23 @@ namespace StickManWebAPI.Controllers
 	{
 		private readonly IMessageService _messageService;
 		private readonly ISessionService _sessionService;
+		private readonly IFileService _fileService;
 
-		public MessageController(IMessageService messageService, ISessionService sessionService)
+		public MessageController(IMessageService messageService, ISessionService sessionService, IFileService fileService)
 		{
 			_messageService = messageService;
 			_sessionService = sessionService;
+			_fileService = fileService;
 		}
 
 		[HttpGet]
-		public IEnumerable<TimelineModel> GetTimeline(int userId)
+		public IEnumerable<TimelineModel> Timeline([FromUri]TimelineRequestModel timeline)
 		{
-			var timeline = _messageService.GetTimeline(userId);
+			_sessionService.Validate(timeline.UserId, timeline.SessionToken);
 
-			return timeline;
+			var messages = _messageService.GetTimeline(timeline.UserId, timeline.Pagination.PageNumber, timeline.Pagination.PageSize);
+
+			return messages;
 		}
 
 		[HttpPost]
@@ -39,49 +45,30 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
-		public Reply SaveCastAudioPath(CastAudioContent audioContent)
+		public Reply Send(RegularMessageToUpload message)
 		{
+			if (string.IsNullOrEmpty(message.Base64Content))
+			{
+				return new Reply(HttpStatusCode.BadRequest, "Message content is required");
+			}
+
 			try
 			{
-				_sessionService.Validate(audioContent.UserId, audioContent.SessionToken);
+				_sessionService.Validate(message.UserId, message.SessionToken);
 			}
-			catch (InvalidSessionException ex)
+			catch (InvalidSessionException)
 			{
-				return new Reply
-				{
-					replyCode = (int)EnumReply.processFail,
-					replyMessage = ex.Message
-				};
+				return new Reply(HttpStatusCode.BadRequest, "Invalid session");
 			}
 
-			_messageService.SaveCastMessage(audioContent.FilePath, audioContent.UserId);
+			_fileService.SaveFile(message.UserId, message.FileName, message.Base64Content);
 
-			return new Reply
+			var ids = _messageService.Save(message.FileName, message.UserId, message.ReceiverIds);
+
+			return new SendMessageReply(HttpStatusCode.OK, message.FileName)
 			{
-				replyCode = (int)EnumReply.processOk,
-				replyMessage = "Cast message sucessfully saved"
+				MessageIds = ids
 			};
-		}
-
-		[HttpPost]
-		public ClickCountReply ClickOnCastMessage(int castMessageId)
-		{
-			var clickCount = _messageService.IncreaseCastClickCount(castMessageId);
-
-			return new ClickCountReply
-			{
-				replyCode = (int)EnumReply.processOk,
-				replyMessage = "Cast message clicked",
-				ClickCount = clickCount
-			};
-		}
-
-		[HttpGet]
-		public IEnumerable<CastMessage> GetCastMessages()
-		{
-			var messages = _messageService.GetCastMessages();
-
-			return messages;
 		}
 	}
 }

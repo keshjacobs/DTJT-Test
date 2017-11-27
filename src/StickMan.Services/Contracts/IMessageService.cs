@@ -5,15 +5,11 @@ namespace StickMan.Services.Contracts
 {
 	public interface IMessageService
 	{
-		IEnumerable<TimelineModel> GetTimeline(int userId);
+		IEnumerable<int> Save(string filePath, int userId, IEnumerable<int> receiverIds);
 
-		void SaveCastMessage(string filePath, int userId);
+		IEnumerable<TimelineModel> GetTimeline(int userId, int page, int size);
 
 		void ReadMessage(int id);
-
-		int IncreaseCastClickCount(int castMessageId);
-
-		IEnumerable<CastMessage> GetCastMessages();
 
 		void CleanUpMessages();
 	}

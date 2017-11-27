@@ -4,9 +4,14 @@ namespace StickMan.Services.Models.Message
 {
 	public class CastMessage
 	{
-		public AudioInfo MessageInfo { get; set; }
+		public CastAudioInfo MessageInfo { get; set; }
 
 		public UserModel User { get; set; }
+	}
+
+	public class CastAudioInfo : AudioInfo
+	{
+		public string Title { get; set; }
 	}
 
 	public class AudioInfo
