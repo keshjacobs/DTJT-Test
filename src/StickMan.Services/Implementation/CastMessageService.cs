@@ -72,7 +72,7 @@ namespace StickMan.Services.Implementation
 			var userIds = users.Select(u => u.UserID).ToList();
 
 			var messages = _unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>()
-				.GetQuery(m => m.UserID != null && userIds.Contains(m.UserID.Value))
+				.GetQuery(m => (m.UserID != null && userIds.Contains(m.UserID.Value)) || (m.Title != null && m.Title.Contains(term)))
 				.OrderByDescending(m => m.ClickCount)
 				.ToList();
 
@@ -106,7 +106,15 @@ namespace StickMan.Services.Implementation
 				var user = users.FirstOrDefault(u => u.UserID == uploadInfo.UserID);
 
 				var message = CreateCastMessage(uploadInfo);
-				FillUserInfo(user, message);
+				if (user != null)
+				{
+					FillUserInfo(user, message);
+				}
+				else
+				{
+					user = _unitOfWork.Repository<StickMan_Users>().GetSingle(u => u.UserID == uploadInfo.UserID);
+					FillUserInfo(user, message);
+				}
 
 				castMessages.Add(message);
 			}
@@ -132,21 +140,18 @@ namespace StickMan.Services.Implementation
 
 		private static void FillUserInfo(StickMan_Users user, CastMessage message)
 		{
-			if (user != null)
+			message.User = new UserModel
 			{
-				message.User = new UserModel
-				{
-					UserId = user.UserID,
-					ImagePath = user.ImagePath,
-					UserName = user.UserName,
-					DOB = user.DOB,
-					DeviceId = user.DeviceId,
-					Email = user.EmailID,
-					FullName = user.FullName,
-					MobileNo = user.MobileNo,
-					Sex = user.Sex
-				};
-			}
+				UserId = user.UserID,
+				ImagePath = user.ImagePath,
+				UserName = user.UserName,
+				DOB = user.DOB,
+				DeviceId = user.DeviceId,
+				Email = user.EmailID,
+				FullName = user.FullName,
+				MobileNo = user.MobileNo,
+				Sex = user.Sex
+			};
 		}
 	}
 }
