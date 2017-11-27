@@ -177,7 +177,6 @@
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\AudioFileController.cs" />
     <Compile Include="Controllers\CastController.cs" />
     <Compile Include="Models\RegularMessageToUpload.cs" />
     <Compile Include="Models\Request\CastMessageToUpload.cs" />
@@ -213,7 +212,6 @@
     <Compile Include="Models\SignUpModel.cs" />
     <Compile Include="Models\TimelineRequestModel.cs" />
     <Compile Include="Models\Unblock.cs" />
-    <Compile Include="Models\FileContent.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\userProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
