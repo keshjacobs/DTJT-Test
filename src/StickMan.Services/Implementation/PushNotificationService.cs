@@ -22,13 +22,22 @@ namespace StickMan.Services.Implementation
 			_userService = userService;
 		}
 
+		public void SendMessagePush(int senderId, IEnumerable<int> receiverIds)
+		{
+			var sender = _userService.GetUser(senderId);
+			var receivers = _userService.GetUsers(receiverIds);
+
+			foreach (var receiver in receivers)
+			{
+				SendMessagePush(receiver.DeviceId, sender);
+			}
+		}
+
 		public void SendMessagePush(int senderId, string deviceId)
 		{
 			var sender = _userService.GetUser(senderId);
 
-			var message = $"{sender.FullName} sent you a new message";
-			PushAppleNotification(deviceId, message);
-			PushAndroidNotification(deviceId, message, sender);
+			SendMessagePush(deviceId, sender);
 		}
 
 		public void SendFriendRequestPush(int senderId, string deviceId)
@@ -37,10 +46,17 @@ namespace StickMan.Services.Implementation
 			var message = $"{sender.FullName} sent you a friend request.";
 
 			PushAppleNotification(deviceId, message);
-			PushAndroidNotification(deviceId, message, sender);
+			PushAndroidNotification(deviceId, message, sender.UserName);
 		}
 
-		private void PushAndroidNotification(string deviceId, string message, UserModel sender)
+		private void SendMessagePush(string deviceId, UserModel sender)
+		{
+			var message = $"{sender.FullName} sent you a new message";
+			PushAppleNotification(deviceId, message);
+			PushAndroidNotification(deviceId, message, sender.UserName);
+		}
+
+		private void PushAndroidNotification(string deviceId, string message, string senderUserName)
 		{
 			using (var client = new JsonServiceClient("https://fcm.googleapis.com"))
 			{
@@ -51,7 +67,7 @@ namespace StickMan.Services.Implementation
 					Data = new AndroidData
 					{
 						Message = message,
-						UserName = sender.UserName,
+						UserName = senderUserName,
 						Flag = "search"
 					},
 					RegistrationIds = new List<string> { deviceId }

@@ -12,14 +12,16 @@ namespace StickManWebAPI.Controllers
 	public class MessageController : ApiController
 	{
 		private readonly IMessageService _messageService;
+		private readonly IPushNotificationService _pushNotificationService;
 		private readonly ISessionService _sessionService;
 		private readonly IFileService _fileService;
 
-		public MessageController(IMessageService messageService, ISessionService sessionService, IFileService fileService)
+		public MessageController(IMessageService messageService, ISessionService sessionService, IFileService fileService, IPushNotificationService pushNotificationService)
 		{
 			_messageService = messageService;
 			_sessionService = sessionService;
 			_fileService = fileService;
+			_pushNotificationService = pushNotificationService;
 		}
 
 		[HttpGet]
@@ -64,6 +66,7 @@ namespace StickManWebAPI.Controllers
 			_fileService.SaveFile(message.UserId, message.FileName, message.Base64Content);
 
 			var ids = _messageService.Save(message.FileName, message.UserId, message.ReceiverIds);
+			_pushNotificationService.SendMessagePush(message.UserId, message.ReceiverIds);
 
 			return new SendMessageReply(HttpStatusCode.OK, message.FileName)
 			{
