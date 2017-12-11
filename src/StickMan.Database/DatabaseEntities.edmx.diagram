@@ -11,7 +11,8 @@
         <EntityTypeShape EntityType="StickManDbModel.StickMan_Users_AudioData_UploadInformation" Width="1.5" PointX="5.75" PointY="0.75" />
         <EntityTypeShape EntityType="StickManDbModel.StickMan_Users_Cast_AudioData_UploadInformation" Width="1.5" PointX="5.75" PointY="4.75" />
         <EntityTypeShape EntityType="StickManDbModel.StickMan_UserSesion" Width="1.5" PointX="0.75" PointY="6.75" />
-        <EntityTypeShape EntityType="StickManDbModel.StickMan_UsersFriendList" Width="1.5" PointX="2.75" PointY="6.75" />
+        <EntityTypeShape EntityType="StickManDbModel.StickMan_UsersFriendList" Width="1.5" PointX="3.625" PointY="6.875" />
+        <AssociationConnector Association="StickManDbModel.CastMessageListeners" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

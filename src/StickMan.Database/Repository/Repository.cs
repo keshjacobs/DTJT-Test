@@ -60,6 +60,16 @@ namespace StickMan.Database.Repository
 				throw new ArgumentNullException(nameof(entity));
 			}
 
+			try
+			{
+				_context.Set<TEntity>().Attach(entity);
+			}
+			catch (Exception e)
+			{
+				_context.Entry(entity).State = EntityState.Detached;
+				_context.Set<TEntity>().Attach(entity);
+			}
+
 			_context.Entry(entity).State = EntityState.Modified;
 		}
 

@@ -14,7 +14,6 @@ namespace StickMan.Database.UnitOfWork
 		{
 			_repositories = new Hashtable();
 			_context = new EfStickManContext();
-			_context.Configuration.AutoDetectChangesEnabled = false;
 		}
 
 		public void Save()

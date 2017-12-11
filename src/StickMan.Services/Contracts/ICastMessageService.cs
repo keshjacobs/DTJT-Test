@@ -7,11 +7,11 @@ namespace StickMan.Services.Contracts
 	{
 		int Save(string filePath, int userId, string title);
 
-		int ReadMessage(int castMessageId);
+		int ReadMessage(int castMessageId, int currentUserId);
 
-		IEnumerable<CastMessage> GetMessages(int page, int size);
+		IEnumerable<CastMessage> GetMessages(int page, int size, int currentUserId);
 
-		IEnumerable<CastMessage> Search(string term);
+		IEnumerable<CastMessage> Search(string term, int currentUserId);
 
 		string ChangeTitle(int userId, int castId, string newTitle);
 	}

@@ -37,18 +37,28 @@ namespace StickMan.Services.Implementation
 			return message.Id;
 		}
 
-		public int ReadMessage(int castMessageId)
+		public int ReadMessage(int castMessageId, int currentUserId)
 		{
 			var castMessage = _unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().GetSingle(m => m.Id == castMessageId);
 
 			castMessage.ClickCount++;
+
+			if (castMessage.UsersListened.All(u => u.UserID != currentUserId))
+			{
+				var currentUser = _unitOfWork.Repository<StickMan_Users>().GetSingle(u => u.UserID == currentUserId);
+				currentUser.ListenedCastMessages.Add(castMessage);
+				castMessage.UsersListened.Add(currentUser);
+
+				_unitOfWork.Repository<StickMan_Users>().Update(currentUser);
+			}
+			
 			_unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().Update(castMessage);
 			_unitOfWork.Save();
 
 			return castMessage.ClickCount.GetValueOrDefault();
 		}
 
-		public IEnumerable<CastMessage> GetMessages(int page, int size)
+		public IEnumerable<CastMessage> GetMessages(int page, int size, int currentUserId)
 		{
 			var messages = _unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>()
 				.GetQueryAll()
@@ -59,12 +69,12 @@ namespace StickMan.Services.Implementation
 
 			var userIds = messages.Select(i => i.UserID).Distinct();
 			var users = _unitOfWork.Repository<StickMan_Users>().Get(u => userIds.Any(m => m == u.UserID)).ToList();
-			var castMessages = GetMergedMessagesInfo(messages, users);
+			var castMessages = GetMergedMessagesInfo(messages, users, currentUserId);
 
 			return castMessages;
 		}
 
-		public IEnumerable<CastMessage> Search(string term)
+		public IEnumerable<CastMessage> Search(string term, int currentUserId)
 		{
 			var users = _unitOfWork.Repository<StickMan_Users>()
 				.Get(u => u.UserName.Contains(term) || u.FullName.Contains(term))
@@ -76,7 +86,7 @@ namespace StickMan.Services.Implementation
 				.OrderByDescending(m => m.ClickCount)
 				.ToList();
 
-			var castMessages = GetMergedMessagesInfo(messages, users);
+			var castMessages = GetMergedMessagesInfo(messages, users, currentUserId);
 
 			return castMessages;
 		}
@@ -97,7 +107,10 @@ namespace StickMan.Services.Implementation
 			return newTitle;
 		}
 
-		private IEnumerable<CastMessage> GetMergedMessagesInfo(IEnumerable<StickMan_Users_Cast_AudioData_UploadInformation> messages, ICollection<StickMan_Users> users)
+		private IEnumerable<CastMessage> GetMergedMessagesInfo(
+			IEnumerable<StickMan_Users_Cast_AudioData_UploadInformation> messages,
+			ICollection<StickMan_Users> users,
+			int currentUserId)
 		{
 			var castMessages = new List<CastMessage>();
 
@@ -105,7 +118,7 @@ namespace StickMan.Services.Implementation
 			{
 				var user = users.FirstOrDefault(u => u.UserID == uploadInfo.UserID);
 
-				var message = CreateCastMessage(uploadInfo);
+				var message = CreateCastMessage(uploadInfo, currentUserId);
 				if (user != null)
 				{
 					FillUserInfo(user, message);
@@ -122,7 +135,7 @@ namespace StickMan.Services.Implementation
 			return castMessages;
 		}
 
-		private static CastMessage CreateCastMessage(StickMan_Users_Cast_AudioData_UploadInformation uploadInfo)
+		private static CastMessage CreateCastMessage(StickMan_Users_Cast_AudioData_UploadInformation uploadInfo, int currentUserId)
 		{
 			var message = new CastMessage
 			{
@@ -133,7 +146,8 @@ namespace StickMan.Services.Implementation
 					UploadTime = uploadInfo.UploadTime.GetValueOrDefault(),
 					Clicks = uploadInfo.ClickCount.GetValueOrDefault(),
 					Title = uploadInfo.Title
-				}
+				},
+				Listened = uploadInfo.UsersListened.Any(u => u.UserID == currentUserId)
 			};
 			return message;
 		}

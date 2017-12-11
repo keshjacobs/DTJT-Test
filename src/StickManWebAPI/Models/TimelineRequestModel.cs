@@ -1,3 +1,5 @@
+using StickManWebAPI.Models.Request;
+
 namespace StickManWebAPI.Models
 {
 	public class TimelineRequestModel
