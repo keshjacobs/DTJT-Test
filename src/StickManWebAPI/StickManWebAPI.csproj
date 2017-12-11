@@ -193,6 +193,7 @@
     <Compile Include="Models\BlockfrndStatus.cs" />
     <Compile Include="Models\ClickCount.cs" />
     <Compile Include="Models\MessageToUpload.cs" />
+    <Compile Include="Models\Request\CastSearchModel.cs" />
     <Compile Include="Models\Response\Reply.cs" />
     <Compile Include="Models\Response\ChangeTitleReply.cs" />
     <Compile Include="Models\Response\ClickCountReply.cs" />
@@ -201,7 +202,7 @@
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\Request\Message.cs" />
     <Compile Include="Models\NewAudioMessage.cs" />
-    <Compile Include="Models\PaginationModel.cs" />
+    <Compile Include="Models\Request\PaginationModel.cs" />
     <Compile Include="Models\PushInfo.cs" />
     <Compile Include="Models\ReadStatus.cs" />
     <Compile Include="Models\ReplyCodes.cs" />

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Web.Http;
 using StickMan.Services.Contracts;
 using StickMan.Services.Exceptions;
@@ -27,17 +28,25 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpGet]
-		public IEnumerable<CastMessage> Get([FromUri]PaginationModel pagination)
+		public IEnumerable<CastMessage> Get([FromUri]CastPaginationModel pagination)
 		{
-			var messages = _castMessageService.GetMessages(pagination.PageNumber, pagination.PageSize);
+			var messages = _castMessageService.GetMessages(pagination.PageNumber, pagination.PageSize, pagination.UserId);
 
 			return messages;
 		}
 
 		[HttpGet]
-		public IEnumerable<CastMessage> Search(string term)
+		public IEnumerable<CastMessage> Search([FromUri]CastSearchModel model, string term)
 		{
-			var messages = _castMessageService.Search(term);
+			if (model == null)
+			{
+				model = new CastSearchModel
+				{
+					Term = term
+				};
+			}
+
+			var messages = _castMessageService.Search(model.Term, model.UserId);
 
 			return messages;
 		}
@@ -69,10 +78,10 @@ namespace StickManWebAPI.Controllers
 			};
 		}
 
-		[HttpPost]
-		public ClickCountReply Click(int castMessageId)
+		[HttpPost]// TODO REMOVE optional
+		public ClickCountReply Click(int castMessageId, int userId = 636)
 		{
-			var clickCount = _castMessageService.ReadMessage(castMessageId);
+			var clickCount = _castMessageService.ReadMessage(castMessageId, userId);
 
 			return new ClickCountReply
 			{

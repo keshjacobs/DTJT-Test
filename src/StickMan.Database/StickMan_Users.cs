@@ -14,6 +14,12 @@ namespace StickMan.Database
     
     public partial class StickMan_Users
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public StickMan_Users()
+        {
+            this.ListenedCastMessages = new HashSet<StickMan_Users_Cast_AudioData_UploadInformation>();
+        }
+    
         public int UserID { get; set; }
         public string UserName { get; set; }
         public string FullName { get; set; }
@@ -24,5 +30,8 @@ namespace StickMan.Database
         public string Sex { get; set; }
         public string ImagePath { get; set; }
         public string DeviceId { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<StickMan_Users_Cast_AudioData_UploadInformation> ListenedCastMessages { get; set; }
     }
 }

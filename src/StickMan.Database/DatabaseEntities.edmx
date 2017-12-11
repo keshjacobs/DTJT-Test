@@ -14,6 +14,14 @@ warning 6013: The table/view 'StickManDB.dbo.dbo.StickMan_Users_MessageStatus' d
           <Property Name="UploadTime" Type="datetime" />
           <Property Name="ReadStatus" Type="bit" />
         </EntityType>-->
+        <EntityType Name="CastMessageListeners">
+          <Key>
+            <PropertyRef Name="CastId" />
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="CastId" Type="int" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="StickMan_FriendRequest">
           <Key>
             <PropertyRef Name="FriendRequestID" />
@@ -97,6 +105,30 @@ warning 6013: The table/view 'StickManDB.dbo.dbo.StickMan_Users_MessageStatus' d
           <Property Name="version" Type="int" />
           <Property Name="definition" Type="varbinary(max)" />
         </EntityType>
+        <Association Name="FK_Cast">
+          <End Role="StickMan_Users_Cast_AudioData_UploadInformation" Type="Self.StickMan_Users_Cast_AudioData_UploadInformation" Multiplicity="1" />
+          <End Role="CastMessageListeners" Type="Self.CastMessageListeners" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StickMan_Users_Cast_AudioData_UploadInformation">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="CastMessageListeners">
+              <PropertyRef Name="CastId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_User">
+          <End Role="StickMan_Users" Type="Self.StickMan_Users" Multiplicity="1" />
+          <End Role="CastMessageListeners" Type="Self.CastMessageListeners" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StickMan_Users">
+              <PropertyRef Name="UserID" />
+            </Principal>
+            <Dependent Role="CastMessageListeners">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Function Name="fn_diagramobjects" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="int" />
         <Function Name="sp_alterdiagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
@@ -230,6 +262,7 @@ warning 6013: The table/view 'StickManDB.dbo.dbo.StickMan_Users_MessageStatus' d
         <Function Name="usp_DeleteFileFromServer" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="usp_GetDeleteStatus" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <EntityContainer Name="StickManDbModelStoreContainer">
+          <EntitySet Name="CastMessageListeners" EntityType="Self.CastMessageListeners" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StickMan_FriendRequest" EntityType="Self.StickMan_FriendRequest" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StickMan_Users" EntityType="Self.StickMan_Users" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StickMan_Users_AudioData_UploadInformation" EntityType="Self.StickMan_Users_AudioData_UploadInformation" Schema="dbo" store:Type="Tables" />
@@ -237,6 +270,14 @@ warning 6013: The table/view 'StickManDB.dbo.dbo.StickMan_Users_MessageStatus' d
           <EntitySet Name="StickMan_UserSesion" EntityType="Self.StickMan_UserSesion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StickMan_UsersFriendList" EntityType="Self.StickMan_UsersFriendList" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Cast" Association="Self.FK_Cast">
+            <End Role="StickMan_Users_Cast_AudioData_UploadInformation" EntitySet="StickMan_Users_Cast_AudioData_UploadInformation" />
+            <End Role="CastMessageListeners" EntitySet="CastMessageListeners" />
+          </AssociationSet>
+          <AssociationSet Name="FK_User" Association="Self.FK_User">
+            <End Role="StickMan_Users" EntitySet="StickMan_Users" />
+            <End Role="CastMessageListeners" EntitySet="CastMessageListeners" />
+          </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -256,6 +297,7 @@ warning 6013: The table/view 'StickManDB.dbo.dbo.StickMan_Users_MessageStatus' d
           <Property Name="Sex" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
           <Property Name="ImagePath" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="DeviceId" Type="String" MaxLength="1024" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ListenedCastMessages" Relationship="StickManDbModel.CastMessageListeners" FromRole="UsersListened" ToRole="ListenedCastMessages" />
         </EntityType>
         <EntityType Name="sysdiagram">
           <Key>
@@ -417,6 +459,10 @@ warning 6013: The table/view 'StickManDB.dbo.dbo.StickMan_Users_MessageStatus' d
           <EntitySet Name="StickMan_Users_Cast_AudioData_UploadInformation" EntityType="StickManDbModel.StickMan_Users_Cast_AudioData_UploadInformation" />
           <EntitySet Name="StickMan_UserSesion" EntityType="StickManDbModel.StickMan_UserSesion" />
           <EntitySet Name="StickMan_UsersFriendList" EntityType="StickManDbModel.StickMan_UsersFriendList" />
+          <AssociationSet Name="CastMessageListeners" Association="StickManDbModel.CastMessageListeners">
+            <End Role="ListenedCastMessages" EntitySet="StickMan_Users_Cast_AudioData_UploadInformation" />
+            <End Role="UsersListened" EntitySet="StickMan_Users" />
+          </AssociationSet>
         </EntityContainer>
         <ComplexType Name="spAndroidLogin_Result">
           <Property Type="Int32" Name="UserID" Nullable="false" />
@@ -563,6 +609,7 @@ warning 6013: The table/view 'StickManDB.dbo.dbo.StickMan_Users_MessageStatus' d
           <Property Name="ClickCount" Type="Int32" />
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Title" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="UsersListened" Relationship="StickManDbModel.CastMessageListeners" FromRole="ListenedCastMessages" ToRole="UsersListened" />
         </EntityType>
         <EntityType Name="StickMan_UserSesion">
           <Key>
@@ -583,6 +630,10 @@ warning 6013: The table/view 'StickManDB.dbo.dbo.StickMan_Users_MessageStatus' d
           <Property Name="FriendID" Type="Int32" Nullable="false" />
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
         </EntityType>
+        <Association Name="CastMessageListeners">
+          <End Type="StickManDbModel.StickMan_Users_Cast_AudioData_UploadInformation" Role="ListenedCastMessages" Multiplicity="*" />
+          <End Type="StickManDbModel.StickMan_Users" Role="UsersListened" Multiplicity="*" />
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -872,6 +923,14 @@ warning 6013: The table/view 'StickManDB.dbo.dbo.StickMan_Users_MessageStatus' d
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <AssociationSetMapping Name="CastMessageListeners" TypeName="StickManDbModel.CastMessageListeners" StoreEntitySet="CastMessageListeners">
+            <EndProperty Name="UsersListened">
+              <ScalarProperty Name="UserID" ColumnName="UserId" />
+            </EndProperty>
+            <EndProperty Name="ListenedCastMessages">
+              <ScalarProperty Name="Id" ColumnName="CastId" />
+            </EndProperty>
+          </AssociationSetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

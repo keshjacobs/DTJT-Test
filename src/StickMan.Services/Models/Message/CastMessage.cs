@@ -7,6 +7,8 @@ namespace StickMan.Services.Models.Message
 		public CastAudioInfo MessageInfo { get; set; }
 
 		public UserModel User { get; set; }
+
+		public bool Listened { get; set; }
 	}
 
 	public class CastAudioInfo : AudioInfo

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace StickManWebAPI.Models
+namespace StickManWebAPI.Models.Request
 {
 	public class PaginationModel
 	{
@@ -17,5 +17,12 @@ namespace StickManWebAPI.Models
 		[Required]
 		[Range(0, int.MaxValue)]
 		public int PageNumber { get; set; }
+	}
+
+	public class CastPaginationModel : PaginationModel
+	{
+		[Required]
+		[Range(1, int.MaxValue)]
+		public int UserId { get; set; }
 	}
 }
