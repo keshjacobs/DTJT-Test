@@ -12,10 +12,12 @@ namespace StickMan.Services.Implementation
 	public class CastMessageService : ICastMessageService
 	{
 		private readonly IUnitOfWork _unitOfWork;
+		private readonly IAudioFileService _audioFileService;
 
-		public CastMessageService(IUnitOfWork unitOfWork)
+		public CastMessageService(IUnitOfWork unitOfWork, IAudioFileService audioFileService)
 		{
 			_unitOfWork = unitOfWork;
+			_audioFileService = audioFileService;
 		}
 
 		public int Save(string filePath, int userId, string title)
@@ -135,7 +137,7 @@ namespace StickMan.Services.Implementation
 			return castMessages;
 		}
 
-		private static CastMessage CreateCastMessage(StickMan_Users_Cast_AudioData_UploadInformation uploadInfo, int currentUserId)
+		private CastMessage CreateCastMessage(StickMan_Users_Cast_AudioData_UploadInformation uploadInfo, int currentUserId)
 		{
 			var message = new CastMessage
 			{
@@ -145,7 +147,9 @@ namespace StickMan.Services.Implementation
 					AudioFilePath = uploadInfo.AudioFilePath,
 					UploadTime = uploadInfo.UploadTime.GetValueOrDefault(),
 					Clicks = uploadInfo.ClickCount.GetValueOrDefault(),
-					Title = uploadInfo.Title
+					Title = uploadInfo.Title,
+					UploadedTimeAgo = DateTime.UtcNow - uploadInfo.UploadTime.GetValueOrDefault(),
+					Duration = _audioFileService.GetDuration(uploadInfo.AudioFilePath)
 				},
 				Listened = uploadInfo.UsersListened.Any(u => u.UserID == currentUserId)
 			};

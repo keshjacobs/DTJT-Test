@@ -14,6 +14,12 @@ namespace StickMan.Services.Implementation
 			_unitOfWork = unitOfWork;
 		}
 
+		public int GetUnansweredRequestsCount(int userId)
+		{
+			return _unitOfWork.Repository<StickMan_FriendRequest>()
+				.Count(x => x.UserID == userId && x.FriendRequestStatus == 0);
+		}
+
 		public StickMan_FriendRequest GetFriendRequest(int userId, int receiverId)
 		{
 			var friendRequest = _unitOfWork.Repository<StickMan_FriendRequest>()

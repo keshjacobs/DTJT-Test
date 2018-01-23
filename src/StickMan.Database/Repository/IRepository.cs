@@ -7,6 +7,8 @@ namespace StickMan.Database.Repository
 {
 	public interface IRepository<TEntity>
 	{
+		int Count(Expression<Func<TEntity, bool>> filter);
+
 		IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter);
 
 		IEnumerable<TEntity> GetQuery(Expression<Func<TEntity, bool>> filter);

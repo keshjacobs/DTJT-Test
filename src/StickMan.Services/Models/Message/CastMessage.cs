@@ -14,6 +14,10 @@ namespace StickMan.Services.Models.Message
 	public class CastAudioInfo : AudioInfo
 	{
 		public string Title { get; set; }
+
+		public TimeSpan UploadedTimeAgo { get; set; }
+
+		public TimeSpan Duration { get; set; }
 	}
 
 	public class AudioInfo

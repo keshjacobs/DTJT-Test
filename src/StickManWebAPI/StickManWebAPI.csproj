@@ -177,6 +177,8 @@
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\ActionBarController.cs" />
+    <Compile Include="Models\Response\ActionBarInfo.cs" />
     <Compile Include="Controllers\CastController.cs" />
     <Compile Include="Models\RegularMessageToUpload.cs" />
     <Compile Include="Models\Request\CastMessageToUpload.cs" />
