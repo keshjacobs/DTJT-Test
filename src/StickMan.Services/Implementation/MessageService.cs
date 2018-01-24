@@ -23,7 +23,7 @@ namespace StickMan.Services.Implementation
 		public int GetUnreadMessagesCount(int userId)
 		{
 			return _unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>()
-				.Count(m => m.RecieverID == userId && !m.ReadStatus); // TODO change if another requirements needed. For now - is not read by me
+				.Count(m => m.RecieverID == userId && !m.ReadStatus);
 		}
 
 		public IEnumerable<int> Save(string filePath, int userId, IEnumerable<int> receiverIds)
