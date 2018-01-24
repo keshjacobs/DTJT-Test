@@ -15,7 +15,7 @@ namespace StickMan.Services.Models.Message
 	{
 		public string Title { get; set; }
 
-		public TimeSpan UploadedTimeAgo { get; set; }
+		public TimeSpan TimePassedSinceUploaded { get; set; }
 
 		public TimeSpan Duration { get; set; }
 	}

@@ -148,7 +148,7 @@ namespace StickMan.Services.Implementation
 					UploadTime = uploadInfo.UploadTime.GetValueOrDefault(),
 					Clicks = uploadInfo.ClickCount.GetValueOrDefault(),
 					Title = uploadInfo.Title,
-					UploadedTimeAgo = DateTime.UtcNow - uploadInfo.UploadTime.GetValueOrDefault(),
+					TimePassedSinceUploaded = DateTime.UtcNow - uploadInfo.UploadTime.GetValueOrDefault(),
 					Duration = _audioFileService.GetDuration(uploadInfo.AudioFilePath)
 				},
 				Listened = uploadInfo.UsersListened.Any(u => u.UserID == currentUserId)

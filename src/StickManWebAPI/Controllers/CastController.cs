@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
-using System.Net.Http;
-using System.Runtime.InteropServices;
 using System.Web.Http;
 using StickMan.Services.Contracts;
 using StickMan.Services.Exceptions;
@@ -78,8 +75,8 @@ namespace StickManWebAPI.Controllers
 			};
 		}
 
-		[HttpPost]// TODO REMOVE optional
-		public ClickCountReply Click(int castMessageId, int userId = 636)
+		[HttpPost]
+		public ClickCountReply Click(int castMessageId, int userId)
 		{
 			var clickCount = _castMessageService.ReadMessage(castMessageId, userId);
 

@@ -16,14 +16,14 @@ namespace StickManWebAPI.Controllers
 	public class ValuesController : ApiController
 	{
 		private readonly IPushNotificationService _pushNotificationService;
-		private readonly IFriendRequestService _friendRequestService;
+		private readonly IFriendService _friendService;
 
 		public ValuesController(
 			IPushNotificationService pushNotificationService,
-			IFriendRequestService friendRequestService)
+			IFriendService friendService)
 		{
 			_pushNotificationService = pushNotificationService;
-			_friendRequestService = friendRequestService;
+			_friendService = friendService;
 		}
 
 		[HttpPost]
@@ -258,16 +258,16 @@ namespace StickManWebAPI.Controllers
 			var reply = new Reply();
 			var requestDetails = new FriendRequest();
 
-			var friendRequest = _friendRequestService.GetFriendRequest(friend.UserId, friend.RecieverUserId);
+			var friendRequest = _friendService.GetFriendRequest(friend.UserId, friend.RecieverUserId);
 			if (friendRequest != null)
 			{
 				return GetAlreadySentResponse(friendRequest, response);
 			}
 
-			var backFriendRequest = _friendRequestService.GetFriendRequest(friend.RecieverUserId, friend.UserId);
+			var backFriendRequest = _friendService.GetFriendRequest(friend.RecieverUserId, friend.UserId);
 			if (backFriendRequest != null)
 			{
-				_friendRequestService.AcceptFriendRequest(backFriendRequest.FriendRequestID);
+				_friendService.AcceptFriendRequest(backFriendRequest.FriendRequestID);
 				return new SendFriendRequest
 				{
 					FriendRequestDetail = new FriendRequest
@@ -477,6 +477,7 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
+		[Obsolete]
 		public SearchResult GetFriends(Friend friend)
 		{
 			var searchResult = new SearchResult();
@@ -616,6 +617,7 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
+		[Obsolete]
 		public SearchResult GetBlockedFriends(Friend friend)
 		{
 			var searchResult = new SearchResult();
