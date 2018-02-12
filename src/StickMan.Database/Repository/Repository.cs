@@ -87,5 +87,13 @@ namespace StickMan.Database.Repository
 
 			_entities.Remove(entity);
 		}
+
+		public void Delete(Expression<Func<TEntity, bool>> filter)
+		{
+			foreach (var entity in Get(filter))
+			{
+				Delete(entity);
+			}
+		}
 	}
 }

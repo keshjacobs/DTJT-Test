@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web.Http;
 using StickMan.Services.Contracts;
@@ -65,12 +66,12 @@ namespace StickManWebAPI.Controllers
 
 			_fileService.SaveFile(message.UserId, message.FileName, message.Base64Content);
 
-			var ids = _messageService.Save(message.FileName, message.UserId, message.ReceiverIds);
-			_pushNotificationService.SendMessagePush(message.UserId, message.ReceiverIds);
+			var messages = _messageService.Save(message.FileName, message.UserId, message.ReceiverIds);
+			_pushNotificationService.SendMessagePush(message.UserId, message.ReceiverIds, messages);
 
 			return new SendMessageReply(HttpStatusCode.OK, message.FileName)
 			{
-				MessageIds = ids
+				MessageIds = messages.Select(x => x.Id)
 			};
 		}
 	}

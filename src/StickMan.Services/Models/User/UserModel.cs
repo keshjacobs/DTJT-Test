@@ -1,6 +1,6 @@
 using System;
 
-namespace StickMan.Services.Models
+namespace StickMan.Services.Models.User
 {
 	public class UserModel
 	{

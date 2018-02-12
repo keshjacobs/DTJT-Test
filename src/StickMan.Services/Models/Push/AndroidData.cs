@@ -12,5 +12,11 @@ namespace StickMan.Services.Models.Push
 
 		[JsonProperty("username")]
 		public string UserName { get; set; }
+
+		[JsonProperty("body")]
+		public object Body { get; set; }
+
+		[JsonProperty("receiverId")]
+		public int ReceiverId { get; set; }
 	}
 }

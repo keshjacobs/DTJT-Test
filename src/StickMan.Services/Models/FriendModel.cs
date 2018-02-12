@@ -10,6 +10,8 @@ namespace StickMan.Services.Models
 
 		public int FriendRequestId { get; set; }
 
-		public bool Blocked { get; set; }
+		public bool BlockedByYou { get; set; }
+
+		public bool BlockedYou { get; set; }
 	}
 }

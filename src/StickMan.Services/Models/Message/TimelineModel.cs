@@ -15,5 +15,9 @@ namespace StickMan.Services.Models.Message
 		public MessageStatus Status { get; set; }
 
 		public MessageArrow Arrow { get; set; }
+
+		public string TimePassedSinceUploaded { get; set; }
+
+		public string Duration { get; set; }
 	}
 }

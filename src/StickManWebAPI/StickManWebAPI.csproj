@@ -179,7 +179,13 @@
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\ActionBarController.cs" />
-    <Compile Include="Controllers\FriendsController.cs" />
+    <Compile Include="Controllers\FriendRequestController.cs" />
+    <Compile Include="Controllers\FriendController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Models\Request\FriendData.cs" />
+    <Compile Include="Models\Request\FriendRequestData.cs" />
+    <Compile Include="Models\Request\SearchUserData.cs" />
+    <Compile Include="Models\Response\FriendRequestsReply.cs" />
     <Compile Include="Models\Response\FriendsReply.cs" />
     <Compile Include="Models\Response\ActionBarInfo.cs" />
     <Compile Include="Controllers\CastController.cs" />
@@ -211,7 +217,9 @@
     <Compile Include="Models\PushInfo.cs" />
     <Compile Include="Models\ReadStatus.cs" />
     <Compile Include="Models\ReplyCodes.cs" />
+    <Compile Include="Models\Response\SearchUserReply.cs" />
     <Compile Include="Models\Response\SendCastMessageReply.cs" />
+    <Compile Include="Models\Response\SendFriendRequestResponse.cs" />
     <Compile Include="Models\Response\SendMessageReply.cs" />
     <Compile Include="Models\SearchUser.cs" />
     <Compile Include="Models\Request\SessionData.cs" />

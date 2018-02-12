@@ -17,17 +17,9 @@ namespace StickMan.Services.Implementation
 			_unitOfWork = unitOfWork;
 		}
 
-		public int GetUnansweredRequestsCount(int userId)
-		{
-			return _unitOfWork.Repository<StickMan_FriendRequest>()
-				.Count(x => x.UserID == userId && x.FriendRequestStatus == 0);
-		}
-
 		public IEnumerable<FriendModel> GetFriends(int userId)
 		{
-			var friendRequests = _unitOfWork.Repository<StickMan_FriendRequest>()
-				.Get(f => f.UserID == userId || f.RecieverID == userId && f.FriendRequestStatus != 0)
-				.ToList();
+			var friendRequests = GetFriendRequests(userId);
 			var friendIds = GetFriendIds(userId, friendRequests);
 			var friendsUsers = _unitOfWork.Repository<StickMan_Users>()
 				.Get(f => friendIds.Contains(f.UserID))
@@ -38,31 +30,67 @@ namespace StickMan.Services.Implementation
 			return friends;
 		}
 
-		public StickMan_FriendRequest GetFriendRequest(int userId, int receiverId)
+		public void Block(int userId, int friendId)
 		{
-			var friendRequest = _unitOfWork.Repository<StickMan_FriendRequest>()
-				.Get(x => x.UserID == userId && x.RecieverID == receiverId)
-				.ToList()
-				.FirstOrDefault();
+			var friend = GetUnblockedFriend(userId, friendId);
 
-			return friendRequest;
+			friend.BlockedBy = userId;
+
+			_unitOfWork.Repository<StickMan_FriendRequest>().Update(friend);
+			_unitOfWork.Save();
 		}
 
-		public void AcceptFriendRequest(int friendRequestId)
+		public void Unblock(int userId, int friendId)
 		{
-			var friendRequest = _unitOfWork.Repository<StickMan_FriendRequest>().GetSingle(x => x.FriendRequestID == friendRequestId);
-			friendRequest.FriendRequestStatus = 1;
+			var friend = GetBlockedFriend(userId, friendId);
 
-			var friend = new StickMan_UsersFriendList
-			{
-				UserID = friendRequest.UserID,
-				FriendID = friendRequest.RecieverID
-			};
+			friend.BlockedBy = null;
 
-			_unitOfWork.Repository<StickMan_FriendRequest>().Update(friendRequest);
-			_unitOfWork.Repository<StickMan_UsersFriendList>().Insert(friend);
-
+			_unitOfWork.Repository<StickMan_FriendRequest>().Update(friend);
 			_unitOfWork.Save();
+		}
+
+		public void Delete(int userId, int friendId)
+		{
+			var friend = GetFriend(userId, friendId);
+
+			friend.FriendRequestStatus = 2;
+
+			_unitOfWork.Repository<StickMan_FriendRequest>().Update(friend);
+			_unitOfWork.Save();
+		}
+
+		private List<StickMan_FriendRequest> GetFriendRequests(int userId)
+		{
+			return _unitOfWork.Repository<StickMan_FriendRequest>()
+				.Get(f => (f.UserID == userId || f.RecieverID == userId) && f.FriendRequestStatus == 1)
+				.ToList();
+		}
+
+		private StickMan_FriendRequest GetFriend(int userId, int friendId)
+		{
+			return _unitOfWork.Repository<StickMan_FriendRequest>()
+				.GetSingle(f => (f.UserID == userId && f.RecieverID == friendId)
+								|| (f.RecieverID == userId && f.UserID == friendId)
+								&& f.FriendRequestStatus == 1);
+		}
+
+		private StickMan_FriendRequest GetBlockedFriend(int userId, int friendId)
+		{
+			return _unitOfWork.Repository<StickMan_FriendRequest>()
+				.GetSingle(f => (f.UserID == userId && f.RecieverID == friendId)
+								|| (f.RecieverID == userId && f.UserID == friendId)
+								&& f.FriendRequestStatus == 1
+								&& f.BlockedBy == userId);
+		}
+
+		private StickMan_FriendRequest GetUnblockedFriend(int userId, int friendId)
+		{
+			return _unitOfWork.Repository<StickMan_FriendRequest>()
+				.GetSingle(f => (f.UserID == userId && f.RecieverID == friendId)
+								|| (f.RecieverID == userId && f.UserID == friendId)
+								&& f.FriendRequestStatus == 1
+								&& f.BlockedBy == null);
 		}
 
 		private IEnumerable<FriendModel> GetFriends(ICollection<StickMan_FriendRequest> friendRequests, ICollection<StickMan_Users> users, int userId)
@@ -84,7 +112,8 @@ namespace StickMan.Services.Implementation
 					UserName = friendUser.UserName,
 					FullName = friendUser.FullName,
 					FriendRequestId = friendRequest.FriendRequestID,
-					Blocked = friendRequest.BlockedBy != null
+					BlockedByYou = friendRequest.BlockedBy == userId,
+					BlockedYou = friendRequest.BlockedBy != null && friendRequest.BlockedBy != userId
 				});
 			}
 

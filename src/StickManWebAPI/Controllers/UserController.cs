@@ -7,34 +7,34 @@ using StickManWebAPI.Models.Response;
 
 namespace StickManWebAPI.Controllers
 {
-	public class FriendsController : ApiController
+	public class UserController : ApiController
 	{
 		private readonly ISessionService _sessionService;
-		private readonly IFriendService _friendService;
+		private readonly IUserService _userService;
 
-		public FriendsController(ISessionService sessionService, IFriendService friendService)
+		public UserController(ISessionService sessionService, IUserService userService)
 		{
 			_sessionService = sessionService;
-			_friendService = friendService;
+			_userService = userService;
 		}
 
 		[HttpGet]
-		public Reply Get([FromUri]SessionData session)
+		public Reply Search([FromUri]SearchUserData data)
 		{
 			try
 			{
-				_sessionService.Validate(session.UserId, session.SessionToken);
+				_sessionService.Validate(data.UserId, data.SessionToken);
 			}
 			catch (InvalidSessionException)
 			{
 				return new Reply(HttpStatusCode.BadRequest, "Invalid session");
 			}
 
-			var friends = _friendService.GetFriends(session.UserId);
+			var users = _userService.Search(data.UserId, data.SearchKeyword);
 
-			return new FriendsReply
+			return new SearchUserReply
 			{
-				Friends = friends
+				Users = users
 			};
 		}
 	}

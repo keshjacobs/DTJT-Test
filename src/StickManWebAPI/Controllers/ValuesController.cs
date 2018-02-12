@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using System.Web.Hosting;
 using System.Web.Http;
 using StickManWebAPI.Models;
@@ -16,14 +17,14 @@ namespace StickManWebAPI.Controllers
 	public class ValuesController : ApiController
 	{
 		private readonly IPushNotificationService _pushNotificationService;
-		private readonly IFriendService _friendService;
+		private readonly IFriendRequestService _friendRequestService;
 
 		public ValuesController(
 			IPushNotificationService pushNotificationService,
-			IFriendService friendService)
+			IFriendRequestService friendRequestService)
 		{
 			_pushNotificationService = pushNotificationService;
-			_friendService = friendService;
+			_friendRequestService = friendRequestService;
 		}
 
 		[HttpPost]
@@ -226,7 +227,7 @@ namespace StickManWebAPI.Controllers
 
 						if (!string.IsNullOrEmpty(deviceId))
 						{
-							_pushNotificationService.SendMessagePush(audioContent.userId, deviceId);
+							_pushNotificationService.SendMessagePush(audioContent.userId, deviceId, int.Parse(audioContent.recieverId.First()));
 							pushInfo.pushStatus = "Sent";
 						}
 						else
@@ -252,22 +253,23 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
+		[Obsolete]
 		public SendFriendRequest SendFriendRequest(Friend friend)
 		{
 			var response = new SendFriendRequest();
 			var reply = new Reply();
 			var requestDetails = new FriendRequest();
 
-			var friendRequest = _friendService.GetFriendRequest(friend.UserId, friend.RecieverUserId);
+			var friendRequest = _friendRequestService.Get(friend.UserId, friend.RecieverUserId);
 			if (friendRequest != null)
 			{
 				return GetAlreadySentResponse(friendRequest, response);
 			}
 
-			var backFriendRequest = _friendService.GetFriendRequest(friend.RecieverUserId, friend.UserId);
+			var backFriendRequest = _friendRequestService.Get(friend.RecieverUserId, friend.UserId);
 			if (backFriendRequest != null)
 			{
-				_friendService.AcceptFriendRequest(backFriendRequest.FriendRequestID);
+				_friendRequestService.Accept(backFriendRequest.FriendRequestID);
 				return new SendFriendRequest
 				{
 					FriendRequestDetail = new FriendRequest
@@ -336,7 +338,7 @@ namespace StickManWebAPI.Controllers
 					{
 						if (!string.IsNullOrEmpty(deviceId))
 						{
-							_pushNotificationService.SendFriendRequestPush(user.userID, deviceId);
+							_pushNotificationService.SendFriendRequestPush(user.userID, deviceId, Convert.ToInt32(ds.Tables[0].Rows[0]["[FriendRequestId]"]));
 						}
 					}
 
@@ -359,6 +361,7 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
+		[Obsolete]
 		public SearchResult SearchUsers(SearchUser searchUser)
 		{
 			var searchResult = new SearchResult();
@@ -398,23 +401,30 @@ namespace StickManWebAPI.Controllers
 				{
 					foreach (DataRow record in ds.Tables[1].Rows)
 					{
+						var userId = Convert.ToInt32(record["UserID"]);
+						if (userId == searchUser.userId)
+						{
+							continue;
+						}
+
 						var user = new UserExtension
 						{
-							userID = Convert.ToInt32(record["UserID"]),
+							userID = userId,
 							username = string.IsNullOrEmpty(record["UserName"].ToString()) ? string.Empty : record["UserName"].ToString(),
-							fullName = string.IsNullOrEmpty(record["FullName"].ToString()) ? string.Empty : record["FullName"].ToString()
+							fullName = string.IsNullOrEmpty(record["FullName"].ToString()) ? string.Empty : record["FullName"].ToString(),
+							sex = string.IsNullOrEmpty(record["Sex"].ToString()) ? string.Empty : record["Sex"].ToString(),
+							imagePath = string.IsNullOrEmpty(record["ImagePath"].ToString()) ? string.Empty : record["ImagePath"].ToString(),
+							FriendRequestStatus = string.Empty,
+							sessionToken = string.Empty,
+							mobileNo = string.IsNullOrEmpty(record["MobileNo"].ToString()) ? string.Empty : record["MobileNo"].ToString(),
+							emailID = string.IsNullOrEmpty(record["EmailID"].ToString()) ? string.Empty : record["EmailID"].ToString(),
+							dob = string.IsNullOrEmpty(record["DOB"].ToString()) ? string.Empty : record["DOB"].ToString(),
+							deviceId = string.Empty
 						};
-						;
-						user.sex = string.IsNullOrEmpty(record["Sex"].ToString()) ? string.Empty : record["Sex"].ToString(); ; ;
-						user.imagePath = string.IsNullOrEmpty(record["ImagePath"].ToString()) ? string.Empty : record["ImagePath"].ToString(); ; ; ;
+
+
 						//user.FriendRequestID = Convert.ToInt32(record["FriendRequestID"]);
-						user.FriendRequestStatus = string.Empty;
 						//user.FriendRequestStatus = string.IsNullOrEmpty(record["FriendRequestStatus"].ToString()) ? string.Empty : record["FriendRequestStatus"].ToString();
-						user.sessionToken = string.Empty;
-						user.mobileNo = string.IsNullOrEmpty(record["MobileNo"].ToString()) ? string.Empty : record["MobileNo"].ToString();
-						user.emailID = string.IsNullOrEmpty(record["EmailID"].ToString()) ? string.Empty : record["EmailID"].ToString();
-						user.dob = string.IsNullOrEmpty(record["DOB"].ToString()) ? string.Empty : record["DOB"].ToString();
-						user.deviceId = string.Empty;
 
 						usersList.Add(user);
 					}
@@ -438,6 +448,7 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
+		[Obsolete]
 		public Reply RespondFriendRequest(Friend friend)
 		{
 			var reply = new Reply();
@@ -544,6 +555,7 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
+		[Obsolete]
 		public SearchResult GetPendingFriendRequests(Friend friend)
 		{
 			var searchResult = new SearchResult();
@@ -680,6 +692,7 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
+		[Obsolete]
 		public string DeleteFriendRequest(string UserId, string ReceiverId)
 		{
 			try
@@ -707,6 +720,7 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
+		[Obsolete]
 		public BlockfrndStatus BlockFriend(BlockfrndStatus values)
 		{
 			try
@@ -734,6 +748,7 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
+		[Obsolete]
 		public Unblock UnBlockFriend(Unblock values)
 		{
 			try
@@ -761,6 +776,7 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
+		[Obsolete]
 		public DeletefrndStatus DeleteFriendRequests(DeletefrndStatus values)
 		{
 			try

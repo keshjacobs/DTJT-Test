@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using StickMan.Database;
 using StickMan.Services.Models.Message;
 
 namespace StickMan.Services.Contracts
@@ -7,7 +8,7 @@ namespace StickMan.Services.Contracts
 	{
 		int GetUnreadMessagesCount(int userId);
 
-		IEnumerable<int> Save(string filePath, int userId, IEnumerable<int> receiverIds);
+		IEnumerable<StickMan_Users_AudioData_UploadInformation> Save(string filePath, int userId, IEnumerable<int> receiverIds);
 
 		IEnumerable<TimelineModel> GetTimeline(int userId, int page, int size);
 

@@ -5,6 +5,7 @@ using System.Linq;
 using StickMan.Database;
 using StickMan.Database.UnitOfWork;
 using StickMan.Services.Contracts;
+using StickMan.Services.Extensions;
 using StickMan.Services.Models.Message;
 
 namespace StickMan.Services.Implementation
@@ -13,20 +14,22 @@ namespace StickMan.Services.Implementation
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IPathProvider _pathProvider;
+		private readonly IAudioFileService _audioFileService;
 
-		public MessageService(IUnitOfWork unitOfWork, IPathProvider pathProvider)
+		public MessageService(IUnitOfWork unitOfWork, IPathProvider pathProvider, IAudioFileService audioFileService)
 		{
 			_unitOfWork = unitOfWork;
 			_pathProvider = pathProvider;
+			_audioFileService = audioFileService;
 		}
 
 		public int GetUnreadMessagesCount(int userId)
 		{
 			return _unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>()
-				.Count(m => m.RecieverID == userId && !m.ReadStatus);
+				.Count(m => m.RecieverID == userId && !m.ReadStatus && !m.DeleteStatus);
 		}
 
-		public IEnumerable<int> Save(string filePath, int userId, IEnumerable<int> receiverIds)
+		public IEnumerable<StickMan_Users_AudioData_UploadInformation> Save(string filePath, int userId, IEnumerable<int> receiverIds)
 		{
 			var messages = new List<StickMan_Users_AudioData_UploadInformation>();
 			foreach (var receiverId in receiverIds)
@@ -47,7 +50,7 @@ namespace StickMan.Services.Implementation
 
 			_unitOfWork.Save();
 
-			return messages.Select(m => m.Id);
+			return messages;
 		}
 
 		public IEnumerable<TimelineModel> GetTimeline(int userId, int page, int size)
@@ -66,7 +69,9 @@ namespace StickMan.Services.Implementation
 				var timelineMessage = new TimelineModel
 				{
 					AudioPath = message.AudioFilePath,
-					MessageId = message.Id
+					MessageId = message.Id,
+					TimePassedSinceUploaded = (DateTime.UtcNow - message.UploadTime).FormatDuration(),
+					Duration = _audioFileService.GetDuration(message.AudioFilePath).FormatDuration()
 				};
 
 				if (message.DeleteStatus)

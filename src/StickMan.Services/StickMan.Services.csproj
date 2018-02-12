@@ -60,6 +60,12 @@
   <ItemGroup>
     <Compile Include="Comparers\FriendModelComparer.cs" />
     <Compile Include="Constants\MessageConstants.cs" />
+    <Compile Include="Contracts\IFriendRequestService.cs" />
+    <Compile Include="Implementation\FriendRequestService.cs" />
+    <Compile Include="Models\FriendRequestDto.cs" />
+    <Compile Include="Models\FriendRequestSendStatus.cs" />
+    <Compile Include="Models\SendFriendRequestResultDto.cs" />
+    <Compile Include="Extensions\TimeSpanExtensions.cs" />
     <Compile Include="Implementation\AudioFileService.cs" />
     <Compile Include="Contracts\IAudioFileService.cs" />
     <Compile Include="Implementation\FileService.cs" />
@@ -87,7 +93,9 @@
     <Compile Include="Models\Message\MessageArrow.cs" />
     <Compile Include="Models\Message\MessageStatus.cs" />
     <Compile Include="Models\Message\TimelineModel.cs" />
-    <Compile Include="Models\UserModel.cs" />
+    <Compile Include="Models\User\FriendStatus.cs" />
+    <Compile Include="Models\User\SearchUserModel.cs" />
+    <Compile Include="Models\User\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

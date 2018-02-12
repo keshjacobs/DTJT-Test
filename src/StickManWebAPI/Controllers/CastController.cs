@@ -16,12 +16,14 @@ namespace StickManWebAPI.Controllers
 		private readonly ICastMessageService _castMessageService;
 		private readonly ISessionService _sessionService;
 		private readonly IFileService _fileService;
+		private readonly IPushNotificationService _pushNotificationService;
 
-		public CastController(ICastMessageService castMessageService, ISessionService sessionService, IFileService fileService)
+		public CastController(ICastMessageService castMessageService, ISessionService sessionService, IFileService fileService, IPushNotificationService pushNotificationService)
 		{
 			_castMessageService = castMessageService;
 			_sessionService = sessionService;
 			_fileService = fileService;
+			_pushNotificationService = pushNotificationService;
 		}
 
 		[HttpGet]
@@ -67,11 +69,12 @@ namespace StickManWebAPI.Controllers
 
 			_fileService.SaveFile(message.UserId, message.FileName, message.Base64Content);
 
-			var id = _castMessageService.Save(message.FileName, message.UserId, message.Title);
+			var castMessage = _castMessageService.Save(message.FileName, message.UserId, message.Title);
+			_pushNotificationService.SendCastPush(message.UserId, castMessage);
 
 			return new SendCastMessageReply(HttpStatusCode.OK, message.FileName)
 			{
-				CastMessageId = id
+				CastMessageId = castMessage.MessageInfo.Id
 			};
 		}
 
