@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace StickMan.Services.Models.Push
 {
@@ -8,7 +9,8 @@ namespace StickMan.Services.Models.Push
 		public string Message { get; set; }
 
 		[JsonProperty("flag")]
-		public string Flag { get; set; }
+		[JsonConverter(typeof(StringEnumConverter))]
+		public NotificationType Flag { get; set; }
 
 		[JsonProperty("username")]
 		public string UserName { get; set; }

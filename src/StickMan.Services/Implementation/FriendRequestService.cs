@@ -19,6 +19,7 @@ namespace StickMan.Services.Implementation
 
 		public SendFriendRequestResultDto Send(int userId, int friendId)
 		{
+			var sender = _unitOfWork.Repository<StickMan_Users>().GetSingle(u => u.UserID == userId);
 			var friendRequest = _unitOfWork.Repository<StickMan_FriendRequest>().Get(f =>
 					(f.UserID == userId && f.RecieverID == friendId) || (f.RecieverID == userId && f.UserID == friendId))
 				.ToList()
@@ -50,7 +51,7 @@ namespace StickMan.Services.Implementation
 			return new SendFriendRequestResultDto
 			{
 				Status = status,
-				Request = friendRequest
+				Request = Map(friendRequest, sender)
 			};
 		}
 
@@ -137,16 +138,22 @@ namespace StickMan.Services.Implementation
 			var requests = new List<FriendRequestDto>();
 			foreach (var friendRequest in friendRequests)
 			{
-				requests.Add(new FriendRequestDto
-				{
-					SenderId = friendRequest.UserID,
-					FriendRequestId = friendRequest.FriendRequestID,
-					SenderUserName = senders.Single(s => s.UserID == friendRequest.UserID).UserName,
-					SendTime = friendRequest.DateTimeStamp.GetValueOrDefault()
-				});
+				requests.Add(Map(friendRequest, senders.Single(s => s.UserID == friendRequest.UserID)));
 			}
 
 			return requests;
+		}
+
+		private FriendRequestDto Map(StickMan_FriendRequest friendRequest, StickMan_Users sender)
+		{
+			return new FriendRequestDto
+			{
+				SenderId = friendRequest.UserID,
+				ReceiverId = friendRequest.RecieverID,
+				FriendRequestId = friendRequest.FriendRequestID,
+				SenderUserName = sender.UserName,
+				SendTime = friendRequest.DateTimeStamp.GetValueOrDefault()
+			};
 		}
 
 		private FriendRequestSendStatus UpdateFriendRequest(StickMan_FriendRequest friendRequest)

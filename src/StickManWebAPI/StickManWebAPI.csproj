@@ -178,6 +178,7 @@
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ActionBarController.cs" />
     <Compile Include="Controllers\FriendRequestController.cs" />
     <Compile Include="Controllers\FriendController.cs" />
@@ -205,6 +206,7 @@
     <Compile Include="Models\ClickCount.cs" />
     <Compile Include="Models\MessageToUpload.cs" />
     <Compile Include="Models\Request\CastSearchModel.cs" />
+    <Compile Include="Models\Response\LoginReply.cs" />
     <Compile Include="Models\Response\Reply.cs" />
     <Compile Include="Models\Response\ChangeTitleReply.cs" />
     <Compile Include="Models\Response\ClickCountReply.cs" />
@@ -223,7 +225,6 @@
     <Compile Include="Models\Response\SendMessageReply.cs" />
     <Compile Include="Models\SearchUser.cs" />
     <Compile Include="Models\Request\SessionData.cs" />
-    <Compile Include="Models\SignUpModel.cs" />
     <Compile Include="Models\TimelineRequestModel.cs" />
     <Compile Include="Models\Unblock.cs" />
     <Compile Include="Models\User.cs" />

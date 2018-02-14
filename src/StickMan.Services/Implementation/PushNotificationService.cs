@@ -4,11 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using ServiceStack;
-using StickMan.Database;
 using StickMan.Services.Contracts;
+using StickMan.Services.Models;
 using StickMan.Services.Models.Message;
 using StickMan.Services.Models.Push;
-using StickMan.Services.Models.User;
 
 namespace StickMan.Services.Implementation
 {
@@ -16,12 +15,10 @@ namespace StickMan.Services.Implementation
 	public class PushNotificationService : IPushNotificationService
 	{
 		private readonly IUserService _userService;
-		private readonly IFriendRequestService _friendRequestService;
 
-		public PushNotificationService(IUserService userService, IFriendRequestService friendRequestService)
+		public PushNotificationService(IUserService userService)
 		{
 			_userService = userService;
-			_friendRequestService = friendRequestService;
 		}
 
 		public void SendCastPush(int senderId, CastMessage castMessage)
@@ -38,59 +35,43 @@ namespace StickMan.Services.Implementation
 				}
 
 				Task.Run(() => PushAndroidNotification(receiver.DeviceId, $"User {sender.UserName} uploaded new cast message",
-					sender.UserName, receiver.UserId, castMessage));
+					sender.UserName, receiver.UserId, NotificationType.Cast, castMessage));
 			}
 		}
 
-		public void SendMessagePush(int senderId, IEnumerable<int> receiverIds, IEnumerable<StickMan_Users_AudioData_UploadInformation> messages)
+		public void SendMessagePush(int senderId, IEnumerable<int> receiverIds, ICollection<JustSentMessage> messages)
 		{
 			var sender = _userService.GetUser(senderId);
 			var receivers = _userService.GetUsers(receiverIds);
 
 			foreach (var receiver in receivers)
 			{
-				var message = messages.Single(m => m.UserID == senderId && m.RecieverID == receiver.UserId);
-				SendMessagePush(receiver.DeviceId, sender, receiver.UserId, message);
+				var message = messages.Single(m => m.ReceiverId == receiver.UserId);
+				var notificationMessage = $"{sender.FullName} sent you a new message";
+				PushAndroidNotification(receiver.DeviceId, notificationMessage, sender.UserName, receiver.UserId, NotificationType.Message, message);
 			}
 		}
 
-		public void SendMessagePush(int senderId, string deviceId, int receiverId)
+		public void SendFriendRequestPush(int senderId, FriendRequestDto friendRequest)
 		{
-			var sender = _userService.GetUser(senderId);
-
-			SendMessagePush(deviceId, sender, receiverId, new object());
-		}
-
-		public void SendFriendRequestPush(int senderId, string deviceId, int friendRequestId)
-		{
+			var receiver = _userService.GetUser(friendRequest.ReceiverId);
 			var sender = _userService.GetUser(senderId);
 			var message = $"{sender.FullName} sent you a friend request.";
 
-			var friendRequest = _friendRequestService.Get(friendRequestId);
-			PushAndroidNotification(deviceId, message, sender.UserName, friendRequest.RecieverID, friendRequest);
+			PushAndroidNotification(receiver.DeviceId, message, sender.UserName, friendRequest.ReceiverId, NotificationType.FriendRequest, friendRequest);
 		}
 
-		public void SendFriendRequestPush(int senderId, StickMan_FriendRequest friendRequest)
+		private void PushAndroidNotification<TBody>(string deviceId, string message, string senderUserName, int receiverId, NotificationType type, TBody messageBody)
 		{
-			var receiver = _userService.GetUser(friendRequest.RecieverID);
-			var sender = _userService.GetUser(senderId);
-			var message = $"{sender.FullName} sent you a friend request.";
+			if (string.IsNullOrEmpty(deviceId))
+			{
+				return;
+			}
 
-			PushAndroidNotification(receiver.DeviceId, message, sender.UserName, friendRequest.RecieverID, friendRequest);
+			PushAndroidNotification(new List<string> { deviceId }, message, senderUserName, receiverId, type, messageBody);
 		}
 
-		private void SendMessagePush<TBody>(string deviceId, UserModel sender, int receiverId, TBody body)
-		{
-			var message = $"{sender.FullName} sent you a new message";
-			PushAndroidNotification(deviceId, message, sender.UserName, receiverId, body);
-		}
-
-		private void PushAndroidNotification<TBody>(string deviceId, string message, string senderUserName, int receiverId, TBody messageBody)
-		{
-			PushAndroidNotification(new List<string> { deviceId }, message, senderUserName, receiverId, messageBody);
-		}
-
-		private void PushAndroidNotification<TBody>(IEnumerable<string> deviceIds, string message, string senderUserName, int receiverId, TBody messageBody)
+		private void PushAndroidNotification<TBody>(IEnumerable<string> deviceIds, string message, string senderUserName, int receiverId, NotificationType type, TBody messageBody)
 		{
 			using (var client = new JsonServiceClient("https://fcm.googleapis.com"))
 			{
@@ -102,7 +83,7 @@ namespace StickMan.Services.Implementation
 					{
 						Message = message,
 						UserName = senderUserName,
-						Flag = "search",
+						Flag = type,
 						Body = messageBody,
 						ReceiverId = receiverId
 					},

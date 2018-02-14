@@ -62,7 +62,7 @@ namespace StickManWebAPI.Controllers
 			{
 				Details = new FriendRequest
 				{
-					FriendRequestId = sendingFriendRequestResult.Request.FriendRequestID,
+					FriendRequestId = sendingFriendRequestResult.Request.FriendRequestId,
 					FriendRequestState = sendingFriendRequestResult.Status.ToString()
 				}
 			};

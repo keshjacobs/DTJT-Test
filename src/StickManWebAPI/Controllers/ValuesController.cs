@@ -10,6 +10,7 @@ using System.Web.Http;
 using StickManWebAPI.Models;
 using StickMan.Database;
 using StickMan.Services.Contracts;
+using StickMan.Services.Models.User;
 using StickManWebAPI.Models.Response;
 
 namespace StickManWebAPI.Controllers
@@ -130,6 +131,7 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
+		[Obsolete]
 		public UserWrapper Login(LoginModel login)
 		{
 			var userWrapper = new UserWrapper();
@@ -187,6 +189,7 @@ namespace StickManWebAPI.Controllers
 		}
 
 		[HttpPost]
+		[Obsolete]
 		public AudioWrapper SaveAudioPath(AudioContent audioContent)
 		{
 			var audioWrapper = new AudioWrapper();
@@ -220,21 +223,6 @@ namespace StickManWebAPI.Controllers
 					reply.replyCode = Convert.ToInt32(ds.Tables[0].Rows[0]["ResponseCode"]);
 					reply.replyMessage = ds.Tables[0].Rows[0]["ResponseMesssage"].ToString();
 					pushInfo.pushStatus = string.Empty;
-					//push message to reciever
-					if (reply.replyCode == 200)
-					{
-						var deviceId = ds.Tables[0].Rows[0]["DeviceID"].ToString();
-
-						if (!string.IsNullOrEmpty(deviceId))
-						{
-							_pushNotificationService.SendMessagePush(audioContent.userId, deviceId, int.Parse(audioContent.recieverId.First()));
-							pushInfo.pushStatus = "Sent";
-						}
-						else
-						{
-							pushInfo.pushStatus = "Not sent. Device Info required.";
-						}
-					}
 
 					audioWrapper.pushInfo = pushInfo;
 
@@ -331,15 +319,6 @@ namespace StickManWebAPI.Controllers
 						user.emailID = string.IsNullOrEmpty(record["EmailID"].ToString()) ? string.Empty : record["EmailID"].ToString();
 						user.dob = string.IsNullOrEmpty(record["DOB"].ToString()) ? string.Empty : record["DOB"].ToString();
 						user.deviceId = string.Empty;
-					}
-
-					//send push notification
-					if (Convert.ToInt32(ds.Tables[0].Rows[0]["ResponseCode"]) == 200)
-					{
-						if (!string.IsNullOrEmpty(deviceId))
-						{
-							_pushNotificationService.SendFriendRequestPush(user.userID, deviceId, Convert.ToInt32(ds.Tables[0].Rows[0]["[FriendRequestId]"]));
-						}
 					}
 
 					response.user = user;

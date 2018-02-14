@@ -71,7 +71,7 @@ namespace StickManWebAPI.Controllers
 
 			return new SendMessageReply(HttpStatusCode.OK, message.FileName)
 			{
-				MessageIds = messages.Select(x => x.Id)
+				MessageIds = messages.Select(x => x.MessageId)
 			};
 		}
 	}
