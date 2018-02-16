@@ -40,13 +40,12 @@ namespace StickManWebAPI.Models
 		public string emailID { get; set; }
 		public string dob { get; set; }
 		public string imagePath { get; set; }
-        public string deviceId { get; set; }
+		public string deviceId { get; set; }
 	}
 
 	public class UserExtension : User
 	{
 		public int FriendRequestID { get; set; }
 		public string FriendRequestStatus { get; set; }
-
 	}
 }

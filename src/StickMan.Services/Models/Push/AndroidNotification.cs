@@ -10,5 +10,7 @@ namespace StickMan.Services.Models.Push
 
 		[JsonProperty("data")]
 		public AndroidData Data { get; set; }
+
+		public int ReceiverId { get; set; }
 	}
 }

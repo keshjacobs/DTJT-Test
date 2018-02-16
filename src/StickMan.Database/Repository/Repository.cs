@@ -18,6 +18,11 @@ namespace StickMan.Database.Repository
 			_entities = context.Set<TEntity>();
 		}
 
+		public int Count(Expression<Func<TEntity, bool>> filter)
+		{
+			return _entities.Count(filter);
+		}
+
 		public IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter)
 		{
 			return GetQuery(filter).ToList();
@@ -81,6 +86,14 @@ namespace StickMan.Database.Repository
 			}
 
 			_entities.Remove(entity);
+		}
+
+		public void Delete(Expression<Func<TEntity, bool>> filter)
+		{
+			foreach (var entity in Get(filter))
+			{
+				Delete(entity);
+			}
 		}
 	}
 }

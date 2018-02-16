@@ -30,8 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="policy.2.0.taglib-sharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0, processorArchitecture=MSIL">
+      <HintPath>..\packages\taglib.2.1.0.0\lib\policy.2.0.taglib-sharp.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack.Client, Version=4.5.14.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ServiceStack.Client.4.5.14\lib\net45\ServiceStack.Client.dll</HintPath>
@@ -47,14 +51,34 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
+    <Reference Include="taglib-sharp, Version=2.1.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0, processorArchitecture=MSIL">
+      <HintPath>..\packages\taglib.2.1.0.0\lib\taglib-sharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Comparers\FriendModelComparer.cs" />
     <Compile Include="Constants\MessageConstants.cs" />
+    <Compile Include="Contracts\IAccountService.cs" />
+    <Compile Include="Contracts\IFriendRequestService.cs" />
+    <Compile Include="Contracts\IMessageConverter.cs" />
+    <Compile Include="Exceptions\AuthenticationException.cs" />
+    <Compile Include="Implementation\AccountService.cs" />
+    <Compile Include="Implementation\FriendRequestService.cs" />
+    <Compile Include="Implementation\MessageConverter.cs" />
+    <Compile Include="Models\FriendRequestDto.cs" />
+    <Compile Include="Models\FriendRequestSendStatus.cs" />
+    <Compile Include="Models\Message\JustSentMessage.cs" />
+    <Compile Include="Models\Push\NotificationType.cs" />
+    <Compile Include="Models\SendFriendRequestResultDto.cs" />
+    <Compile Include="Extensions\TimeSpanExtensions.cs" />
+    <Compile Include="Implementation\AudioFileService.cs" />
+    <Compile Include="Contracts\IAudioFileService.cs" />
     <Compile Include="Implementation\FileService.cs" />
     <Compile Include="Contracts\ICastMessageService.cs" />
     <Compile Include="Contracts\IFileService.cs" />
-    <Compile Include="Contracts\IFriendRequestService.cs" />
+    <Compile Include="Contracts\IFriendService.cs" />
     <Compile Include="Contracts\IPathProvider.cs" />
     <Compile Include="Contracts\IMessageService.cs" />
     <Compile Include="Contracts\IPushNotificationService.cs" />
@@ -62,7 +86,8 @@
     <Compile Include="Contracts\IUserService.cs" />
     <Compile Include="Exceptions\InvalidSessionException.cs" />
     <Compile Include="Implementation\CastMessageService.cs" />
-    <Compile Include="Implementation\FriendRequestService.cs" />
+    <Compile Include="Implementation\FriendService.cs" />
+    <Compile Include="Models\FriendModel.cs" />
     <Compile Include="Models\Push\AndroidData.cs" />
     <Compile Include="Models\Push\AndroidNotification.cs" />
     <Compile Include="Implementation\MessageService.cs" />
@@ -75,7 +100,11 @@
     <Compile Include="Models\Message\MessageArrow.cs" />
     <Compile Include="Models\Message\MessageStatus.cs" />
     <Compile Include="Models\Message\TimelineModel.cs" />
-    <Compile Include="Models\UserModel.cs" />
+    <Compile Include="Models\User\FriendStatus.cs" />
+    <Compile Include="Models\User\SearchUserModel.cs" />
+    <Compile Include="Models\User\SignUpModel.cs" />
+    <Compile Include="Models\User\UserModel.cs" />
+    <Compile Include="Models\User\UserSessionModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

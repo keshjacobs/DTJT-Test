@@ -4,21 +4,24 @@ using System.Linq;
 using StickMan.Database;
 using StickMan.Database.UnitOfWork;
 using StickMan.Services.Contracts;
-using StickMan.Services.Models;
+using StickMan.Services.Extensions;
 using StickMan.Services.Models.Message;
+using StickMan.Services.Models.User;
 
 namespace StickMan.Services.Implementation
 {
 	public class CastMessageService : ICastMessageService
 	{
 		private readonly IUnitOfWork _unitOfWork;
+		private readonly IAudioFileService _audioFileService;
 
-		public CastMessageService(IUnitOfWork unitOfWork)
+		public CastMessageService(IUnitOfWork unitOfWork, IAudioFileService audioFileService)
 		{
 			_unitOfWork = unitOfWork;
+			_audioFileService = audioFileService;
 		}
 
-		public int Save(string filePath, int userId, string title)
+		public CastMessage Save(string filePath, int userId, string title)
 		{
 			var message = new StickMan_Users_Cast_AudioData_UploadInformation
 			{
@@ -34,7 +37,11 @@ namespace StickMan.Services.Implementation
 			_unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().Insert(message);
 			_unitOfWork.Save();
 
-			return message.Id;
+			var castMessage = CreateCastMessage(message, userId);
+			var user = _unitOfWork.Repository<StickMan_Users>().GetSingle(u => u.UserID == userId);
+			FillUserInfo(user, castMessage);
+
+			return castMessage;
 		}
 
 		public int ReadMessage(int castMessageId, int currentUserId)
@@ -135,7 +142,7 @@ namespace StickMan.Services.Implementation
 			return castMessages;
 		}
 
-		private static CastMessage CreateCastMessage(StickMan_Users_Cast_AudioData_UploadInformation uploadInfo, int currentUserId)
+		private CastMessage CreateCastMessage(StickMan_Users_Cast_AudioData_UploadInformation uploadInfo, int currentUserId)
 		{
 			var message = new CastMessage
 			{
@@ -145,7 +152,9 @@ namespace StickMan.Services.Implementation
 					AudioFilePath = uploadInfo.AudioFilePath,
 					UploadTime = uploadInfo.UploadTime.GetValueOrDefault(),
 					Clicks = uploadInfo.ClickCount.GetValueOrDefault(),
-					Title = uploadInfo.Title
+					Title = uploadInfo.Title,
+					TimePassedSinceUploaded = (DateTime.UtcNow - uploadInfo.UploadTime.GetValueOrDefault()).FormatDuration(),
+					Duration = _audioFileService.GetDuration(uploadInfo.AudioFilePath).FormatDuration()
 				},
 				Listened = uploadInfo.UsersListened.Any(u => u.UserID == currentUserId)
 			};

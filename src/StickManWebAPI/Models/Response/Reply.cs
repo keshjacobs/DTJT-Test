@@ -8,6 +8,10 @@ namespace StickManWebAPI.Models.Response
 		{
 		}
 
+		public Reply(string message) : this(HttpStatusCode.OK, message)
+		{
+		}
+
 		public Reply(HttpStatusCode code, string message)
 		{
 			replyCode = (int) code;

@@ -1,4 +1,5 @@
 using System;
+using StickMan.Services.Models.User;
 
 namespace StickMan.Services.Models.Message
 {
@@ -14,6 +15,10 @@ namespace StickMan.Services.Models.Message
 	public class CastAudioInfo : AudioInfo
 	{
 		public string Title { get; set; }
+
+		public string TimePassedSinceUploaded { get; set; }
+
+		public string Duration { get; set; }
 	}
 
 	public class AudioInfo

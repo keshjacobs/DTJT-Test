@@ -5,7 +5,7 @@ namespace StickMan.Services.Contracts
 {
 	public interface ICastMessageService
 	{
-		int Save(string filePath, int userId, string title);
+		CastMessage Save(string filePath, int userId, string title);
 
 		int ReadMessage(int castMessageId, int currentUserId);
 

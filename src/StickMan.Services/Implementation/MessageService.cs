@@ -13,16 +13,24 @@ namespace StickMan.Services.Implementation
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IPathProvider _pathProvider;
+		private readonly IMessageConverter _messageConverter;
 
-		public MessageService(IUnitOfWork unitOfWork, IPathProvider pathProvider)
+		public MessageService(IUnitOfWork unitOfWork, IPathProvider pathProvider, IMessageConverter messageConverter)
 		{
 			_unitOfWork = unitOfWork;
 			_pathProvider = pathProvider;
+			_messageConverter = messageConverter;
 		}
 
-		public IEnumerable<int> Save(string filePath, int userId, IEnumerable<int> receiverIds)
+		public int GetUnreadMessagesCount(int userId)
 		{
-			var messages = new List<StickMan_Users_AudioData_UploadInformation>();
+			return _unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>()
+				.Count(m => m.RecieverID == userId && !m.ReadStatus && !m.DeleteStatus);
+		}
+
+		public ICollection<JustSentMessage> Save(string filePath, int userId, IEnumerable<int> receiverIds)
+		{
+			var messages = new List<JustSentMessage>();
 			foreach (var receiverId in receiverIds)
 			{
 				var message = new StickMan_Users_AudioData_UploadInformation
@@ -36,12 +44,13 @@ namespace StickMan.Services.Implementation
 				};
 
 				_unitOfWork.Repository<StickMan_Users_AudioData_UploadInformation>().Insert(message);
-				messages.Add(message);
+				_unitOfWork.Save();
+
+				var justSentMessage = _messageConverter.MapToJustSentMessage(message, receiverId);
+				messages.Add(justSentMessage);
 			}
 
-			_unitOfWork.Save();
-
-			return messages.Select(m => m.Id);
+			return messages;
 		}
 
 		public IEnumerable<TimelineModel> GetTimeline(int userId, int page, int size)
@@ -57,22 +66,7 @@ namespace StickMan.Services.Implementation
 
 			foreach (var message in messagesInfo)
 			{
-				var timelineMessage = new TimelineModel
-				{
-					AudioPath = message.AudioFilePath,
-					MessageId = message.Id
-				};
-
-				if (message.DeleteStatus)
-				{
-					FillDeletedMessageInfo(timelineMessage, message);
-				}
-				else
-				{
-					FillExistingMessageInfo(userId, timelineMessage, message);
-				}
-
-				FillUser(timelineMessage, message, userId);
+				var timelineMessage = _messageConverter.MapToTimeLine(message, userId);
 
 				timeline.Add(timelineMessage);
 			}
@@ -113,40 +107,6 @@ namespace StickMan.Services.Implementation
 			}
 
 			_unitOfWork.Save();
-		}
-
-		private static void FillExistingMessageInfo(int userId, TimelineModel timelineMessage, StickMan_Users_AudioData_UploadInformation message)
-		{
-			timelineMessage.Emoji = message.ReadStatus ? Emoji.Grimacing : Emoji.Smile;
-
-			if (message.UserID == userId)
-			{
-				timelineMessage.Arrow = MessageArrow.Right;
-				timelineMessage.Status = MessageStatus.Sent;
-			}
-
-			if (message.RecieverID == userId)
-			{
-				timelineMessage.Arrow = MessageArrow.Left;
-				timelineMessage.Status = MessageStatus.Received;
-			}
-		}
-
-		private static void FillDeletedMessageInfo(TimelineModel timelineMessage, StickMan_Users_AudioData_UploadInformation message)
-		{
-			timelineMessage.Emoji = message.ReadStatus ? Emoji.Grimacing : Emoji.SmilingImp;
-
-			timelineMessage.Arrow = MessageArrow.None;
-			timelineMessage.Status = MessageStatus.Deleted;
-		}
-
-		private void FillUser(TimelineModel timelineMessage, StickMan_Users_AudioData_UploadInformation message, int userId)
-		{
-			var id = message.UserID == userId ? message.RecieverID : message.UserID;
-
-			var user = _unitOfWork.Repository<StickMan_Users>().GetSingle(x => x.UserID == id);
-			timelineMessage.UserName = user.UserName;
-			timelineMessage.UserId = id;
 		}
 	}
 }
