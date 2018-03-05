@@ -75,7 +75,7 @@ namespace StickMan.Services.Implementation
 		{
 			using (var client = new JsonServiceClient("https://fcm.googleapis.com"))
 			{
-				client.Headers.Add("Authorization", "key=AAAAiYYf1YI:APA91bEpV9iycjVv0IvKxWR8YPIylkEY3Or9HFw8ONhGuGXmdr3dPhlcZN9XN5tEY3ZLgVK7yUlAyFzK8QRrJaEhmMTtoSp_tqzMy8N33rvEjaV4hqvbX-7ESnU-kX5QBRK6FnhzJRpD");
+				client.Headers.Add("Authorization", "key=AAAAeUdKrWE:APA91bGyBE4DDn3X2-u1jtXOWlQgjQQm8z3OzHk5agB6qv_j2BiVZKcCd4ny-5b8lW4cpdI5yEd37y0ruL7ysj9oNmWsCAQuM87TpY3P-JxGxO-CiRdnsFSmdnfaMSkN7Zo51VzaYRnZ");
 
 				var notification = new AndroidNotification
 				{
