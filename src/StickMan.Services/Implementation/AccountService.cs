@@ -11,7 +11,9 @@ namespace StickMan.Services.Implementation
 {
 	public class AccountService : IAccountService
 	{
-		private readonly IUnitOfWork _unitOfWork;
+        private static readonly Encoding Encoding1252 = Encoding.GetEncoding(1252);
+
+        private readonly IUnitOfWork _unitOfWork;
 
 		public AccountService(IUnitOfWork unitOfWork)
 		{
@@ -44,7 +46,30 @@ namespace StickMan.Services.Implementation
 			return userModel;
 		}
 
-		private string CreateSession(int userId)
+        public ResetPasswordModel ResetPassword(int userId)
+        {
+            var user = GetUser(userId);
+
+            //reset password
+            var randomStr = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 8);
+            var newPassword = EcnryptPassword(randomStr);
+            user.Password = newPassword;
+
+            _unitOfWork.Repository<StickMan_Users>().Update(user);
+            _unitOfWork.Save();
+
+            var token = CreateSession(user.UserID);
+
+            var userModel = new ResetPasswordModel
+            {
+                SessionToken = token,
+                NewPassword = randomStr
+            };
+
+            return userModel;
+        }
+
+        private string CreateSession(int userId)
 		{
 			var session = new StickMan_UserSesion
 			{
@@ -93,11 +118,26 @@ namespace StickMan.Services.Implementation
 			return user;
 		}
 
-		private static void VerifyPassword(string savedPassword, string enteredPassword)
-		{
-			var encryptedPass = EcnryptPassword(enteredPassword);
+        private StickMan_Users GetUser(int userId)
+        {
+            StickMan_Users user;
+            try
+            {
+                user = _unitOfWork.Repository<StickMan_Users>().GetSingle(u => u.UserID == userId);
+            }
+            catch (InvalidOperationException)
+            {
+                throw new AuthenticationException($"User with userId {userId} was not found.");
+            }
 
-			if (string.Equals(encryptedPass, savedPassword, StringComparison.CurrentCultureIgnoreCase))
+            return user;
+        }
+
+        private static void VerifyPassword(string savedPassword, string enteredPassword)
+		{
+            var encryptedPass = EcnryptPassword(enteredPassword);
+
+            if (!string.Equals(encryptedPass, savedPassword, StringComparison.CurrentCultureIgnoreCase))
 			{
 				throw new AuthenticationException("Invalid password");
 			}
@@ -105,12 +145,12 @@ namespace StickMan.Services.Implementation
 
 		private static string EcnryptPassword(string password)
 		{
-			var passwordData = Encoding.ASCII.GetBytes(password);
-			var encryptor = SHA1.Create();
+			var passwordData = Encoding1252.GetBytes(password);
+            var encryptor = SHA1.Create();
 			var computedHash = encryptor.ComputeHash(passwordData);
-			var encryptedPass = HexStringFromBytes(computedHash);
+			var encryptedPass = Encoding1252.GetString(computedHash);
 
-			return encryptedPass;
+            return encryptedPass;
 		}
 
 		public static string HexStringFromBytes(byte[] bytes)

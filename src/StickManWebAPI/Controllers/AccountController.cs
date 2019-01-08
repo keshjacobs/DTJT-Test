@@ -10,10 +10,14 @@ namespace StickManWebAPI.Controllers
 	public class AccountController : ApiController
 	{
 		private readonly IAccountService _accountService;
+        private readonly ISessionService _sessionService;
 
-		public AccountController(IAccountService accountService)
+        public AccountController(
+            IAccountService accountService,
+            ISessionService sessionService)
 		{
 			_accountService = accountService;
+            _sessionService = sessionService;
 		}
 
 		[HttpPost]
@@ -32,5 +36,24 @@ namespace StickManWebAPI.Controllers
 				return new Reply(HttpStatusCode.Unauthorized, e.Message);
 			}
 		}
-	}
+
+        [HttpPost]
+        public Reply ResetPassword(ResetPasswordModel model)
+        {
+            try
+            {
+                _sessionService.Validate(model.UserId, model.SessionToken);
+                var user = _accountService.ResetPassword(model.UserId);
+
+                return new ResetPasswordReply
+                {
+                    User = user
+                };
+            }
+            catch (InvalidSessionException)
+            {
+                return new Reply(HttpStatusCode.BadRequest, "Invalid session");
+            }
+        }
+    }
 }

@@ -19,7 +19,21 @@ namespace StickMan.Services.Models.Message
 		public string TimePassedSinceUploaded { get; set; }
 
 		public string Duration { get; set; }
-	}
+
+        public int Likes { get; set; }
+
+        public int Dislikes { get; set; }
+
+        public int Replied { get; set; }
+
+        public int Reposted { get; set; }
+
+        public string Type { get; set; }
+
+        public string Description { get; set; }
+
+        public CastMessage OriginalMessageInfo { get; set; }
+    }
 
 	public class AudioInfo
 	{

@@ -18,6 +18,8 @@ namespace StickMan.Database
         public StickMan_Users()
         {
             this.ListenedCastMessages = new HashSet<StickMan_Users_Cast_AudioData_UploadInformation>();
+            this.LikePosts = new HashSet<LikePost>();
+            this.PostUsers = new HashSet<PostUser>();
         }
     
         public int UserID { get; set; }
@@ -33,5 +35,9 @@ namespace StickMan.Database
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<StickMan_Users_Cast_AudioData_UploadInformation> ListenedCastMessages { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<LikePost> LikePosts { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<PostUser> PostUsers { get; set; }
     }
 }

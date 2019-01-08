@@ -6,14 +6,14 @@ namespace StickMan.Database.UnitOfWork
 {
 	public class UnitOfWork : IUnitOfWork, IDisposable
 	{
-		private readonly EfStickManContext _context;
+		private readonly EfStickManConnectionString _context;
 		private bool _disposed;
 		private readonly Hashtable _repositories;
 
 		public UnitOfWork()
 		{
 			_repositories = new Hashtable();
-			_context = new EfStickManContext();
+			_context = new EfStickManConnectionString();
 		}
 
 		public void Save()

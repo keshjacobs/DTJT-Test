@@ -42,6 +42,12 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AggregatedCounter.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Counter.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="DatabaseEntities.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -57,10 +63,43 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DatabaseEntities.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Hash.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Job.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="JobParameter.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="JobQueue.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="LikePost.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="List.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PostUser.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="Repository\IRepository.cs" />
     <Compile Include="Repository\Repository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Schema.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Server.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Set.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="spAndroidLogin_Result.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="State.cs">
       <DependentUpon>DatabaseEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="StickMan_FriendRequest.cs">
@@ -137,6 +176,9 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>DatabaseEntities.Designer.cs</LastGenOutput>
     </EntityDeploy>
+    <None Include="App.Config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="DatabaseEntities.edmx.diagram">
       <DependentUpon>DatabaseEntities.edmx</DependentUpon>
     </None>

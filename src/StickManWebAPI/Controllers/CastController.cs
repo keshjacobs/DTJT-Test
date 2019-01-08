@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
+using Hangfire;
 using StickMan.Services.Contracts;
 using StickMan.Services.Exceptions;
 using StickMan.Services.Models.Message;
@@ -123,5 +124,78 @@ namespace StickManWebAPI.Controllers
 				};
 			}
 		}
-	}
+
+        [HttpPost]
+        public LikePostReply LikePost(int castMessageId, int userId)
+        {
+            var likeCount = _castMessageService.LikeMessage(castMessageId, userId);
+
+            return new LikePostReply
+            {
+                LikePostCount = likeCount
+            };
+        }
+
+
+        [HttpPost]
+        public DislikePostReply DislikePost(int castMessageId, int userId)
+        {
+            var likeCount = _castMessageService.DislikeMessage(castMessageId, userId);
+
+            return new DislikePostReply
+            {
+                DislikePostCount = likeCount
+            };
+        }
+
+        [HttpPost]
+        public Reply Repost(RepostModel model)
+        {
+            try
+            {
+                _sessionService.Validate(model.UserId, model.SessionToken);
+            }
+            catch (InvalidSessionException)
+            {
+                return new Reply(HttpStatusCode.BadRequest, "Invalid session");
+            }
+
+            var castMessage = _castMessageService.Repost(model.UserId, model.CastMessageId, model.Comment);
+
+            return new SendCastMessageReply(HttpStatusCode.OK, "Repost message clicked")
+            {
+                CastMessageId = castMessage.MessageInfo.Id
+            };
+        }
+
+        [HttpPost]
+        public Reply ReplyPost(ReplyPostModel model)
+        {
+            if (string.IsNullOrEmpty(model.Base64Content))
+            {
+                return new Reply(HttpStatusCode.BadRequest, "Message content is required");
+            }
+
+            try
+            {
+                _sessionService.Validate(model.UserId, model.SessionToken);
+            }
+            catch (InvalidSessionException)
+            {
+                return new Reply(HttpStatusCode.BadRequest, "Invalid session");
+            }
+
+            _fileService.SaveFile(model.UserId, model.FileName, model.Base64Content);
+
+            var message = _castMessageService.GetMessage(model.CastMessageId);
+
+            var castMessage = _castMessageService.Save(model.FileName, model.UserId, message.Title, model.CastMessageId);
+            var repost = _castMessageService.Repost(model.UserId, castMessage.MessageInfo.Id, model.Comment, model.CastMessageId);
+
+            return new SendCastMessageReply(HttpStatusCode.OK, model.FileName)
+            {
+                CastMessageId = castMessage.MessageInfo.Id
+            };
+        }
+    }
 }

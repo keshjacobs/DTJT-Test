@@ -9,10 +9,10 @@ namespace StickMan.Database.Repository
 	public class Repository<TEntity> : IRepository<TEntity>
 		where TEntity : class
 	{
-		private readonly EfStickManContext _context;
+		private readonly EfStickManConnectionString _context;
 		private readonly IDbSet<TEntity> _entities;
 
-		public Repository(EfStickManContext context)
+		public Repository(EfStickManConnectionString context)
 		{
 			_context = context;
 			_entities = context.Set<TEntity>();

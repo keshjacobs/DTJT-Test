@@ -13,6 +13,25 @@
         <EntityTypeShape EntityType="StickManDbModel.StickMan_UserSesion" Width="1.5" PointX="0.75" PointY="6.75" />
         <EntityTypeShape EntityType="StickManDbModel.StickMan_UsersFriendList" Width="1.5" PointX="3.625" PointY="6.875" />
         <AssociationConnector Association="StickManDbModel.CastMessageListeners" />
+        <EntityTypeShape EntityType="StickManDbModel.LikePost" Width="1.5" PointX="8" PointY="3.375" />
+        <AssociationConnector Association="StickManDbModel.FK_Like_StickMan_Users" />
+        <AssociationConnector Association="StickManDbModel.FK_LikePost_StickMan_Users_Cast_AudioData_UploadInformation" />
+        <EntityTypeShape EntityType="StickManDbModel.PostUser" Width="1.5" PointX="11" PointY="3.375" />
+        <AssociationConnector Association="StickManDbModel.FK__PostUser__Create__6C190EBB" />
+        <AssociationConnector Association="StickManDbModel.FK__PostUser__PostId__6D0D32F4" />
+        <EntityTypeShape EntityType="StickManDbModel.AggregatedCounter" Width="1.5" PointX="8.75" PointY="0.75" />
+        <EntityTypeShape EntityType="StickManDbModel.Counter" Width="1.5" PointX="0.75" PointY="9.75" />
+        <EntityTypeShape EntityType="StickManDbModel.Hash" Width="1.5" PointX="2.75" PointY="9.75" />
+        <EntityTypeShape EntityType="StickManDbModel.Job" Width="1.5" PointX="8.75" PointY="8.25" />
+        <EntityTypeShape EntityType="StickManDbModel.JobParameter" Width="1.5" PointX="11" PointY="10.25" />
+        <EntityTypeShape EntityType="StickManDbModel.JobQueue" Width="1.5" PointX="4.75" PointY="9.75" />
+        <EntityTypeShape EntityType="StickManDbModel.List" Width="1.5" PointX="10.75" PointY="0.75" />
+        <EntityTypeShape EntityType="StickManDbModel.Schema" Width="1.5" PointX="12.75" PointY="0.75" />
+        <EntityTypeShape EntityType="StickManDbModel.Server" Width="1.5" PointX="0.75" PointY="12.75" />
+        <EntityTypeShape EntityType="StickManDbModel.Set" Width="1.5" PointX="2.75" PointY="12.75" />
+        <EntityTypeShape EntityType="StickManDbModel.State" Width="1.5" PointX="11" PointY="7.125" />
+        <AssociationConnector Association="StickManDbModel.FK_HangFire_JobParameter_Job" />
+        <AssociationConnector Association="StickManDbModel.FK_HangFire_State_Job" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
