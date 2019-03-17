@@ -12,7 +12,16 @@ namespace StickMan.Services.Implementation
 		{
 			_pathProvider = pathProvider;
 		}
-
+		
+		public void CopyFile(string sourcePath, string destPath)
+        	{
+            		if (!Directory.Exists(destPath))
+            		{
+                		Directory.CreateDirectory(destPath);
+            		}
+            		File.Copy(sourcePath, destPath, true);
+        	}
+		
 		public void SaveFile(int userId, string fileName, string base64Content)
 		{
 			var filePath = _pathProvider.BuildAudioPath(fileName);
