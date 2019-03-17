@@ -33,9 +33,11 @@ namespace StickMan.Services.Implementation
 			var messages = new List<JustSentMessage>();
 			foreach (var receiverId in receiverIds)
 			{
+				string[] filePathsplit = filePath.Split('/');
+                		string copyPath = "/" + userId.ToString() + "/" + filePath.Replace("/" + userId.ToString(), receiverIds.ToString());                
 				var message = new StickMan_Users_AudioData_UploadInformation
 				{
-					AudioFilePath = filePath,
+					AudioFilePath = copyPath,
 					UserID = userId,
 					RecieverID = receiverId,
 					ReadStatus = false,
