@@ -14,8 +14,9 @@ namespace StickMan.Database.Repository
 		IEnumerable<TEntity> GetQuery(Expression<Func<TEntity, bool>> filter);
 
 		TEntity GetSingle(Expression<Func<TEntity, bool>> filter);
+        TEntity GetFirstOrDefault(Expression<Func<TEntity, bool>> filter);
 
-		IEnumerable<TEntity> GetAll();
+        IEnumerable<TEntity> GetAll();
 
 		IQueryable<TEntity> GetQueryAll();
 

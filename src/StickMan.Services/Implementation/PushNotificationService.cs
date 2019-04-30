@@ -15,11 +15,14 @@ namespace StickMan.Services.Implementation
 	public class PushNotificationService : IPushNotificationService
 	{
 		private readonly IUserService _userService;
+        private readonly ICastMessageService _castMessageService;
+        
 
-		public PushNotificationService(IUserService userService)
+        public PushNotificationService(IUserService userService, ICastMessageService castMessageService)
 		{
 			_userService = userService;
-		}
+            _castMessageService = castMessageService;
+        }
 
 		public void SendCastPush(int senderId, CastMessage castMessage)
 		{
@@ -51,8 +54,31 @@ namespace StickMan.Services.Implementation
 				PushAndroidNotification(receiver.DeviceId, notificationMessage, sender.UserName, receiver.UserId, NotificationType.Message, message);
 			}
 		}
+        public void SendCastPush(int userId, int postId, NotificationType type)
+        {
+            string message;
+            var castMessage = _castMessageService.GetMessage(postId);
+            var receiver = _userService.GetUser(castMessage.UserID.Value);
+            var sender = _userService.GetUser(userId);
+            //var message = $"{sender.FullName} Repost your Cast {castMessage.Title}.";
+            switch (type) {
+                case NotificationType.Repost:
+                    message= $"{sender.FullName} Repost your Cast {castMessage.Title}.";
+                    break;
+                case NotificationType.Replay:
+                    message = $"{sender.FullName} Replay your Cast {castMessage.Title}.";
+                    break;
+                case NotificationType.Like:
+                    message = $"{sender.FullName} Like your Cast {castMessage.Title}.";
+                    break;
+                default:
+                    message = $"{sender.FullName} Push Notification.";
+                    break;
+            }
 
-		public void SendFriendRequestPush(int senderId, FriendRequestDto friendRequest)
+            PushAndroidNotification(receiver.DeviceId, message, sender.UserName, receiver.UserId, NotificationType.Repost, castMessage.Title);
+        }
+        public void SendFriendRequestPush(int senderId, FriendRequestDto friendRequest)
 		{
 			var receiver = _userService.GetUser(friendRequest.ReceiverId);
 			var sender = _userService.GetUser(senderId);
@@ -90,11 +116,12 @@ namespace StickMan.Services.Implementation
 					RegistrationIds = deviceIds
 				};
 
-				var body = JsonConvert.SerializeObject(notification);
+                
+                var body = JsonConvert.SerializeObject(notification);
 
 				var response = client.Post<string>("fcm/send", body);
 				Console.WriteLine($"Sending android push notification response: {response}");
 			}
 		}
-	}
+    }
 }

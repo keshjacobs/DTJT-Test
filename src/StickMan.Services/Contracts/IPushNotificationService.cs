@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using StickMan.Services.Models;
 using StickMan.Services.Models.Message;
+using StickMan.Services.Models.Push;
 
 namespace StickMan.Services.Contracts
 {
@@ -11,5 +12,6 @@ namespace StickMan.Services.Contracts
 		void SendMessagePush(int senderId, IEnumerable<int> receiverIds, ICollection<JustSentMessage> messages);
 
 		void SendFriendRequestPush(int senderId, FriendRequestDto friendRequest);
-	}
+        void SendCastPush(int userId, int postId, NotificationType type);
+    }
 }

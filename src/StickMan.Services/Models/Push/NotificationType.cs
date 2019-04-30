@@ -5,6 +5,9 @@ namespace StickMan.Services.Models.Push
 		None = 0,
 		FriendRequest = 1,
 		Message = 2,
-		Cast = 3
-	}
+		Cast = 3,
+        Repost = 4,
+        Replay =5,
+        Like = 6
+    }
 }

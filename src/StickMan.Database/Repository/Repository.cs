@@ -33,7 +33,12 @@ namespace StickMan.Database.Repository
 			return _entities.Where(filter);
 		}
 
-		public TEntity GetSingle(Expression<Func<TEntity, bool>> filter)
+        
+        public TEntity GetFirstOrDefault(Expression<Func<TEntity, bool>> filter)
+        {
+            return Get(filter).FirstOrDefault();
+        }
+        public TEntity GetSingle(Expression<Func<TEntity, bool>> filter)
 		{
 			return Get(filter).Single();
 		}

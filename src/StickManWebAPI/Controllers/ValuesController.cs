@@ -27,8 +27,108 @@ namespace StickManWebAPI.Controllers
 			_pushNotificationService = pushNotificationService;
 			_friendRequestService = friendRequestService;
 		}
+        [HttpPost]
+        public UserWrapper FacebooksignUp(SignUpModel signUpModel)
+        {
+            var userWrapper = new UserWrapper();
+            var reply = new Reply();
+            var user = new User();
 
-		[HttpPost]
+            try
+            {
+                //required field checks
+                if (!string.IsNullOrWhiteSpace(signUpModel.Username))
+                {
+                    if (!string.IsNullOrWhiteSpace(signUpModel.EmailID))
+                    {
+                        if (!string.IsNullOrWhiteSpace(signUpModel.Password))
+                        {
+                            var con = new SqlConnection
+                            {
+                                ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+                            };
+
+                            var cmd = new SqlCommand
+                            {
+                                CommandType = CommandType.StoredProcedure,
+                                Connection = con,
+
+                                CommandText = "StickMan_usp_CreateFB_User"
+                            };
+                            cmd.Parameters.Add("@UserID", SqlDbType.Int).Value = 0;
+                            cmd.Parameters.Add("@UserName", SqlDbType.VarChar, 500).Value = signUpModel.Username;
+                            cmd.Parameters.Add("@FullName", SqlDbType.VarChar, 500).Value = signUpModel.FullName;
+                            cmd.Parameters.Add("@Password", SqlDbType.VarChar, 500).Value = signUpModel.Password;
+                            cmd.Parameters.Add("@MobileNo", SqlDbType.VarChar, 500).Value = signUpModel.MobileNo;
+                            cmd.Parameters.Add("@EmailID", SqlDbType.VarChar, 500).Value = signUpModel.EmailID;
+                            cmd.Parameters.Add("@DOB", SqlDbType.VarChar, 100).Value = signUpModel.Dob;
+                            cmd.Parameters.Add("@Sex", SqlDbType.VarChar, 500).Value = signUpModel.Sex;
+                            cmd.Parameters.Add("@ImagePath", SqlDbType.VarChar, 1024).Value = signUpModel.ImagePath;
+                            cmd.Parameters.Add("@DeviceId", SqlDbType.VarChar, 1024).Value = signUpModel.DeviceId;
+
+                            var adp = new SqlDataAdapter(cmd);
+                            var ds = new DataSet();
+                            adp.Fill(ds);
+
+                            user.userID = Convert.ToInt32(ds.Tables[0].Rows[0]["UserID"]);
+                            user.sessionToken = ds.Tables[0].Rows[0]["Token"].ToString();
+                            reply.replyCode = Convert.ToInt32(ds.Tables[0].Rows[0]["ResponseCode"]);
+                            reply.replyMessage = ds.Tables[0].Rows[0]["Message"].ToString();
+
+                            if (Convert.ToInt32(ds.Tables[0].Rows[0]["ResponseCode"]) == 200)
+                            {
+                                user.username = ds.Tables[0].Rows[0]["username"].ToString();
+                                user.fullName = ds.Tables[0].Rows[0]["FullName"].ToString();
+                                user.mobileNo = ds.Tables[0].Rows[0]["MobileNo"].ToString();
+                                user.emailID = ds.Tables[0].Rows[0]["EmailID"].ToString();
+                                user.dob = ds.Tables[0].Rows[0]["DOB"].ToString();
+                                user.sex = ds.Tables[0].Rows[0]["Sex"].ToString();
+                                user.imagePath = ds.Tables[0].Rows[0]["imagePath"].ToString();
+                                user.deviceId = ds.Tables[0].Rows[0]["DeviceId"].ToString();
+                            }
+
+                            userWrapper.user = user;
+
+                            if (reply.replyCode == 200)
+                            {
+                                var mainDIR = @"~\Content\Audio\" + user.userID;
+
+                                if (!Directory.Exists(mainDIR))
+                                {
+                                    Directory.CreateDirectory(HostingEnvironment.MapPath(mainDIR));
+                                    //System.Web.Hosting.HostingEnvironment.MapPath(mainDIR);
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            reply.replyCode = 305;
+                            reply.replyMessage = "Password required";
+                        }
+                    }
+                    else
+                    {
+                        reply.replyCode = 304;
+                        reply.replyMessage = "Email ID required";
+                    }
+                }
+                else
+                {
+                    reply.replyCode = 303;
+                    reply.replyMessage = "Username required";
+                }
+            }
+            catch (Exception ex)
+            {
+                reply.replyCode = Convert.ToInt32(EnumReply.processFail);
+                reply.replyMessage = ex.Message;
+            }
+
+            userWrapper.reply = reply;
+            return userWrapper;
+        }
+        [HttpPost]
 		public UserWrapper signUp(SignUpModel signUpModel)
 		{
 			var userWrapper = new UserWrapper();
@@ -188,7 +288,66 @@ namespace StickManWebAPI.Controllers
 			return userWrapper;
 		}
 
-		[HttpPost]
+        [HttpPost]
+        [Obsolete]
+        public UserWrapper FacebookLogin(LoginModel login)
+        {
+            var userWrapper = new UserWrapper();
+            var reply = new Reply();
+            var user = new User();
+            try
+            {
+                var con = new SqlConnection
+                {
+                    ConnectionString = ConfigurationManager.ConnectionStrings["StickManConnection"].ConnectionString
+                };
+
+                var cmd = new SqlCommand
+                {
+                    CommandType = CommandType.StoredProcedure,
+                    Connection = con,
+                    CommandText = "StickMan_usp_FbLogin_User"
+                };
+                cmd.Parameters.Add("@UserName", SqlDbType.VarChar, 32).Value = login.Username;
+                cmd.Parameters.Add("@EmailID", SqlDbType.VarChar, 1024).Value = login.Password;
+                cmd.Parameters.Add("@DeviceId", SqlDbType.VarChar, 1024).Value = login.DeviceId;
+                var adp = new SqlDataAdapter(cmd);
+                var ds = new DataSet();
+                adp.Fill(ds);
+
+                user.userID = Convert.ToInt32(ds.Tables[0].Rows[0]["UserId"]);
+                user.sessionToken = ds.Tables[0].Rows[0]["Token"].ToString();
+
+                reply.replyCode = Convert.ToInt32(ds.Tables[0].Rows[0]["ResponseCode"]);
+                reply.replyMessage = ds.Tables[0].Rows[0]["Message"].ToString();
+
+                if (Convert.ToInt32(ds.Tables[0].Rows[0]["ResponseCode"]) == 200)
+                {
+                    user.username = ds.Tables[0].Rows[0]["username"].ToString();
+                    user.fullName = ds.Tables[0].Rows[0]["FullName"].ToString();
+                    user.mobileNo = ds.Tables[0].Rows[0]["MobileNo"].ToString();
+                    user.emailID = ds.Tables[0].Rows[0]["EmailID"].ToString();
+                    user.dob = ds.Tables[0].Rows[0]["DOB"].ToString();
+                    user.sex = ds.Tables[0].Rows[0]["Sex"].ToString();
+                    user.imagePath = ds.Tables[0].Rows[0]["imagePath"].ToString();
+                    user.deviceId = ds.Tables[0].Rows[0]["DeviceId"].ToString();
+
+                }
+
+                userWrapper.user = user;
+            }
+            catch (Exception ex)
+            {
+                reply.replyCode = Convert.ToInt32(EnumReply.processFail);
+                reply.replyMessage = ex.Message;
+            }
+
+            userWrapper.reply = reply;
+            return userWrapper;
+        }
+
+
+        [HttpPost]
 		[Obsolete]
 		public AudioWrapper SaveAudioPath(AudioContent audioContent)
 		{

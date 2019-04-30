@@ -20,7 +20,57 @@ namespace StickMan.Services.Implementation
 			_unitOfWork = unitOfWork;
 		}
 
-		public UserSessionModel Login(string userName, string password, string deviceId)
+        public void CreateFacebookUser(StickMan_Users users) {
+
+        }
+        public UserSessionModel FacebookLogin(StickMan_Users userLogin)
+        {
+            string token;
+            //StickMan_Users user = _unitOfWork.Repository<StickMan_Users>().GetFirstOrDefault(u => u.UserName == userLogin.UserName || u.EmailID == userLogin.EmailID);
+            StickMan_Users user = _unitOfWork.Repository<StickMan_Users>().GetFirstOrDefault(u => u.EmailID == userLogin.EmailID);
+            if (user == null)
+            {
+                _unitOfWork.Repository<StickMan_Users>().Insert(userLogin);
+                user = userLogin;
+            }
+            else {
+                UpdateDeviceId(userLogin.DeviceId, user);
+                CleanUpUsersWithTheSameDeviceId(userLogin.DeviceId, user.UserName);
+            }
+            //if (user != null)
+            //{
+            //    if (user.UserName.Equals(userLogin.UserName) && ("FACEBOOK").Equals(user.Password))
+            //    {
+            //        UpdateDeviceId(userLogin.DeviceId, user);
+            //        CleanUpUsersWithTheSameDeviceId(userLogin.DeviceId, user.UserName);                    
+            //    }
+            //    else {
+            //        throw new AuthenticationException($"User with email {user.EmailID} already exist.");
+            //    }
+            //}
+            //else {
+            //    _unitOfWork.Repository<StickMan_Users>().Insert(userLogin);
+            //    user = userLogin;
+            //}
+            token = CreateSession(user.UserID);
+
+            var userModel = new UserSessionModel
+            {
+                SessionToken = token,
+                DeviceId = user.DeviceId,
+                UserName = user.UserName,
+                UserId = user.UserID,
+                FullName = user.FullName,
+                DOB = user.DOB,
+                Email = user.EmailID,
+                ImagePath = user.ImagePath,
+                MobileNo = user.MobileNo,
+                Sex = user.Sex
+            };
+
+            return userModel;
+        }
+        public UserSessionModel Login(string userName, string password, string deviceId)
 		{
 			var user = GetUser(userName);
 
