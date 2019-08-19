@@ -8,6 +8,7 @@ namespace StickMan.Services.Models.Push
 		Cast = 3,
         Repost = 4,
         Replay =5,
-        Like = 6
+        Like = 6,
+        DisLike = 7
     }
 }

@@ -8,7 +8,8 @@ namespace StickManWebAPI.Models.Response
 		}
 
 		public int UnreadMessages { get; set; }
+        public int UnreadNotification { get; set; }
 
-		public int UnansweredFriendRequests { get; set; }
+        public int UnansweredFriendRequests { get; set; }
 	}
 }

@@ -198,6 +198,7 @@
     <Compile Include="Controllers\ActionBarController.cs" />
     <Compile Include="Controllers\FriendRequestController.cs" />
     <Compile Include="Controllers\FriendController.cs" />
+    <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Models\ReplyPostModel.cs" />
     <Compile Include="Models\RepostModel.cs" />
@@ -205,6 +206,7 @@
     <Compile Include="Models\Request\FriendRequestData.cs" />
     <Compile Include="Models\Request\SearchUserData.cs" />
     <Compile Include="Models\ResetPasswordModel.cs" />
+    <Compile Include="Models\Response\UnReadCount.cs" />
     <Compile Include="Models\Response\DislikePostReply.cs" />
     <Compile Include="Models\Response\FriendRequestsReply.cs" />
     <Compile Include="Models\Response\FriendsReply.cs" />

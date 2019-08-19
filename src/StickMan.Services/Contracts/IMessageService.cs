@@ -11,7 +11,7 @@ namespace StickMan.Services.Contracts
 
 		IEnumerable<TimelineModel> GetTimeline(int userId, int page, int size);
 
-		void ReadMessage(int id);
+        void ReadMessage(int id);
 
 		void CleanUpMessages();
 	}

@@ -23,6 +23,21 @@
           <Property Name="Likes" Type="int" />
           <Property Name="IsLike" Type="bit" Nullable="false" />
         </EntityType>
+        <EntityType Name="Notification">
+          <Key>
+            <PropertyRef Name="NotificationId" />
+          </Key>
+          <Property Name="NotificationId" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="PostId" Type="int" Nullable="false" />
+          <Property Name="Type" Type="int" Nullable="false" />
+          <Property Name="SenderId" Type="int" Nullable="false" />
+          <Property Name="RecieverId" Type="int" Nullable="false" />
+          <Property Name="Message" Type="varchar(max)" Nullable="false" />
+          <Property Name="Title" Type="varchar(max)" Nullable="false" />
+          <Property Name="ReadStatus" Type="bit" Nullable="false" />
+          <Property Name="DeleteStatus" Type="bit" Nullable="false" />
+          <Property Name="NotifacationTime" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="PostUser">
           <Key>
             <PropertyRef Name="Id" />
@@ -220,19 +235,7 @@
           <Property Name="CreatedAt" Type="datetime" Nullable="false" />
           <Property Name="Data" Type="nvarchar(max)" />
         </EntityType>
-        <Association Name="FK__PostUser__Create__6C190EBB">
-          <End Role="StickMan_Users" Type="Self.StickMan_Users" Multiplicity="1" />
-          <End Role="PostUser" Type="Self.PostUser" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="StickMan_Users">
-              <PropertyRef Name="UserID" />
-            </Principal>
-            <Dependent Role="PostUser">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__PostUser__PostId__6D0D32F4">
+        <Association Name="FK__PostUser__PostId__5812160E">
           <End Role="StickMan_Users_Cast_AudioData_UploadInformation" Type="Self.StickMan_Users_Cast_AudioData_UploadInformation" Multiplicity="1" />
           <End Role="PostUser" Type="Self.PostUser" Multiplicity="*" />
           <ReferentialConstraint>
@@ -241,6 +244,18 @@
             </Principal>
             <Dependent Role="PostUser">
               <PropertyRef Name="PostId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__PostUser__UserId__571DF1D5">
+          <End Role="StickMan_Users" Type="Self.StickMan_Users" Multiplicity="1" />
+          <End Role="PostUser" Type="Self.PostUser" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StickMan_Users">
+              <PropertyRef Name="UserID" />
+            </Principal>
+            <Dependent Role="PostUser">
+              <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -455,6 +470,7 @@
         <EntityContainer Name="StickManDbModelStoreContainer">
           <EntitySet Name="CastMessageListeners" EntityType="Self.CastMessageListeners" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="LikePost" EntityType="Self.LikePost" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Notification" EntityType="Self.Notification" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PostUser" EntityType="Self.PostUser" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StickMan_FriendRequest" EntityType="Self.StickMan_FriendRequest" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StickMan_Users" EntityType="Self.StickMan_Users" Schema="dbo" store:Type="Tables" />
@@ -474,12 +490,12 @@
           <EntitySet Name="Server" EntityType="Self.Server" Schema="HangFire" store:Type="Tables" />
           <EntitySet Name="Set" EntityType="Self.Set" Schema="HangFire" store:Type="Tables" />
           <EntitySet Name="State" EntityType="Self.State" Schema="HangFire" store:Type="Tables" />
-          <AssociationSet Name="FK__PostUser__Create__6C190EBB" Association="Self.FK__PostUser__Create__6C190EBB">
-            <End Role="StickMan_Users" EntitySet="StickMan_Users" />
+          <AssociationSet Name="FK__PostUser__PostId__5812160E" Association="Self.FK__PostUser__PostId__5812160E">
+            <End Role="StickMan_Users_Cast_AudioData_UploadInformation" EntitySet="StickMan_Users_Cast_AudioData_UploadInformation" />
             <End Role="PostUser" EntitySet="PostUser" />
           </AssociationSet>
-          <AssociationSet Name="FK__PostUser__PostId__6D0D32F4" Association="Self.FK__PostUser__PostId__6D0D32F4">
-            <End Role="StickMan_Users_Cast_AudioData_UploadInformation" EntitySet="StickMan_Users_Cast_AudioData_UploadInformation" />
+          <AssociationSet Name="FK__PostUser__UserId__571DF1D5" Association="Self.FK__PostUser__UserId__571DF1D5">
+            <End Role="StickMan_Users" EntitySet="StickMan_Users" />
             <End Role="PostUser" EntitySet="PostUser" />
           </AssociationSet>
           <AssociationSet Name="FK_Cast" Association="Self.FK_Cast">
@@ -730,6 +746,7 @@
             <End Role="Job" EntitySet="Jobs" />
             <End Role="State" EntitySet="States" />
           </AssociationSet>
+          <EntitySet Name="Notifications" EntityType="StickManDbModel.Notification" />
         </EntityContainer>
         <ComplexType Name="spAndroidLogin_Result">
           <Property Type="Int32" Name="UserID" Nullable="false" />
@@ -1111,6 +1128,21 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Notification">
+          <Key>
+            <PropertyRef Name="NotificationId" />
+          </Key>
+          <Property Name="NotificationId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PostId" Type="Int32" Nullable="false" />
+          <Property Name="Type" Type="Int32" Nullable="false" />
+          <Property Name="Message" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Title" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="ReadStatus" Type="Boolean" Nullable="false" />
+          <Property Name="DeleteStatus" Type="Boolean" Nullable="false" />
+          <Property Name="NotifacationTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="SenderId" Type="Int32" Nullable="false" />
+          <Property Name="RecieverId" Type="Int32" Nullable="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1542,6 +1574,22 @@
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="JobId" ColumnName="JobId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Notifications">
+            <EntityTypeMapping TypeName="StickManDbModel.Notification">
+              <MappingFragment StoreEntitySet="Notification">
+                <ScalarProperty Name="RecieverId" ColumnName="RecieverId" />
+                <ScalarProperty Name="SenderId" ColumnName="SenderId" />
+                <ScalarProperty Name="NotifacationTime" ColumnName="NotifacationTime" />
+                <ScalarProperty Name="DeleteStatus" ColumnName="DeleteStatus" />
+                <ScalarProperty Name="ReadStatus" ColumnName="ReadStatus" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Message" ColumnName="Message" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="PostId" ColumnName="PostId" />
+                <ScalarProperty Name="NotificationId" ColumnName="NotificationId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

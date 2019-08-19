@@ -47,6 +47,7 @@ namespace StickMan.Database
         public virtual DbSet<Server> Servers { get; set; }
         public virtual DbSet<Set> Sets { get; set; }
         public virtual DbSet<State> States { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
     
         public virtual int sp_alterdiagram(string diagramname, Nullable<int> owner_id, Nullable<int> version, byte[] definition)
         {

@@ -6,6 +6,7 @@ using Hangfire;
 using StickMan.Services.Contracts;
 using StickMan.Services.Exceptions;
 using StickMan.Services.Models.Message;
+using StickMan.Services.Models.Push;
 using StickManWebAPI.Models;
 using StickManWebAPI.Models.Request;
 using StickManWebAPI.Models.Response;
@@ -18,22 +19,25 @@ namespace StickManWebAPI.Controllers
 		private readonly ISessionService _sessionService;
 		private readonly IFileService _fileService;
 		private readonly IPushNotificationService _pushNotificationService;
+        private readonly INotificationService _notificationService;
 
-		public CastController(ICastMessageService castMessageService, ISessionService sessionService, IFileService fileService, IPushNotificationService pushNotificationService)
+        public CastController(ICastMessageService castMessageService, ISessionService sessionService, IFileService fileService, IPushNotificationService pushNotificationService, INotificationService notificationService)
 		{
 			_castMessageService = castMessageService;
 			_sessionService = sessionService;
 			_fileService = fileService;
 			_pushNotificationService = pushNotificationService;
+            _notificationService = notificationService;
 		}
 
 		[HttpGet]
 		public IEnumerable<CastMessage> Get([FromUri]CastPaginationModel pagination)
 		{
-			var messages = _castMessageService.GetMessages(pagination.PageNumber, pagination.PageSize, pagination.UserId);
-
-			return messages;
-		}
+            if (pagination.PostId.HasValue) {
+               return _castMessageService.GetMessages(pagination.PageNumber, pagination.PageSize, pagination.UserId,pagination.PostId.Value);
+            }
+            return _castMessageService.GetMessages(pagination.PageNumber, pagination.PageSize, pagination.UserId);
+        }
 
 		[HttpGet]
 		public IEnumerable<CastMessage> Search([FromUri]CastSearchModel model, string term)
@@ -129,7 +133,7 @@ namespace StickManWebAPI.Controllers
         public LikePostReply LikePost(int castMessageId, int userId)
         {
             var likeCount = _castMessageService.LikeMessage(castMessageId, userId);
-
+            _notificationService.SaveCastNotification(userId, castMessageId, NotificationType.Like);
             return new LikePostReply
             {
                 LikePostCount = likeCount
@@ -141,7 +145,7 @@ namespace StickManWebAPI.Controllers
         public DislikePostReply DislikePost(int castMessageId, int userId)
         {
             var likeCount = _castMessageService.DislikeMessage(castMessageId, userId);
-
+            _notificationService.SaveCastNotification(userId, castMessageId, NotificationType.DisLike);
             return new DislikePostReply
             {
                 DislikePostCount = likeCount
@@ -161,7 +165,7 @@ namespace StickManWebAPI.Controllers
             }
 
             var castMessage = _castMessageService.Repost(model.UserId, model.CastMessageId, model.Comment);
-
+            _notificationService.SaveCastNotification(model.UserId, model.CastMessageId, NotificationType.Repost);
             return new SendCastMessageReply(HttpStatusCode.OK, "Repost message clicked")
             {
                 CastMessageId = castMessage.MessageInfo.Id
@@ -191,7 +195,7 @@ namespace StickManWebAPI.Controllers
 
             var castMessage = _castMessageService.Save(model.FileName, model.UserId, message.Title, model.CastMessageId);
             var repost = _castMessageService.Repost(model.UserId, castMessage.MessageInfo.Id, model.Comment, model.CastMessageId);
-
+            _notificationService.SaveCastNotification(model.UserId, model.CastMessageId, NotificationType.Replay);
             return new SendCastMessageReply(HttpStatusCode.OK, model.FileName)
             {
                 CastMessageId = castMessage.MessageInfo.Id

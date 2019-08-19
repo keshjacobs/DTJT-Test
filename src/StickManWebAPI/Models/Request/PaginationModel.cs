@@ -1,4 +1,6 @@
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 
 namespace StickManWebAPI.Models.Request
 {
@@ -24,5 +26,9 @@ namespace StickManWebAPI.Models.Request
 		[Required]
 		[Range(1, int.MaxValue)]
 		public int UserId { get; set; }
-	}
+
+        [Range(1, int.MaxValue)]
+        public Nullable<int> PostId { get; set; }
+
+    }
 }

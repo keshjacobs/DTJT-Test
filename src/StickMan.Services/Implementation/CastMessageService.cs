@@ -67,7 +67,7 @@ namespace StickMan.Services.Implementation
 			return castMessage.ClickCount.GetValueOrDefault();
 		}
 
-		public IEnumerable<CastMessage> GetMessages(int page, int size, int currentUserId)
+		public IEnumerable<CastMessage> GetMessages(int page, int size, int currentUserId,int posId=-1)
 		{
 			var messages = _unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>()
 				.GetQueryAll()
@@ -75,7 +75,12 @@ namespace StickMan.Services.Implementation
 				.Skip(page * size)
 				.Take(size)
 				.ToList();
-
+            if (posId != -1 && !messages.Any(c=>c.Id==posId)) {
+                var message = _unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().GetFirstOrDefault(c => c.Id == posId);
+                if(message != null) {
+                    messages.Add(message);
+                }                    
+            }
 			var userIds = messages.Select(i => i.UserID).Distinct();
 			var users = _unitOfWork.Repository<StickMan_Users>().Get(u => userIds.Any(m => m == u.UserID)).ToList();
 			var castMessages = GetMergedMessagesInfo(messages, users, currentUserId);
@@ -175,9 +180,12 @@ namespace StickMan.Services.Implementation
                     if (repliedMessage != null)
                     {
                         var originalUser = users.FirstOrDefault(u => u.UserID == repliedMessage.UserID);
-                        message.MessageInfo.Description = string.Format("{0} replied {1}'s post", user.UserName, originalUser.UserName);
-                        message.MessageInfo.OriginalMessageInfo = CreateCastMessage(repliedMessage, originalUser.UserID);
-                        FillUserInfo(originalUser, message.MessageInfo.OriginalMessageInfo);
+                        if (originalUser != null)
+                        {
+                            message.MessageInfo.Description = string.Format("{0} replied {1}'s post", user.UserName, originalUser.UserName);
+                            message.MessageInfo.OriginalMessageInfo = CreateCastMessage(repliedMessage, originalUser.UserID);
+                            FillUserInfo(originalUser, message.MessageInfo.OriginalMessageInfo);
+                        }
                     }
                 }
 

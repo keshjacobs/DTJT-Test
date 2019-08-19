@@ -12,13 +12,17 @@ namespace StickManWebAPI.Controllers
 		private readonly ISessionService _sessionService;
 		private readonly IFriendRequestService _friendRequestService;
 		private readonly IMessageService _messageService;
+        private readonly INotificationService _notificationService;
 
-		public ActionBarController(ISessionService sessionService, IFriendRequestService friendRequestService, IMessageService messageService)
+
+        public ActionBarController(ISessionService sessionService, IFriendRequestService friendRequestService, IMessageService messageService,INotificationService notificationService)
 		{
 			_sessionService = sessionService;
 			_friendRequestService = friendRequestService;
 			_messageService = messageService;
-		}
+            _notificationService = notificationService;
+
+        }
 
 		[HttpGet]
 		public Reply Get([FromUri]SessionData session)
@@ -39,7 +43,8 @@ namespace StickManWebAPI.Controllers
 			return new ActionBarInfo
 			{
 				UnansweredFriendRequests = _friendRequestService.GetUnansweredCount(session.UserId),
-				UnreadMessages = _messageService.GetUnreadMessagesCount(session.UserId)
+				UnreadMessages = _messageService.GetUnreadMessagesCount(session.UserId),
+                UnreadNotification=_notificationService.GetUnreadNotificationCount(session.UserId)
 			};
 		}
 	}

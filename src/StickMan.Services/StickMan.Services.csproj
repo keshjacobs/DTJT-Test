@@ -78,13 +78,16 @@
     <Compile Include="Contracts\IAccountService.cs" />
     <Compile Include="Contracts\IFriendRequestService.cs" />
     <Compile Include="Contracts\IMessageConverter.cs" />
+    <Compile Include="Contracts\INotificationService.cs" />
     <Compile Include="Exceptions\AuthenticationException.cs" />
     <Compile Include="Implementation\AccountService.cs" />
     <Compile Include="Implementation\FriendRequestService.cs" />
     <Compile Include="Implementation\MessageConverter.cs" />
+    <Compile Include="Implementation\NotificationService.cs" />
     <Compile Include="Models\FriendRequestDto.cs" />
     <Compile Include="Models\FriendRequestSendStatus.cs" />
     <Compile Include="Models\Message\JustSentMessage.cs" />
+    <Compile Include="Models\Notification\NotificationTimeline.cs" />
     <Compile Include="Models\Push\NotificationType.cs" />
     <Compile Include="Models\SendFriendRequestResultDto.cs" />
     <Compile Include="Extensions\TimeSpanExtensions.cs" />

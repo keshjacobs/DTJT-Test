@@ -81,6 +81,9 @@
     <Compile Include="List.cs">
       <DependentUpon>DatabaseEntities.tt</DependentUpon>
     </Compile>
+    <Compile Include="Notification.cs">
+      <DependentUpon>DatabaseEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="PostUser.cs">
       <DependentUpon>DatabaseEntities.tt</DependentUpon>
     </Compile>

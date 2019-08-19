@@ -10,7 +10,7 @@ namespace StickMan.Services.Contracts
 
 		int ReadMessage(int castMessageId, int currentUserId);
 
-		IEnumerable<CastMessage> GetMessages(int page, int size, int currentUserId);
+		IEnumerable<CastMessage> GetMessages(int page, int size, int currentUserId,int postId=-1);
 
 		IEnumerable<CastMessage> Search(string term, int currentUserId);
 

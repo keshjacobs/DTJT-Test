@@ -71,6 +71,9 @@ namespace StickMan.Services.Implementation
                 case NotificationType.Like:
                     message = $"{sender.FullName} Like your Cast {castMessage.Title}.";
                     break;
+                case NotificationType.DisLike:
+                    message = $"{sender.FullName} Dislike your Cast {castMessage.Title}.";
+                    break;
                 default:
                     message = $"{sender.FullName} Push Notification.";
                     break;

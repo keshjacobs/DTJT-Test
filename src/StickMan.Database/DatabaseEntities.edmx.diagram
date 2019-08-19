@@ -32,6 +32,7 @@
         <EntityTypeShape EntityType="StickManDbModel.State" Width="1.5" PointX="11" PointY="7.125" />
         <AssociationConnector Association="StickManDbModel.FK_HangFire_JobParameter_Job" />
         <AssociationConnector Association="StickManDbModel.FK_HangFire_State_Job" />
+        <EntityTypeShape EntityType="StickManDbModel.Notification" Width="1.5" PointX="7.375" PointY="11.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
