@@ -154,7 +154,7 @@ namespace StickMan.Services.Implementation
                 }
 
                 message.MessageInfo.Type = "repost";
-                message.MessageInfo.Description = string.Format("{0} reposted {1}'s post", user.UserName, originalUser.UserName);
+                message.MessageInfo.Description = string.Format("{0} reposted {1}'s post", user?.UserName, originalUser?.UserName);
                 castMessages.Add(message);
             }
 
