@@ -55,6 +55,22 @@ namespace StickManWebAPI.Controllers
 			return messages;
 		}
 
+		[HttpGet]
+		public IEnumerable<CastMessage> GetReplies([FromUri] SearchReplyModel model, int postId)
+		{
+			if (model == null)
+			{
+				model = new SearchReplyModel
+				{
+					OrginalPostId = postId
+				};
+			}
+
+			var messages = _castMessageService.Replies(model.OrginalPostId, model.UserId);
+
+			return messages;
+		}
+
 		[HttpPost]
 		public Reply Send(CastMessageToUpload message)
 		{

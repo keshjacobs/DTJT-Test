@@ -14,6 +14,8 @@ namespace StickMan.Services.Contracts
 
 		IEnumerable<CastMessage> Search(string term, int currentUserId);
 
+		IEnumerable<CastMessage> Replies(int postId, int currentUserId);
+
 		string ChangeTitle(int userId, int castId, string newTitle);
 
         int LikeMessage(int castMessageId, int userId);

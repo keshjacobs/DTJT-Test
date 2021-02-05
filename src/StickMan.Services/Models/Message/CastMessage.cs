@@ -24,7 +24,9 @@ namespace StickMan.Services.Models.Message
 
         public int Dislikes { get; set; }
 
-        public int Replied { get; set; }
+		public int Replies { get; set; }
+
+		public int Replied { get; set; }
 
         public int Reposted { get; set; }
 

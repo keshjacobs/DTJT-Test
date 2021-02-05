@@ -70,7 +70,8 @@ namespace StickMan.Services.Implementation
 		public IEnumerable<CastMessage> GetMessages(int page, int size, int currentUserId,int posId=-1)
 		{
 			var messages = _unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>()
-				.GetQueryAll()
+				//.GetQuery(c=> !c.ReplyPostId.HasValue || c.ReplyPostId==0)
+                .GetAll()
 				.OrderByDescending(u => u.UploadTime)
 				.Skip(page * size)
 				.Take(size)
@@ -83,12 +84,60 @@ namespace StickMan.Services.Implementation
             }
 			var userIds = messages.Select(i => i.UserID).Distinct();
 			var users = _unitOfWork.Repository<StickMan_Users>().Get(u => userIds.Any(m => m == u.UserID)).ToList();
-			var castMessages = GetMergedMessagesInfo(messages, users, currentUserId);
+            //var replies = _unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().Count(u => u.ReplyPostId==));
+            var castMessages = GetMergedMessagesInfo(messages, users, currentUserId);
 
 			return castMessages;
 		}
+        public IEnumerable<CastMessage> Replies(int postId, int currentUserId) {
 
-		public IEnumerable<CastMessage> Search(string term, int currentUserId)
+            var messages = _unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>()
+                .GetQuery(m => (m.ReplyPostId== postId))
+                .OrderByDescending(m => m.ClickCount)
+                .ToList();
+            var castMessages = new List<CastMessage>();
+            var userIds = messages.Select(i => i.UserID).Distinct();
+            var users = _unitOfWork.Repository<StickMan_Users>().Get(u => userIds.Any(m => m == u.UserID)).ToList();
+
+            foreach (var uploadInfo in messages)
+            {
+                var user = users.FirstOrDefault(u => u.UserID == uploadInfo.UserID);
+
+                var message = CreateCastMessage(uploadInfo, currentUserId);
+                if (user != null)
+                {
+                    FillUserInfo(user, message);
+                }
+                else
+                {
+                    user = _unitOfWork.Repository<StickMan_Users>().GetSingle(u => u.UserID == uploadInfo.UserID);
+                    FillUserInfo(user, message);
+                }
+
+                if (uploadInfo.ReplyPostId != null && uploadInfo.ReplyPostId > 0)
+                {
+                    message.MessageInfo.Type = "reply";
+                    var repliedMessage = _unitOfWork.Repository<StickMan_Users_Cast_AudioData_UploadInformation>().GetQuery(s => s.Id == uploadInfo.ReplyPostId).FirstOrDefault();
+                    if (repliedMessage != null)
+                    {
+                        var originalUser = users.FirstOrDefault(u => u.UserID == repliedMessage.UserID);
+                        if (originalUser != null)
+                        {
+                            message.MessageInfo.Description = string.Format("{0} replied {1}'s post", user.UserName, originalUser.UserName);
+                            message.MessageInfo.OriginalMessageInfo = CreateCastMessage(repliedMessage, originalUser.UserID);
+                            FillUserInfo(originalUser, message.MessageInfo.OriginalMessageInfo);
+                        }
+                    }
+                }
+
+                castMessages.Add(message);
+            }
+
+            return castMessages.OrderByDescending(u => u.MessageInfo.UploadTime); 
+        }
+
+
+        public IEnumerable<CastMessage> Search(string term, int currentUserId)
 		{
 			var users = _unitOfWork.Repository<StickMan_Users>()
 				.Get(u => u.UserName.Contains(term) || u.FullName.Contains(term))

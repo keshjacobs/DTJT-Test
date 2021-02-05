@@ -204,6 +204,7 @@
     <Compile Include="Models\RepostModel.cs" />
     <Compile Include="Models\Request\FriendData.cs" />
     <Compile Include="Models\Request\FriendRequestData.cs" />
+    <Compile Include="Models\Request\SearchReplyModel.cs" />
     <Compile Include="Models\Request\SearchUserData.cs" />
     <Compile Include="Models\ResetPasswordModel.cs" />
     <Compile Include="Models\Response\UnReadCount.cs" />
